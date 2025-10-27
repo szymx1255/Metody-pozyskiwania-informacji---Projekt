@@ -1,14 +1,6 @@
-#!/usr/bin/env python3
-"""Fetch hourly weather for a set of mountains every hour and store into SQLite.
 
-API: https://api.open-meteo.com/v1/forecast
-Requested params: past_days=31, forecast_days=3, hourly=temperature_2m,rain,snowfall,wind_speed_10m,weather_code,wind_direction_10m,uv_index
-
-This script stores raw JSON and normalized hourly rows in `data/meteodata.db`.
-"""
 
 import argparse
-import json
 import os
 import signal
 import sqlite3
@@ -21,7 +13,6 @@ import requests
 
 # DB file
 DB_PATH = Path("data/meteodata.db")
-RAW_DIR = Path("data/raw")
 
 # API config
 API_URL = "https://api.open-meteo.com/v1/forecast"
@@ -40,6 +31,15 @@ LOCATIONS = [
     {"name": "Zugspitze", "latitude": 47.4212, "longitude": 10.9863, "elevation_m": 2962},
 ]
 
+MINUTELY_15_VARS = ",".join([
+    "temperature_2m",
+    "wind_speed_10m",
+    "rain",
+    "snowfall",
+    "wind_direction_10m",
+    "weather_code",
+])
+
 DEFAULT_PARAMS = {
     "hourly": ",".join([
         "temperature_2m",
@@ -50,15 +50,28 @@ DEFAULT_PARAMS = {
         "wind_direction_10m",
         "uv_index",
     ]),
-    "past_days": 31,
+    # zmienione dla minutely_15: krótszy zakres historii (7 dni)
+    "past_days": 7,
     "forecast_days": 3,
     "timezone": "UTC",
+    # dołącz parametry 15-minutowe
+    "minutely_15": MINUTELY_15_VARS,
 }
+
+# Support for 15-minute resolution variables (minutely_15)
+MINUTELY_15_VARS = ",".join([
+    "temperature_2m",
+    "wind_speed_10m",
+    "rain",
+    "snowfall",
+    "wind_direction_10m",
+    "weather_code",
+])
 
 
 def ensure_dirs():
+    # Utwórz katalog (data/) jeśli nie istnieje
     DB_PATH.parent.mkdir(parents=True, exist_ok=True)
-    RAW_DIR.mkdir(parents=True, exist_ok=True)
 
 
 def init_db(conn: sqlite3.Connection):
@@ -93,6 +106,28 @@ def init_db(conn: sqlite3.Connection):
         """
     )
     conn.commit()
+    # PL: Zainicjalizuj tabele w bazie danych: locations i hourly.
+    # Tabela `hourly` ma unikalny klucz (location_id, timestamp),
+    # co ułatwia pomijanie duplikatów przy wstawianiu.
+    # Dodaj tabelę na dane 15-minutowe (minutely_15)
+    cur.execute(
+        """
+        CREATE TABLE IF NOT EXISTS minutely15 (
+            id INTEGER PRIMARY KEY,
+            location_id INTEGER NOT NULL,
+            timestamp TEXT NOT NULL,
+            temperature REAL,
+            wind_speed REAL,
+            rain REAL,
+            snowfall REAL,
+            wind_direction REAL,
+            weather_code INTEGER,
+            UNIQUE(location_id, timestamp),
+            FOREIGN KEY(location_id) REFERENCES locations(id)
+        )
+        """
+    )
+    conn.commit()
 
 
 def insert_or_get_location(conn: sqlite3.Connection, loc: dict) -> int:
@@ -107,24 +142,26 @@ def insert_or_get_location(conn: sqlite3.Connection, loc: dict) -> int:
     )
     conn.commit()
     return cur.lastrowid
+    # PL: Jeśli lokalizacja istnieje, zwróć jej id, w przeciwnym razie dodaj nowy rekord.
 
 
-def fetch_location(location: dict) -> dict:
+def fetch_location(location: dict, extra_params: dict | None = None) -> dict:
     params = {
         "latitude": location["latitude"],
         "longitude": location["longitude"],
         **DEFAULT_PARAMS,
     }
+    if extra_params:
+        params.update(extra_params)
+    # PL: Wykonaj zapytanie HTTP do API Open-Meteo
     print(f"[HTTP] Fetching {location['name']} ({location['latitude']},{location['longitude']})")
     r = requests.get(API_URL, params=params, timeout=TIMEOUT)
     r.raise_for_status()
     payload = r.json()
-    # save raw JSON for audit
-    fname = RAW_DIR / f"{location['name'].replace(' ', '_')}_{datetime.utcnow().strftime('%Y%m%d_%H%M%S')}.json"
-    with open(fname, "w", encoding="utf-8") as f:
-        json.dump(payload, f, ensure_ascii=False, indent=2)
-    print(f"[FILE] saved raw response: {fname}")
+    # PL: Nie zapisujemy surowych JSONów na dysk — wystarczy zapis do SQLite
     return payload
+
+    # PL: Payload zawiera pola 'hourly' z tablicami czasów i wartości.
 
 
 def store_hourly(conn: sqlite3.Connection, location_id: int, location_name: str, payload: dict) -> int:
@@ -145,8 +182,17 @@ def store_hourly(conn: sqlite3.Connection, location_id: int, location_name: str,
     wind_dirs = get_arr("wind_direction_10m")
     uvs = get_arr("uv_index")
 
+    # PL: Znajdź najnowszy zapisany timestamp dla lokalizacji, aby nie duplikować
+    cur = conn.cursor()
+    cur.execute("SELECT MAX(timestamp) FROM hourly WHERE location_id=?", (location_id,))
+    r = cur.fetchone()
+    max_ts = r[0] if r and r[0] is not None else None
+
     rows = []
     for i, t in enumerate(times):
+        # PL: Pomiń godziny które już mamy w bazie (<= max_ts)
+        if max_ts is not None and t <= max_ts:
+            continue
         rows.append(
             (
                 location_id,
@@ -161,12 +207,69 @@ def store_hourly(conn: sqlite3.Connection, location_id: int, location_name: str,
             )
         )
 
-    cur = conn.cursor()
+    # cur already defined above when checking max_ts
     cur.executemany(
         """
         INSERT OR REPLACE INTO hourly
             (location_id, timestamp, temperature, rain, snowfall, wind_speed, weather_code, wind_direction, uv_index)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """,
+        rows,
+    )
+    conn.commit()
+    return len(rows)
+    # PL: Zwracamy liczbę wstawionych/ zaktualizowanych wierszy godzinowych.
+
+
+def store_minutely15(conn: sqlite3.Connection, location_id: int, location_name: str, payload: dict) -> int:
+    """Zapisz dane 15-minutowe z pola 'minutely_15' (jeśli obecne).
+
+    PL: Funkcja filtruje już zapisane timestampy (MAX per location) i wstawia tylko nowe.
+    """
+    minutely = payload.get("minutely_15") or {}
+    times = minutely.get("time", [])
+    if not times:
+        # brak minutely_15 w odpowiedzi
+        return 0
+
+    def get_arr(name):
+        return minutely.get(name, [])
+
+    temps = get_arr("temperature_2m")
+    wind_speeds = get_arr("wind_speed_10m")
+    rains = get_arr("rain")
+    snows = get_arr("snowfall")
+    wind_dirs = get_arr("wind_direction_10m")
+    weather_codes = get_arr("weather_code") or get_arr("weathercode")
+
+    # unikaj duplikatów: pobierz maksymalny timestamp dla tej lokalizacji
+    cur = conn.cursor()
+    cur.execute("SELECT MAX(timestamp) FROM minutely15 WHERE location_id=?", (location_id,))
+    r = cur.fetchone()
+    max_ts = r[0] if r and r[0] is not None else None
+
+    rows = []
+    for i, t in enumerate(times):
+        if max_ts is not None and t <= max_ts:
+            continue
+        rows.append(
+            (
+                location_id,
+                t,
+                temps[i] if i < len(temps) else None,
+                wind_speeds[i] if i < len(wind_speeds) else None,
+                rains[i] if i < len(rains) else None,
+                snows[i] if i < len(snows) else None,
+                wind_dirs[i] if i < len(wind_dirs) else None,
+                weather_codes[i] if i < len(weather_codes) else None,
+            )
+        )
+
+    cur.executemany(
+        """
+        INSERT OR REPLACE INTO minutely15
+            (location_id, timestamp, temperature, wind_speed, rain, snowfall, wind_direction, weather_code)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
         """,
         rows,
     )
@@ -182,10 +285,34 @@ def fetch_and_store_all(db_path: Path):
     for loc in LOCATIONS:
         try:
             loc_id = insert_or_get_location(conn, loc)
-            payload = fetch_location(loc)
-            inserted = store_hourly(conn, loc_id, loc["name"], payload)
-            total_inserted += inserted
-            print(f"[DB] {loc['name']}: inserted/updated {inserted} hourly rows (location_id={loc_id})")
+
+            # check latest stored timestamp for this location
+            cur = conn.cursor()
+            cur.execute("SELECT MAX(timestamp) FROM hourly WHERE location_id=?", (loc_id,))
+            r = cur.fetchone()
+            max_ts = r[0] if r and r[0] is not None else None
+
+            # PL: Jeśli mamy już dane do aktualnej godziny, pomiń pobieranie dla tej lokalizacji
+            if max_ts is not None:
+                now = datetime.utcnow()
+                current_hour_iso = now.replace(minute=0, second=0, microsecond=0).isoformat()
+                if max_ts >= current_hour_iso:
+                    print(f"[SKIP] {loc['name']} is up-to-date (max_ts={max_ts})")
+                    continue
+
+            # request starting from the last stored date to reduce download size
+            extra = None
+            if max_ts is not None:
+                # API accepts start_date as YYYY-MM-DD; this will reduce the fetched window.
+                extra = {"start_date": max_ts.split("T")[0]}
+
+            # PL: Pobierz nowe dane (od start_date jeśli było max_ts)
+            payload = fetch_location(loc, extra_params=extra)
+            # store both hourly and 15-minute (if present)
+            inserted_h = store_hourly(conn, loc_id, loc["name"], payload)
+            inserted_m = store_minutely15(conn, loc_id, loc["name"], payload)
+            total_inserted += (inserted_h + inserted_m)
+            print(f"[DB] {loc['name']}: hourly={inserted_h} rows, minutely15={inserted_m} rows (location_id={loc_id})")
         except Exception as e:
             print(f"[ERROR] Failed for {loc['name']}: {e}")
             # continue with next location
@@ -200,6 +327,7 @@ def _install_signal_handlers(stop_event: threading.Event):
 
     signal.signal(signal.SIGINT, _handler)
     signal.signal(signal.SIGTERM, _handler)
+    # PL: Reaguj na SIGINT i SIGTERM i ustaw stop_event aby przerwać pętlę po bieżącej iteracji.
 
 
 def main():
@@ -211,6 +339,7 @@ def main():
     stop_event = threading.Event()
     _install_signal_handlers(stop_event)
 
+    # PL: Flaga --once pozwala na jednorazowe uruchomienie (przydatne do testów)
     if args.once:
         print("[RUN] single run (--once)")
         inserted = fetch_and_store_all(Path(args.db))
