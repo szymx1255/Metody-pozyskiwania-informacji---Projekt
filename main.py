@@ -1,211 +1,201 @@
-import datetime
+#!/usr/bin/env python3
+"""Fetch hourly weather for a set of mountains every hour and store into SQLite.
+
+API: https://api.open-meteo.com/v1/forecast
+Requested params: past_days=31, forecast_days=3, hourly=temperature_2m,rain,snowfall,wind_speed_10m,weather_code,wind_direction_10m,uv_index
+
+This script stores raw JSON and normalized hourly rows in `data/meteodata.db`.
+"""
+
+import argparse
 import json
+import os
 import signal
+import sqlite3
 import threading
 import time
+from datetime import datetime
+from pathlib import Path
 
-import openmeteo_requests
-import pandas as pd
-import requests_cache
-from retry_requests import retry
+import requests
 
-import db
+# DB file
+DB_PATH = Path("data/meteodata.db")
+RAW_DIR = Path("data/raw")
 
-# path to sqlite DB
-DB_PATH = "data/meteodata.db"
+# API config
+API_URL = "https://api.open-meteo.com/v1/forecast"
+TIMEOUT = 30
 
-# fetch interval in seconds (1 hour)
-INTERVAL_SECONDS = 60 * 60
+# Coordinates/order taken from your provided API URL (8 locations)
+# Map index -> mountain name taken from your screenshot (order aligns with coords below)
+LOCATIONS = [
+    {"name": "Grossglockner", "latitude": 47.0744, "longitude": 12.6940, "elevation_m": 3798},
+    {"name": "Täschhorn", "latitude": 46.0834, "longitude": 7.8572, "elevation_m": 4491},
+    {"name": "Zumsteinspitze", "latitude": 45.9322, "longitude": 7.8714, "elevation_m": 4563},
+    {"name": "Dufourspitze", "latitude": 45.9369, "longitude": 7.8668, "elevation_m": 4634},
+    {"name": "Mont Blanc", "latitude": 45.8330, "longitude": 6.8640, "elevation_m": 4806},
+    {"name": "Matterhorn", "latitude": 45.9764, "longitude": 7.6586, "elevation_m": 4478},
+    {"name": "Tryglaw", "latitude": 46.3782, "longitude": 13.8367, "elevation_m": 2864},
+    {"name": "Zugspitze", "latitude": 47.4212, "longitude": 10.9863, "elevation_m": 2962},
+]
 
-# Setup the Open-Meteo API client with cache and retry on error
-cache_session = requests_cache.CachedSession('.cache', expire_after=3600)
-retry_session = retry(cache_session, retries=5, backoff_factor=0.2)
-openmeteo = openmeteo_requests.Client(session=retry_session)
-
-
-# Make sure all required weather variables are listed here
-# The order of variables in hourly or daily is important to assign them correctly below
-URL = "https://api.open-meteo.com/v1/forecast"
-PARAMS = {
-    "latitude": [45.833, 45.9167, 45.9764, 45.9369, 45.9322, 46.1013, 46.0834, 47.0744, 47.4212, 46.3782],
-    "longitude": [6.864, 6.9167, 7.6586, 7.8668, 7.8714, 7.7161, 7.8572, 12.694, 10.9863, 13.8367],
-    "daily": [
-        "temperature_2m_max",
-        "temperature_2m_min",
-        "sunrise",
-        "sunset",
-        "uv_index_max",
-        "precipitation_hours",
-    ],
-    "hourly": [
+DEFAULT_PARAMS = {
+    "hourly": ",".join([
         "temperature_2m",
         "rain",
-        "showers",
         "snowfall",
-        "snow_depth",
-        "precipitation_probability",
-        "visibility",
-        "relative_humidity_2m",
         "wind_speed_10m",
-        "wind_speed_80m",
-        "wind_speed_120m",
-        "wind_speed_180m",
-    ],
+        "weather_code",
+        "wind_direction_10m",
+        "uv_index",
+    ]),
+    "past_days": 31,
+    "forecast_days": 3,
+    "timezone": "UTC",
 }
 
 
-def _val(v):
-    """Convert pandas/np types to native python or None."""
-    try:
-        if pd.isna(v):
-            return None
-    except Exception:
-        pass
-    try:
-        return float(v)
-    except Exception:
-        return v
+def ensure_dirs():
+    DB_PATH.parent.mkdir(parents=True, exist_ok=True)
+    RAW_DIR.mkdir(parents=True, exist_ok=True)
 
 
-def fetch_and_store_once():
-    """Fetch current data from Open-Meteo and store locations/hourly/daily into DB."""
-    responses = openmeteo.weather_api(URL, params=PARAMS)
+def init_db(conn: sqlite3.Connection):
+    cur = conn.cursor()
+    cur.execute(
+        """
+        CREATE TABLE IF NOT EXISTS locations (
+            id INTEGER PRIMARY KEY,
+            name TEXT UNIQUE,
+            latitude REAL,
+            longitude REAL,
+            elevation_m REAL
+        )
+        """
+    )
+    cur.execute(
+        """
+        CREATE TABLE IF NOT EXISTS hourly (
+            id INTEGER PRIMARY KEY,
+            location_id INTEGER NOT NULL,
+            timestamp TEXT NOT NULL,
+            temperature REAL,
+            rain REAL,
+            snowfall REAL,
+            wind_speed REAL,
+            weather_code INTEGER,
+            wind_direction REAL,
+            uv_index REAL,
+            UNIQUE(location_id, timestamp),
+            FOREIGN KEY(location_id) REFERENCES locations(id)
+        )
+        """
+    )
+    conn.commit()
 
-    for response in responses:
+
+def insert_or_get_location(conn: sqlite3.Connection, loc: dict) -> int:
+    cur = conn.cursor()
+    cur.execute("SELECT id FROM locations WHERE name=?", (loc["name"],))
+    row = cur.fetchone()
+    if row:
+        return row[0]
+    cur.execute(
+        "INSERT INTO locations (name, latitude, longitude, elevation_m) VALUES (?, ?, ?, ?)",
+        (loc["name"], loc["latitude"], loc["longitude"], loc.get("elevation_m")),
+    )
+    conn.commit()
+    return cur.lastrowid
+
+
+def fetch_location(location: dict) -> dict:
+    params = {
+        "latitude": location["latitude"],
+        "longitude": location["longitude"],
+        **DEFAULT_PARAMS,
+    }
+    print(f"[HTTP] Fetching {location['name']} ({location['latitude']},{location['longitude']})")
+    r = requests.get(API_URL, params=params, timeout=TIMEOUT)
+    r.raise_for_status()
+    payload = r.json()
+    # save raw JSON for audit
+    fname = RAW_DIR / f"{location['name'].replace(' ', '_')}_{datetime.utcnow().strftime('%Y%m%d_%H%M%S')}.json"
+    with open(fname, "w", encoding="utf-8") as f:
+        json.dump(payload, f, ensure_ascii=False, indent=2)
+    print(f"[FILE] saved raw response: {fname}")
+    return payload
+
+
+def store_hourly(conn: sqlite3.Connection, location_id: int, location_name: str, payload: dict) -> int:
+    hourly = payload.get("hourly") or {}
+    times = hourly.get("time", [])
+    if not times:
+        print(f"[WARN] no hourly times for {location_name}")
+        return 0
+
+    def get_arr(name):
+        return hourly.get(name, [])
+
+    temps = get_arr("temperature_2m")
+    rains = get_arr("rain")
+    snows = get_arr("snowfall")
+    wind_speeds = get_arr("wind_speed_10m")
+    weather_codes = get_arr("weather_code") or get_arr("weathercode")
+    wind_dirs = get_arr("wind_direction_10m")
+    uvs = get_arr("uv_index")
+
+    rows = []
+    for i, t in enumerate(times):
+        rows.append(
+            (
+                location_id,
+                t,
+                temps[i] if i < len(temps) else None,
+                rains[i] if i < len(rains) else None,
+                snows[i] if i < len(snows) else None,
+                wind_speeds[i] if i < len(wind_speeds) else None,
+                weather_codes[i] if i < len(weather_codes) else None,
+                wind_dirs[i] if i < len(wind_dirs) else None,
+                uvs[i] if i < len(uvs) else None,
+            )
+        )
+
+    cur = conn.cursor()
+    cur.executemany(
+        """
+        INSERT OR REPLACE INTO hourly
+            (location_id, timestamp, temperature, rain, snowfall, wind_speed, weather_code, wind_direction, uv_index)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """,
+        rows,
+    )
+    conn.commit()
+    return len(rows)
+
+
+def fetch_and_store_all(db_path: Path):
+    ensure_dirs()
+    conn = sqlite3.connect(db_path)
+    init_db(conn)
+    total_inserted = 0
+    for loc in LOCATIONS:
         try:
-            print(f"\nCoordinates: {response.Latitude()}°N {response.Longitude()}°E")
-            try:
-                elev = response.Elevation()
-            except Exception:
-                elev = None
-            print(f"Elevation: {elev} m asl")
-            print(f"Timezone difference to GMT+0: {response.UtcOffsetSeconds()}s")
-
-            # Process hourly data. The order of variables needs to be the same as requested.
-            hourly = response.Hourly()
-            hourly_temperature_2m = hourly.Variables(0).ValuesAsNumpy()
-            hourly_rain = hourly.Variables(1).ValuesAsNumpy()
-            hourly_showers = hourly.Variables(2).ValuesAsNumpy()
-            hourly_snowfall = hourly.Variables(3).ValuesAsNumpy()
-            hourly_snow_depth = hourly.Variables(4).ValuesAsNumpy()
-            hourly_precipitation_probability = hourly.Variables(5).ValuesAsNumpy()
-            hourly_visibility = hourly.Variables(6).ValuesAsNumpy()
-            hourly_relative_humidity_2m = hourly.Variables(7).ValuesAsNumpy()
-            hourly_wind_speed_10m = hourly.Variables(8).ValuesAsNumpy()
-            hourly_wind_speed_80m = hourly.Variables(9).ValuesAsNumpy()
-            hourly_wind_speed_120m = hourly.Variables(10).ValuesAsNumpy()
-            hourly_wind_speed_180m = hourly.Variables(11).ValuesAsNumpy()
-
-            hourly_data = {
-                "date": pd.date_range(
-                    start=pd.to_datetime(hourly.Time(), unit="s", utc=True),
-                    end=pd.to_datetime(hourly.TimeEnd(), unit="s", utc=True),
-                    freq=pd.Timedelta(seconds=hourly.Interval()),
-                    inclusive="left",
-                )
-            }
-
-            hourly_data["temperature_2m"] = hourly_temperature_2m
-            hourly_data["rain"] = hourly_rain
-            hourly_data["showers"] = hourly_showers
-            hourly_data["snowfall"] = hourly_snowfall
-            hourly_data["snow_depth"] = hourly_snow_depth
-            hourly_data["precipitation_probability"] = hourly_precipitation_probability
-            hourly_data["visibility"] = hourly_visibility
-            hourly_data["relative_humidity_2m"] = hourly_relative_humidity_2m
-            hourly_data["wind_speed_10m"] = hourly_wind_speed_10m
-            hourly_data["wind_speed_80m"] = hourly_wind_speed_80m
-            hourly_data["wind_speed_120m"] = hourly_wind_speed_120m
-            hourly_data["wind_speed_180m"] = hourly_wind_speed_180m
-
-            hourly_dataframe = pd.DataFrame(data=hourly_data)
-
-            # Process daily data. The order of variables needs to be the same as requested.
-            daily = response.Daily()
-            daily_temperature_2m_max = daily.Variables(0).ValuesAsNumpy()
-            daily_temperature_2m_min = daily.Variables(1).ValuesAsNumpy()
-            daily_sunrise = daily.Variables(2).ValuesInt64AsNumpy()
-            daily_sunset = daily.Variables(3).ValuesInt64AsNumpy()
-            daily_uv_index_max = daily.Variables(4).ValuesAsNumpy()
-            daily_precipitation_hours = daily.Variables(5).ValuesAsNumpy()
-
-            daily_data = {
-                "date": pd.date_range(
-                    start=pd.to_datetime(daily.Time(), unit="s", utc=True),
-                    end=pd.to_datetime(daily.TimeEnd(), unit="s", utc=True),
-                    freq=pd.Timedelta(seconds=daily.Interval()),
-                    inclusive="left",
-                )
-            }
-
-            daily_data["temperature_2m_max"] = daily_temperature_2m_max
-            daily_data["temperature_2m_min"] = daily_temperature_2m_min
-            daily_data["sunrise"] = daily_sunrise
-            daily_data["sunset"] = daily_sunset
-            daily_data["uv_index_max"] = daily_uv_index_max
-            daily_data["precipitation_hours"] = daily_precipitation_hours
-
-            daily_dataframe = pd.DataFrame(data=daily_data)
-
-            # Persist into SQLite
-            fetched_at = datetime.datetime.utcnow().isoformat() + "Z"
-            lat = response.Latitude()
-            lon = response.Longitude()
-            loc_id = db.insert_location(DB_PATH, float(lat), float(lon), float(elev) if elev is not None else None, None)
-
-            # hourly rows
-            hourly_rows = []
-            for _, row in hourly_dataframe.iterrows():
-                ts = row["date"].isoformat() if hasattr(row["date"], "isoformat") else str(row["date"])
-                hourly_rows.append({
-                    "timestamp": ts,
-                    "temperature_2m": _val(row.get("temperature_2m")),
-                    "rain": _val(row.get("rain")),
-                    "showers": _val(row.get("showers")),
-                    "snowfall": _val(row.get("snowfall")),
-                    "snow_depth": _val(row.get("snow_depth")),
-                    "precipitation_probability": _val(row.get("precipitation_probability")),
-                    "visibility": _val(row.get("visibility")),
-                    "relative_humidity_2m": _val(row.get("relative_humidity_2m")),
-                    "wind_speed_10m": _val(row.get("wind_speed_10m")),
-                    "wind_speed_80m": _val(row.get("wind_speed_80m")),
-                    "wind_speed_120m": _val(row.get("wind_speed_120m")),
-                    "wind_speed_180m": _val(row.get("wind_speed_180m")),
-                })
-            if hourly_rows:
-                db.insert_hourly_bulk(DB_PATH, loc_id, hourly_rows)
-
-            # daily rows
-            daily_rows = []
-            for _, row in daily_dataframe.iterrows():
-                d = row["date"].date().isoformat() if hasattr(row["date"], "date") else str(row["date"])
-                daily_rows.append({
-                    "date": d,
-                    "temperature_2m_max": _val(row.get("temperature_2m_max")),
-                    "temperature_2m_min": _val(row.get("temperature_2m_min")),
-                    "sunrise": _val(row.get("sunrise")),
-                    "sunset": _val(row.get("sunset")),
-                    "uv_index_max": _val(row.get("uv_index_max")),
-                    "precipitation_hours": _val(row.get("precipitation_hours")),
-                })
-            if daily_rows:
-                db.insert_daily_bulk(DB_PATH, loc_id, daily_rows)
-
-            # save fetch metadata
-            try:
-                db.save_fetch_meta(DB_PATH, fetched_at, "open-meteo", "current", params=json.dumps(PARAMS), note=None)
-            except Exception:
-                # non-critical
-                pass
-
-            print(f"Saved location {loc_id}, hourly {len(hourly_rows)} rows, daily {len(daily_rows)} rows")
+            loc_id = insert_or_get_location(conn, loc)
+            payload = fetch_location(loc)
+            inserted = store_hourly(conn, loc_id, loc["name"], payload)
+            total_inserted += inserted
+            print(f"[DB] {loc['name']}: inserted/updated {inserted} hourly rows (location_id={loc_id})")
         except Exception as e:
-            print("Failed processing response:", e)
+            print(f"[ERROR] Failed for {loc['name']}: {e}")
+            # continue with next location
+    conn.close()
+    return total_inserted
 
 
 def _install_signal_handlers(stop_event: threading.Event):
     def _handler(signum, frame):
-        print(f"Received signal {signum}; stopping after current iteration...")
+        print(f"[SIGNAL] Received {signum}. Stopping after current iteration...")
         stop_event.set()
 
     signal.signal(signal.SIGINT, _handler)
@@ -213,16 +203,31 @@ def _install_signal_handlers(stop_event: threading.Event):
 
 
 def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--once", action="store_true", help="Run a single fetch+store then exit")
+    parser.add_argument("--db", default=str(DB_PATH), help="Path to sqlite DB file")
+    args = parser.parse_args()
+
     stop_event = threading.Event()
     _install_signal_handlers(stop_event)
-    print(f"Starting fetch loop every {INTERVAL_SECONDS} seconds. Press Ctrl+C to stop.")
+
+    if args.once:
+        print("[RUN] single run (--once)")
+        inserted = fetch_and_store_all(Path(args.db))
+        print(f"[DONE] inserted/updated {inserted} total rows")
+        return
+
+    print("[RUN] starting continuous hourly fetch. Press Ctrl+C to stop.")
     while not stop_event.is_set():
+        start = time.time()
         try:
-            fetch_and_store_once()
+            inserted = fetch_and_store_all(Path(args.db))
+            print(f"[LOOP] iteration done. inserted/updated {inserted} rows. time={time.time()-start:.1f}s")
         except Exception as e:
-            print("Error during fetch_and_store_once:", e)
-        # wait interruptibly
-        if stop_event.wait(timeout=INTERVAL_SECONDS):
+            print(f"[ERROR] During iteration: {e}")
+        # wait up to 1 hour from start, but exit early if stop_event set
+        wait_seconds = max(0, 3600 - (time.time() - start))
+        if stop_event.wait(timeout=wait_seconds):
             break
 
 
