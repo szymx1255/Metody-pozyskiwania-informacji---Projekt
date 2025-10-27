@@ -1,5 +1,3 @@
-
-
 import argparse
 import os
 import signal
@@ -8,10 +6,9 @@ import threading
 import time
 from datetime import datetime
 from pathlib import Path
-
 import requests
 
-# DB file
+
 DB_PATH = Path("data/meteodata.db")
 
 # API config
@@ -31,15 +28,6 @@ LOCATIONS = [
     {"name": "Zugspitze", "latitude": 47.4212, "longitude": 10.9863, "elevation_m": 2962},
 ]
 
-MINUTELY_15_VARS = ",".join([
-    "temperature_2m",
-    "wind_speed_10m",
-    "rain",
-    "snowfall",
-    "wind_direction_10m",
-    "weather_code",
-])
-
 DEFAULT_PARAMS = {
     "hourly": ",".join([
         "temperature_2m",
@@ -54,8 +42,6 @@ DEFAULT_PARAMS = {
     "past_days": 7,
     "forecast_days": 3,
     "timezone": "UTC",
-    # dołącz parametry 15-minutowe
-    "minutely_15": MINUTELY_15_VARS,
 }
 
 # Support for 15-minute resolution variables (minutely_15)
@@ -151,6 +137,8 @@ def fetch_location(location: dict, extra_params: dict | None = None) -> dict:
         "longitude": location["longitude"],
         **DEFAULT_PARAMS,
     }
+    # Dołącz parametr minutely_15 aby API zwróciło 15-minutowe pola (jeśli obsługiwane)
+    params["minutely_15"] = MINUTELY_15_VARS
     if extra_params:
         params.update(extra_params)
     # PL: Wykonaj zapytanie HTTP do API Open-Meteo
@@ -292,19 +280,35 @@ def fetch_and_store_all(db_path: Path):
             r = cur.fetchone()
             max_ts = r[0] if r and r[0] is not None else None
 
-            # PL: Jeśli mamy już dane do aktualnej godziny, pomiń pobieranie dla tej lokalizacji
-            if max_ts is not None:
-                now = datetime.utcnow()
-                current_hour_iso = now.replace(minute=0, second=0, microsecond=0).isoformat()
-                if max_ts >= current_hour_iso:
-                    print(f"[SKIP] {loc['name']} is up-to-date (max_ts={max_ts})")
-                    continue
+            # Jeśli mamy już dane godzinowe do aktualnej godziny, sprawdź też tabelę 15-minutową.
+            # Jeśli zarówno hourly jak i minutely15 są aktualne (mają timestamp >= bieżącej godziny),
+            # pomiń pobieranie. W przeciwnym razie pobierz (np. żeby uzupełnić brakujące minutely15).
+            now = datetime.utcnow()
+            current_hour_iso = now.replace(minute=0, second=0, microsecond=0).isoformat()
+
+            cur2 = conn.cursor()
+            cur2.execute("SELECT MAX(timestamp) FROM minutely15 WHERE location_id=?", (loc_id,))
+            r2 = cur2.fetchone()
+            max_ts_minutely = r2[0] if r2 and r2[0] is not None else None
+
+            if max_ts is not None and max_ts >= current_hour_iso and max_ts_minutely is not None and max_ts_minutely >= current_hour_iso:
+                print(f"[SKIP] {loc['name']} is fully up-to-date (hourly_max={max_ts} minutely15_max={max_ts_minutely})")
+                continue
 
             # request starting from the last stored date to reduce download size
             extra = None
             if max_ts is not None:
-                # API accepts start_date as YYYY-MM-DD; this will reduce the fetched window.
-                extra = {"start_date": max_ts.split("T")[0]}
+                # Jeśli najnowszy timestamp w DB jest w przeszłości, użyj jego daty jako start_date.
+                # Jeśli jest w przyszłości (np. wcześniejsze zapisy zawierają prognozy),
+                # nie ustawiaj start_date — pozwól API zwrócić domyślny zakres (past_days).
+                try:
+                    ts_date = datetime.fromisoformat(max_ts).date()
+                    today_date = datetime.utcnow().date()
+                    if ts_date < today_date:
+                        extra = {"start_date": ts_date.isoformat()}
+                except Exception:
+                    # jeśli parsowanie nie powiedzie się, nie ustawiamy start_date
+                    extra = None
 
             # PL: Pobierz nowe dane (od start_date jeśli było max_ts)
             payload = fetch_location(loc, extra_params=extra)
