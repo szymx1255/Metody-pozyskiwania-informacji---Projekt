@@ -141,13 +141,28 @@ def fetch_location(location: dict, extra_params: dict | None = None) -> dict:
     params["minutely_15"] = MINUTELY_15_VARS
     if extra_params:
         params.update(extra_params)
-    # PL: Wykonaj zapytanie HTTP do API Open-Meteo
+    # PL: Wykonaj zapytanie HTTP do API Open-Meteo z prostym retry/backoff
     print(f"[HTTP] Fetching {location['name']} ({location['latitude']},{location['longitude']})")
-    r = requests.get(API_URL, params=params, timeout=TIMEOUT)
-    r.raise_for_status()
-    payload = r.json()
-    # PL: Nie zapisujemy surowych JSONów na dysk — wystarczy zapis do SQLite
-    return payload
+    attempts = 3
+    backoff = 1
+    last_exc = None
+    for attempt in range(1, attempts + 1):
+        try:
+            r = requests.get(API_URL, params=params, timeout=TIMEOUT)
+            r.raise_for_status()
+            payload = r.json()
+            return payload
+        except requests.HTTPError as he:
+            # For 4xx errors, don't retry (client error), return/raise immediately
+            print(f"[HTTP] HTTP error for {location['name']}: {he}")
+            raise
+        except requests.RequestException as re:
+            print(f"[HTTP] transient error (attempt {attempt}/{attempts}) for {location['name']}: {re}")
+            last_exc = re
+            time.sleep(backoff)
+            backoff *= 2
+    # If all retries failed, raise last exception
+    raise last_exc
 
     # PL: Payload zawiera pola 'hourly' z tablicami czasów i wartości.
 
@@ -295,20 +310,11 @@ def fetch_and_store_all(db_path: Path):
                 print(f"[SKIP] {loc['name']} is fully up-to-date (hourly_max={max_ts} minutely15_max={max_ts_minutely})")
                 continue
 
-            # request starting from the last stored date to reduce download size
+            # Nie ustawiamy start_date — unikamy wysyłania kombinacji parametrów,
+            # które w niektórych sytuacjach powodowały 400 (API może nie akceptować
+            # start_date razem z innymi parametrami w tej formie). Pobieramy pełny
+            # zakres (past_days) i polegamy na deduplikacji przed zapisem.
             extra = None
-            if max_ts is not None:
-                # Jeśli najnowszy timestamp w DB jest w przeszłości, użyj jego daty jako start_date.
-                # Jeśli jest w przyszłości (np. wcześniejsze zapisy zawierają prognozy),
-                # nie ustawiaj start_date — pozwól API zwrócić domyślny zakres (past_days).
-                try:
-                    ts_date = datetime.fromisoformat(max_ts).date()
-                    today_date = datetime.utcnow().date()
-                    if ts_date < today_date:
-                        extra = {"start_date": ts_date.isoformat()}
-                except Exception:
-                    # jeśli parsowanie nie powiedzie się, nie ustawiamy start_date
-                    extra = None
 
             # PL: Pobierz nowe dane (od start_date jeśli było max_ts)
             payload = fetch_location(loc, extra_params=extra)
