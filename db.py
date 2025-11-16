@@ -64,6 +64,10 @@ DB_SCHEMA_SQL = [
 
 
 def init_db(path: str) -> None:
+    """Utwórz strukturę bazy danych na dysku jeśli nie istnieje.
+
+    Tworzy plik bazy (katalog jeśli potrzeba) i wykonuje schemat z DB_SCHEMA_SQL.
+    """
     os.makedirs(os.path.dirname(path) or ".", exist_ok=True)
     conn = sqlite3.connect(path)
     cur = conn.cursor()
@@ -74,6 +78,14 @@ def init_db(path: str) -> None:
 
 
 def insert_location(path: str, latitude: float, longitude: float, elevation: Optional[float] = None, timezone: Optional[str] = None) -> int:
+    """Dodaj lokalizację lub zwróć istniejący identyfikator.
+
+    Parametry:
+      - path: ścieżka do pliku bazy
+      - latitude, longitude: współrzędne
+      - elevation, timezone: opcjonalne metadane
+    Zwraca: id lokalizacji (int)
+    """
     init_db(path)
     conn = sqlite3.connect(path)
     cur = conn.cursor()
@@ -92,6 +104,7 @@ def insert_location(path: str, latitude: float, longitude: float, elevation: Opt
 
 def insert_hourly_bulk(path: str, location_id: int, rows: Iterable[Dict]) -> None:
     """Rows is iterable of dicts with keys matching hourly columns (timestamp, temperature_2m, ...)."""
+    # Przygotuj i wstaw wiele wierszy do tabeli `hourly`.
     init_db(path)
     conn = sqlite3.connect(path)
     cur = conn.cursor()
@@ -124,6 +137,7 @@ def insert_hourly_bulk(path: str, location_id: int, rows: Iterable[Dict]) -> Non
 
 
 def insert_daily_bulk(path: str, location_id: int, rows: Iterable[Dict]) -> None:
+    # Wstaw wiele wierszy do tabeli `daily` (zbiorcze wartości dzienne).
     init_db(path)
     conn = sqlite3.connect(path)
     cur = conn.cursor()
@@ -150,6 +164,10 @@ def insert_daily_bulk(path: str, location_id: int, rows: Iterable[Dict]) -> None
 
 
 def save_fetch_meta(path: str, fetched_at: str, source: str, fetch_type: str, params: Optional[Dict] = None, note: Optional[str] = None) -> None:
+    """Zapisz metadane o wykonanym pobraniu (np. czas, źródło, parametry).
+
+    Przydatne do audytu i śledzenia historii fetchów.
+    """
     init_db(path)
     conn = sqlite3.connect(path)
     cur = conn.cursor()
