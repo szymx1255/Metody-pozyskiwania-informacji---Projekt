@@ -49,8 +49,8 @@ def main():
                         fetch_hourly, fetch_minutely, "wszystkie" if selected is None else selected)
 
         ans_cont = input("Uruchomić w trybie ciągłym? [y/N] ").strip().lower()
-        ans_save = input("Czy zapisać surowe odpowiedzi API do plików JSON na dysku? [y/N] ").strip().lower()
-        save_payloads = _yes(ans_save)
+        #ans_save = input("Czy zapisać surowe odpowiedzi API do plików JSON na dysku? [y/N] ").strip().lower()
+        #save_payloads = _yes(ans_save)
 
         if _yes(ans_cont):
             minutes = input("Podaj częstotliwość w minutach (np. 60): ").strip()

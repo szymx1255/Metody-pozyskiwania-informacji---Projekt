@@ -11013,3 +11013,1099 @@
 2025-11-17 08:38:31,212 INFO: Wygenerowano 76 alertów z analizy payloadu dla Zugspitze
 2025-11-17 08:38:31,221 INFO: Zapisano payload do Zugspitze-20251117T073831Z.json
 2025-11-17 08:38:31,222 INFO: Zakończono. Wstawiono alertów: 0
+2025-11-17 09:08:39,137 INFO: Uruchamiam fetch (hourly=True, minutely=False) dla: wszystkie
+2025-11-17 09:08:47,239 INFO: Pobieram Grossglockner
+2025-11-17 09:08:47,809 WARNING: ALERT: Wykryto możliwe opady o 09:00 (loc=1) precipitation=1.19
+2025-11-17 09:08:47,814 WARNING: ALERT: Wykryto możliwe opady o 10:00 (loc=1) precipitation=0.91
+2025-11-17 09:08:47,819 WARNING: ALERT: Wykryto możliwe opady o 11:00 (loc=1) precipitation=0.56
+2025-11-17 09:08:47,824 WARNING: ALERT: Wykryto możliwe opady o 12:00 (loc=1) precipitation=0.28
+2025-11-17 09:08:47,828 WARNING: ALERT: Wykryto możliwe opady o 13:00 (loc=1) precipitation=0.49
+2025-11-17 09:08:47,833 WARNING: ALERT: Wykryto możliwe opady o 14:00 (loc=1) precipitation=0.56
+2025-11-17 09:08:47,838 WARNING: ALERT: Wykryto możliwe opady o 15:00 (loc=1) precipitation=0.56
+2025-11-17 09:08:47,844 WARNING: ALERT: Wykryto możliwe opady o 16:00 (loc=1) precipitation=0.35
+2025-11-17 09:08:47,849 WARNING: ALERT: Wykryto możliwe opady o 17:00 (loc=1) precipitation=0.28
+2025-11-17 09:08:47,854 WARNING: ALERT: Wykryto możliwe opady o 18:00 (loc=1) precipitation=0.28
+2025-11-17 09:08:47,858 WARNING: ALERT: Wykryto możliwe opady o 19:00 (loc=1) precipitation=0.28
+2025-11-17 09:08:47,861 WARNING: ALERT: Wykryto możliwe opady o 20:00 (loc=1) precipitation=0.28
+2025-11-17 09:08:47,865 WARNING: ALERT: Wykryto możliwe opady o 21:00 (loc=1) precipitation=0.28
+2025-11-17 09:08:47,870 WARNING: ALERT: Wykryto możliwe opady o 22:00 (loc=1) precipitation=0.28
+2025-11-17 09:08:47,873 WARNING: ALERT: Wykryto możliwe opady o 23:00 (loc=1) precipitation=0.28
+2025-11-17 09:08:47,877 WARNING: ALERT: Temperatura poniżej -19.0 °C o 00:00 (loc=1) temperature=-19.30
+2025-11-17 09:08:47,879 WARNING: ALERT: Wykryto możliwe opady o 00:00 (loc=1) precipitation=0.21
+2025-11-17 09:08:47,884 WARNING: ALERT: Temperatura poniżej -19.0 °C o 01:00 (loc=1) temperature=-19.60
+2025-11-17 09:08:47,888 WARNING: ALERT: Wykryto możliwe opady o 01:00 (loc=1) precipitation=0.07
+2025-11-17 09:08:47,892 WARNING: ALERT: Temperatura poniżej -19.0 °C o 02:00 (loc=1) temperature=-20.30
+2025-11-17 09:08:47,895 WARNING: ALERT: Temperatura poniżej -19.0 °C o 03:00 (loc=1) temperature=-20.50
+2025-11-17 09:08:47,898 WARNING: ALERT: Temperatura poniżej -19.0 °C o 04:00 (loc=1) temperature=-20.50
+2025-11-17 09:08:47,902 WARNING: ALERT: Temperatura poniżej -19.0 °C o 05:00 (loc=1) temperature=-20.00
+2025-11-17 09:08:47,905 WARNING: ALERT: Temperatura poniżej -19.0 °C o 06:00 (loc=1) temperature=-19.50
+2025-11-17 09:08:47,908 WARNING: ALERT: Wykryto możliwe opady o 08:15 (loc=1) precipitation=0.35
+2025-11-17 09:08:47,911 WARNING: ALERT: Wykryto możliwe opady o 08:30 (loc=1) precipitation=0.28
+2025-11-17 09:08:47,915 WARNING: ALERT: Wykryto możliwe opady o 08:45 (loc=1) precipitation=0.28
+2025-11-17 09:08:47,920 WARNING: ALERT: Wykryto możliwe opady o 09:00 (loc=1) precipitation=0.28
+2025-11-17 09:08:47,923 WARNING: ALERT: Wykryto możliwe opady o 09:15 (loc=1) precipitation=0.28
+2025-11-17 09:08:47,926 WARNING: ALERT: Wykryto możliwe opady o 09:30 (loc=1) precipitation=0.28
+2025-11-17 09:08:47,930 WARNING: ALERT: Wykryto możliwe opady o 09:45 (loc=1) precipitation=0.21
+2025-11-17 09:08:47,933 WARNING: ALERT: Wykryto możliwe opady o 10:00 (loc=1) precipitation=0.14
+2025-11-17 09:08:47,938 WARNING: ALERT: Wykryto możliwe opady o 10:15 (loc=1) precipitation=0.21
+2025-11-17 09:08:47,941 WARNING: ALERT: Wykryto możliwe opady o 10:30 (loc=1) precipitation=0.14
+2025-11-17 09:08:47,944 WARNING: ALERT: Wykryto możliwe opady o 10:45 (loc=1) precipitation=0.14
+2025-11-17 09:08:47,948 WARNING: ALERT: Wykryto możliwe opady o 11:00 (loc=1) precipitation=0.07
+2025-11-17 09:08:47,952 WARNING: ALERT: Wykryto możliwe opady o 11:15 (loc=1) precipitation=0.07
+2025-11-17 09:08:47,956 WARNING: ALERT: Wykryto możliwe opady o 11:30 (loc=1) precipitation=0.07
+2025-11-17 09:08:47,959 WARNING: ALERT: Wykryto możliwe opady o 11:45 (loc=1) precipitation=0.07
+2025-11-17 09:08:47,962 WARNING: ALERT: Wykryto możliwe opady o 12:00 (loc=1) precipitation=0.07
+2025-11-17 09:08:47,965 WARNING: ALERT: Wykryto możliwe opady o 12:15 (loc=1) precipitation=0.07
+2025-11-17 09:08:47,969 WARNING: ALERT: Wykryto możliwe opady o 12:30 (loc=1) precipitation=0.07
+2025-11-17 09:08:47,973 WARNING: ALERT: Wykryto możliwe opady o 12:45 (loc=1) precipitation=0.14
+2025-11-17 09:08:47,976 WARNING: ALERT: Wykryto możliwe opady o 13:00 (loc=1) precipitation=0.21
+2025-11-17 09:08:47,979 WARNING: ALERT: Wykryto możliwe opady o 13:15 (loc=1) precipitation=0.21
+2025-11-17 09:08:47,983 WARNING: ALERT: Wykryto możliwe opady o 13:30 (loc=1) precipitation=0.14
+2025-11-17 09:08:47,987 WARNING: ALERT: Wykryto możliwe opady o 13:45 (loc=1) precipitation=0.14
+2025-11-17 09:08:47,991 WARNING: ALERT: Wykryto możliwe opady o 14:00 (loc=1) precipitation=0.07
+2025-11-17 09:08:47,994 WARNING: ALERT: Wykryto możliwe opady o 14:15 (loc=1) precipitation=0.14
+2025-11-17 09:08:47,997 WARNING: ALERT: Wykryto możliwe opady o 14:30 (loc=1) precipitation=0.14
+2025-11-17 09:08:48,001 WARNING: ALERT: Wykryto możliwe opady o 14:45 (loc=1) precipitation=0.14
+2025-11-17 09:08:48,005 WARNING: ALERT: Wykryto możliwe opady o 15:00 (loc=1) precipitation=0.14
+2025-11-17 09:08:48,008 WARNING: ALERT: Wykryto możliwe opady o 15:15 (loc=1) precipitation=0.14
+2025-11-17 09:08:48,012 WARNING: ALERT: Wykryto możliwe opady o 15:30 (loc=1) precipitation=0.07
+2025-11-17 09:08:48,015 WARNING: ALERT: Wykryto możliwe opady o 15:45 (loc=1) precipitation=0.07
+2025-11-17 09:08:48,019 WARNING: ALERT: Wykryto możliwe opady o 16:00 (loc=1) precipitation=0.07
+2025-11-17 09:08:48,022 WARNING: ALERT: Wykryto możliwe opady o 16:15 (loc=1) precipitation=0.07
+2025-11-17 09:08:48,025 WARNING: ALERT: Wykryto możliwe opady o 16:30 (loc=1) precipitation=0.07
+2025-11-17 09:08:48,028 WARNING: ALERT: Wykryto możliwe opady o 16:45 (loc=1) precipitation=0.07
+2025-11-17 09:08:48,031 WARNING: ALERT: Wykryto możliwe opady o 17:00 (loc=1) precipitation=0.07
+2025-11-17 09:08:48,036 WARNING: ALERT: Wykryto możliwe opady o 17:15 (loc=1) precipitation=0.07
+2025-11-17 09:08:48,039 WARNING: ALERT: Wykryto możliwe opady o 17:30 (loc=1) precipitation=0.07
+2025-11-17 09:08:48,042 WARNING: ALERT: Wykryto możliwe opady o 17:45 (loc=1) precipitation=0.07
+2025-11-17 09:08:48,045 WARNING: ALERT: Wykryto możliwe opady o 18:00 (loc=1) precipitation=0.07
+2025-11-17 09:08:48,049 WARNING: ALERT: Wykryto możliwe opady o 18:15 (loc=1) precipitation=0.07
+2025-11-17 09:08:48,053 WARNING: ALERT: Wykryto możliwe opady o 18:30 (loc=1) precipitation=0.07
+2025-11-17 09:08:48,056 WARNING: ALERT: Wykryto możliwe opady o 18:45 (loc=1) precipitation=0.07
+2025-11-17 09:08:48,060 WARNING: ALERT: Wykryto możliwe opady o 19:00 (loc=1) precipitation=0.07
+2025-11-17 09:08:48,064 WARNING: ALERT: Wykryto możliwe opady o 19:15 (loc=1) precipitation=0.07
+2025-11-17 09:08:48,068 WARNING: ALERT: Wykryto możliwe opady o 19:30 (loc=1) precipitation=0.07
+2025-11-17 09:08:48,071 WARNING: ALERT: Wykryto możliwe opady o 19:45 (loc=1) precipitation=0.07
+2025-11-17 09:08:48,074 WARNING: ALERT: Wykryto możliwe opady o 20:00 (loc=1) precipitation=0.07
+2025-11-17 09:08:48,077 WARNING: ALERT: Wykryto możliwe opady o 20:15 (loc=1) precipitation=0.07
+2025-11-17 09:08:48,080 WARNING: ALERT: Wykryto możliwe opady o 20:30 (loc=1) precipitation=0.07
+2025-11-17 09:08:48,085 WARNING: ALERT: Wykryto możliwe opady o 20:45 (loc=1) precipitation=0.07
+2025-11-17 09:08:48,089 WARNING: ALERT: Wykryto możliwe opady o 21:00 (loc=1) precipitation=0.07
+2025-11-17 09:08:48,092 WARNING: ALERT: Wykryto możliwe opady o 21:15 (loc=1) precipitation=0.07
+2025-11-17 09:08:48,095 WARNING: ALERT: Wykryto możliwe opady o 21:30 (loc=1) precipitation=0.07
+2025-11-17 09:08:48,098 WARNING: ALERT: Wykryto możliwe opady o 21:45 (loc=1) precipitation=0.07
+2025-11-17 09:08:48,103 WARNING: ALERT: Wykryto możliwe opady o 22:00 (loc=1) precipitation=0.07
+2025-11-17 09:08:48,106 WARNING: ALERT: Wykryto możliwe opady o 22:15 (loc=1) precipitation=0.07
+2025-11-17 09:08:48,109 WARNING: ALERT: Wykryto możliwe opady o 22:30 (loc=1) precipitation=0.07
+2025-11-17 09:08:48,112 WARNING: ALERT: Wykryto możliwe opady o 22:45 (loc=1) precipitation=0.07
+2025-11-17 09:08:48,114 WARNING: ALERT: Wykryto możliwe opady o 23:00 (loc=1) precipitation=0.07
+2025-11-17 09:08:48,119 WARNING: ALERT: Temperatura poniżej -19.0 °C o 23:15 (loc=1) temperature=-19.00
+2025-11-17 09:08:48,122 WARNING: ALERT: Wykryto możliwe opady o 23:15 (loc=1) precipitation=0.07
+2025-11-17 09:08:48,124 WARNING: ALERT: Temperatura poniżej -19.0 °C o 23:30 (loc=1) temperature=-19.10
+2025-11-17 09:08:48,128 WARNING: ALERT: Wykryto możliwe opady o 23:30 (loc=1) precipitation=0.07
+2025-11-17 09:08:48,130 WARNING: ALERT: Temperatura poniżej -19.0 °C o 23:45 (loc=1) temperature=-19.20
+2025-11-17 09:08:48,135 WARNING: ALERT: Wykryto możliwe opady o 23:45 (loc=1) precipitation=0.07
+2025-11-17 09:08:48,138 WARNING: ALERT: Temperatura poniżej -19.0 °C o 00:00 (loc=1) temperature=-19.30
+2025-11-17 09:08:48,140 WARNING: ALERT: Temperatura poniżej -19.0 °C o 00:15 (loc=1) temperature=-19.40
+2025-11-17 09:08:48,144 WARNING: ALERT: Wykryto możliwe opady o 00:15 (loc=1) precipitation=0.07
+2025-11-17 09:08:48,147 WARNING: ALERT: Temperatura poniżej -19.0 °C o 00:30 (loc=1) temperature=-19.40
+2025-11-17 09:08:48,150 WARNING: ALERT: Temperatura poniżej -19.0 °C o 00:45 (loc=1) temperature=-19.50
+2025-11-17 09:08:48,154 WARNING: ALERT: Temperatura poniżej -19.0 °C o 01:00 (loc=1) temperature=-19.50
+2025-11-17 09:08:48,157 WARNING: ALERT: Temperatura poniżej -19.0 °C o 01:15 (loc=1) temperature=-19.80
+2025-11-17 09:08:48,160 WARNING: ALERT: Temperatura poniżej -19.0 °C o 01:30 (loc=1) temperature=-20.00
+2025-11-17 09:08:48,162 WARNING: ALERT: Temperatura poniżej -19.0 °C o 01:45 (loc=1) temperature=-20.10
+2025-11-17 09:08:48,166 WARNING: ALERT: Temperatura poniżej -19.0 °C o 02:00 (loc=1) temperature=-20.30
+2025-11-17 09:08:48,169 WARNING: ALERT: Temperatura poniżej -19.0 °C o 02:15 (loc=1) temperature=-20.40
+2025-11-17 09:08:48,172 WARNING: ALERT: Temperatura poniżej -19.0 °C o 02:30 (loc=1) temperature=-20.50
+2025-11-17 09:08:48,174 WARNING: ALERT: Temperatura poniżej -19.0 °C o 02:45 (loc=1) temperature=-20.50
+2025-11-17 09:08:48,177 WARNING: ALERT: Temperatura poniżej -19.0 °C o 03:00 (loc=1) temperature=-20.50
+2025-11-17 09:08:48,180 WARNING: ALERT: Temperatura poniżej -19.0 °C o 03:15 (loc=1) temperature=-20.50
+2025-11-17 09:08:48,184 WARNING: ALERT: Temperatura poniżej -19.0 °C o 03:30 (loc=1) temperature=-20.50
+2025-11-17 09:08:48,187 WARNING: ALERT: Temperatura poniżej -19.0 °C o 03:45 (loc=1) temperature=-20.50
+2025-11-17 09:08:48,190 WARNING: ALERT: Temperatura poniżej -19.0 °C o 04:00 (loc=1) temperature=-20.50
+2025-11-17 09:08:48,193 WARNING: ALERT: Temperatura poniżej -19.0 °C o 04:15 (loc=1) temperature=-20.40
+2025-11-17 09:08:48,196 WARNING: ALERT: Temperatura poniżej -19.0 °C o 04:30 (loc=1) temperature=-20.20
+2025-11-17 09:08:48,199 WARNING: ALERT: Temperatura poniżej -19.0 °C o 04:45 (loc=1) temperature=-20.10
+2025-11-17 09:08:48,203 WARNING: ALERT: Temperatura poniżej -19.0 °C o 05:00 (loc=1) temperature=-20.00
+2025-11-17 09:08:48,205 WARNING: ALERT: Temperatura poniżej -19.0 °C o 05:15 (loc=1) temperature=-19.90
+2025-11-17 09:08:48,208 WARNING: ALERT: Temperatura poniżej -19.0 °C o 05:30 (loc=1) temperature=-19.80
+2025-11-17 09:08:48,211 WARNING: ALERT: Temperatura poniżej -19.0 °C o 05:45 (loc=1) temperature=-19.60
+2025-11-17 09:08:48,213 WARNING: ALERT: Temperatura poniżej -19.0 °C o 06:00 (loc=1) temperature=-19.50
+2025-11-17 09:08:48,217 WARNING: ALERT: Temperatura poniżej -19.0 °C o 06:15 (loc=1) temperature=-19.40
+2025-11-17 09:08:48,220 WARNING: ALERT: Temperatura poniżej -19.0 °C o 06:30 (loc=1) temperature=-19.20
+2025-11-17 09:08:48,223 WARNING: ALERT: Temperatura poniżej -19.0 °C o 06:45 (loc=1) temperature=-19.00
+2025-11-17 09:08:48,223 INFO: Wygenerowano 119 alertów z analizy payloadu dla Grossglockner
+2025-11-17 09:08:48,224 INFO: Pobieram Täschhorn
+2025-11-17 09:08:48,703 WARNING: ALERT: Wykryto możliwe opady o 10:00 (loc=2) precipitation=0.21
+2025-11-17 09:08:48,707 WARNING: ALERT: Wykryto możliwe opady o 11:00 (loc=2) precipitation=0.49
+2025-11-17 09:08:48,711 WARNING: ALERT: Wykryto możliwe opady o 12:00 (loc=2) precipitation=0.35
+2025-11-17 09:08:48,716 WARNING: ALERT: Wykryto możliwe opady o 13:00 (loc=2) precipitation=0.49
+2025-11-17 09:08:48,722 WARNING: ALERT: Wykryto możliwe opady o 14:00 (loc=2) precipitation=0.42
+2025-11-17 09:08:48,725 WARNING: ALERT: Wykryto możliwe opady o 15:00 (loc=2) precipitation=0.70
+2025-11-17 09:08:48,729 WARNING: ALERT: Wykryto możliwe opady o 16:00 (loc=2) precipitation=0.49
+2025-11-17 09:08:48,733 WARNING: ALERT: Wykryto możliwe opady o 17:00 (loc=2) precipitation=0.07
+2025-11-17 09:08:48,737 WARNING: ALERT: Wykryto możliwe opady o 09:30 (loc=2) precipitation=0.07
+2025-11-17 09:08:48,741 WARNING: ALERT: Wykryto możliwe opady o 09:45 (loc=2) precipitation=0.07
+2025-11-17 09:08:48,743 WARNING: ALERT: Wykryto możliwe opady o 10:00 (loc=2) precipitation=0.07
+2025-11-17 09:08:48,746 WARNING: ALERT: Wykryto możliwe opady o 10:15 (loc=2) precipitation=0.07
+2025-11-17 09:08:48,749 WARNING: ALERT: Wykryto możliwe opady o 10:30 (loc=2) precipitation=0.14
+2025-11-17 09:08:48,753 WARNING: ALERT: Wykryto możliwe opady o 10:45 (loc=2) precipitation=0.14
+2025-11-17 09:08:48,757 WARNING: ALERT: Wykryto możliwe opady o 11:00 (loc=2) precipitation=0.14
+2025-11-17 09:08:48,759 WARNING: ALERT: Wykryto możliwe opady o 11:15 (loc=2) precipitation=0.14
+2025-11-17 09:08:48,762 WARNING: ALERT: Wykryto możliwe opady o 11:30 (loc=2) precipitation=0.07
+2025-11-17 09:08:48,766 WARNING: ALERT: Wykryto możliwe opady o 11:45 (loc=2) precipitation=0.07
+2025-11-17 09:08:48,770 WARNING: ALERT: Wykryto możliwe opady o 12:00 (loc=2) precipitation=0.07
+2025-11-17 09:08:48,773 WARNING: ALERT: Wykryto możliwe opady o 12:15 (loc=2) precipitation=0.14
+2025-11-17 09:08:48,776 WARNING: ALERT: Wykryto możliwe opady o 12:30 (loc=2) precipitation=0.14
+2025-11-17 09:08:48,779 WARNING: ALERT: Wykryto możliwe opady o 12:45 (loc=2) precipitation=0.14
+2025-11-17 09:08:48,782 WARNING: ALERT: Wykryto możliwe opady o 13:00 (loc=2) precipitation=0.07
+2025-11-17 09:08:48,786 WARNING: ALERT: Wykryto możliwe opady o 13:15 (loc=2) precipitation=0.07
+2025-11-17 09:08:48,789 WARNING: ALERT: Wykryto możliwe opady o 13:30 (loc=2) precipitation=0.07
+2025-11-17 09:08:48,792 WARNING: ALERT: Wykryto możliwe opady o 13:45 (loc=2) precipitation=0.14
+2025-11-17 09:08:48,795 WARNING: ALERT: Wykryto możliwe opady o 14:00 (loc=2) precipitation=0.14
+2025-11-17 09:08:48,798 WARNING: ALERT: Wykryto możliwe opady o 14:15 (loc=2) precipitation=0.21
+2025-11-17 09:08:48,802 WARNING: ALERT: Wykryto możliwe opady o 14:30 (loc=2) precipitation=0.21
+2025-11-17 09:08:48,806 WARNING: ALERT: Wykryto możliwe opady o 14:45 (loc=2) precipitation=0.14
+2025-11-17 09:08:48,809 WARNING: ALERT: Wykryto możliwe opady o 15:00 (loc=2) precipitation=0.14
+2025-11-17 09:08:48,812 WARNING: ALERT: Wykryto możliwe opady o 15:15 (loc=2) precipitation=0.14
+2025-11-17 09:08:48,817 WARNING: ALERT: Wykryto możliwe opady o 15:30 (loc=2) precipitation=0.14
+2025-11-17 09:08:48,822 WARNING: ALERT: Wykryto możliwe opady o 15:45 (loc=2) precipitation=0.07
+2025-11-17 09:08:48,825 WARNING: ALERT: Wykryto możliwe opady o 16:00 (loc=2) precipitation=0.14
+2025-11-17 09:08:48,827 WARNING: ALERT: Wykryto możliwe opady o 16:15 (loc=2) precipitation=0.07
+2025-11-17 09:08:48,828 INFO: Wygenerowano 36 alertów z analizy payloadu dla Täschhorn
+2025-11-17 09:08:48,829 INFO: Pobieram Zumsteinspitze
+2025-11-17 09:08:49,266 WARNING: ALERT: Wykryto możliwe opady o 11:00 (loc=3) precipitation=0.07
+2025-11-17 09:08:49,270 WARNING: ALERT: Wykryto możliwe opady o 12:00 (loc=3) precipitation=0.14
+2025-11-17 09:08:49,273 WARNING: ALERT: Wykryto możliwe opady o 15:00 (loc=3) precipitation=0.28
+2025-11-17 09:08:49,277 WARNING: ALERT: Wykryto możliwe opady o 16:00 (loc=3) precipitation=0.28
+2025-11-17 09:08:49,281 WARNING: ALERT: Wykryto możliwe opady o 17:00 (loc=3) precipitation=0.14
+2025-11-17 09:08:49,287 WARNING: ALERT: Temperatura poniżej -19.0 °C o 18:00 (loc=3) temperature=-19.20
+2025-11-17 09:08:49,290 WARNING: ALERT: Temperatura poniżej -19.0 °C o 19:00 (loc=3) temperature=-19.50
+2025-11-17 09:08:49,294 WARNING: ALERT: Temperatura poniżej -19.0 °C o 20:00 (loc=3) temperature=-19.10
+2025-11-17 09:08:49,297 WARNING: ALERT: Wykryto możliwe opady o 11:00 (loc=3) precipitation=0.07
+2025-11-17 09:08:49,302 WARNING: ALERT: Wykryto możliwe opady o 11:15 (loc=3) precipitation=0.07
+2025-11-17 09:08:49,305 WARNING: ALERT: Wykryto możliwe opady o 12:00 (loc=3) precipitation=0.07
+2025-11-17 09:08:49,308 WARNING: ALERT: Wykryto możliwe opady o 14:15 (loc=3) precipitation=0.07
+2025-11-17 09:08:49,311 WARNING: ALERT: Wykryto możliwe opady o 14:30 (loc=3) precipitation=0.07
+2025-11-17 09:08:49,314 WARNING: ALERT: Wykryto możliwe opady o 14:45 (loc=3) precipitation=0.07
+2025-11-17 09:08:49,318 WARNING: ALERT: Wykryto możliwe opady o 15:00 (loc=3) precipitation=0.07
+2025-11-17 09:08:49,322 WARNING: ALERT: Wykryto możliwe opady o 15:15 (loc=3) precipitation=0.07
+2025-11-17 09:08:49,325 WARNING: ALERT: Wykryto możliwe opady o 15:30 (loc=3) precipitation=0.07
+2025-11-17 09:08:49,327 WARNING: ALERT: Wykryto możliwe opady o 15:45 (loc=3) precipitation=0.07
+2025-11-17 09:08:49,330 WARNING: ALERT: Wykryto możliwe opady o 16:00 (loc=3) precipitation=0.07
+2025-11-17 09:08:49,334 WARNING: ALERT: Wykryto możliwe opady o 16:15 (loc=3) precipitation=0.07
+2025-11-17 09:08:49,338 WARNING: ALERT: Wykryto możliwe opady o 16:30 (loc=3) precipitation=0.07
+2025-11-17 09:08:49,340 WARNING: ALERT: Temperatura poniżej -19.0 °C o 17:15 (loc=3) temperature=-19.00
+2025-11-17 09:08:49,343 WARNING: ALERT: Temperatura poniżej -19.0 °C o 17:30 (loc=3) temperature=-19.00
+2025-11-17 09:08:49,345 WARNING: ALERT: Temperatura poniżej -19.0 °C o 17:45 (loc=3) temperature=-19.10
+2025-11-17 09:08:49,349 WARNING: ALERT: Temperatura poniżej -19.0 °C o 18:00 (loc=3) temperature=-19.20
+2025-11-17 09:08:49,353 WARNING: ALERT: Temperatura poniżej -19.0 °C o 18:15 (loc=3) temperature=-19.30
+2025-11-17 09:08:49,356 WARNING: ALERT: Temperatura poniżej -19.0 °C o 18:30 (loc=3) temperature=-19.40
+2025-11-17 09:08:49,359 WARNING: ALERT: Temperatura poniżej -19.0 °C o 18:45 (loc=3) temperature=-19.50
+2025-11-17 09:08:49,362 WARNING: ALERT: Temperatura poniżej -19.0 °C o 19:00 (loc=3) temperature=-19.50
+2025-11-17 09:08:49,365 WARNING: ALERT: Temperatura poniżej -19.0 °C o 19:15 (loc=3) temperature=-19.50
+2025-11-17 09:08:49,369 WARNING: ALERT: Temperatura poniżej -19.0 °C o 19:30 (loc=3) temperature=-19.40
+2025-11-17 09:08:49,372 WARNING: ALERT: Temperatura poniżej -19.0 °C o 19:45 (loc=3) temperature=-19.20
+2025-11-17 09:08:49,375 WARNING: ALERT: Temperatura poniżej -19.0 °C o 20:00 (loc=3) temperature=-19.10
+2025-11-17 09:08:49,378 WARNING: ALERT: Temperatura poniżej -19.0 °C o 20:15 (loc=3) temperature=-19.00
+2025-11-17 09:08:49,381 WARNING: ALERT: Temperatura poniżej -19.0 °C o 20:30 (loc=3) temperature=-19.00
+2025-11-17 09:08:49,386 WARNING: ALERT: Temperatura poniżej -19.0 °C o 06:00 (loc=3) temperature=-19.00
+2025-11-17 09:08:49,389 WARNING: ALERT: Temperatura poniżej -19.0 °C o 06:15 (loc=3) temperature=-19.00
+2025-11-17 09:08:49,391 WARNING: ALERT: Temperatura poniżej -19.0 °C o 06:30 (loc=3) temperature=-19.00
+2025-11-17 09:08:49,395 WARNING: ALERT: Temperatura poniżej -19.0 °C o 06:45 (loc=3) temperature=-19.00
+2025-11-17 09:08:49,395 INFO: Wygenerowano 39 alertów z analizy payloadu dla Zumsteinspitze
+2025-11-17 09:08:49,395 INFO: Pobieram Dufourspitze
+2025-11-17 09:08:49,841 WARNING: ALERT: Wykryto możliwe opady o 11:00 (loc=4) precipitation=0.07
+2025-11-17 09:08:49,845 WARNING: ALERT: Wykryto możliwe opady o 12:00 (loc=4) precipitation=0.14
+2025-11-17 09:08:49,849 WARNING: ALERT: Wykryto możliwe opady o 15:00 (loc=4) precipitation=0.28
+2025-11-17 09:08:49,853 WARNING: ALERT: Wykryto możliwe opady o 16:00 (loc=4) precipitation=0.28
+2025-11-17 09:08:49,858 WARNING: ALERT: Temperatura poniżej -19.0 °C o 17:00 (loc=4) temperature=-19.10
+2025-11-17 09:08:49,861 WARNING: ALERT: Wykryto możliwe opady o 17:00 (loc=4) precipitation=0.14
+2025-11-17 09:08:49,864 WARNING: ALERT: Temperatura poniżej -19.0 °C o 18:00 (loc=4) temperature=-19.50
+2025-11-17 09:08:49,868 WARNING: ALERT: Temperatura poniżej -19.0 °C o 19:00 (loc=4) temperature=-19.80
+2025-11-17 09:08:49,872 WARNING: ALERT: Temperatura poniżej -19.0 °C o 20:00 (loc=4) temperature=-19.50
+2025-11-17 09:08:49,874 WARNING: ALERT: Temperatura poniżej -19.0 °C o 21:00 (loc=4) temperature=-19.10
+2025-11-17 09:08:49,877 WARNING: ALERT: Temperatura poniżej -19.0 °C o 05:00 (loc=4) temperature=-19.10
+2025-11-17 09:08:49,879 WARNING: ALERT: Temperatura poniżej -19.0 °C o 06:00 (loc=4) temperature=-19.30
+2025-11-17 09:08:49,884 WARNING: ALERT: Wykryto możliwe opady o 11:00 (loc=4) precipitation=0.07
+2025-11-17 09:08:49,888 WARNING: ALERT: Wykryto możliwe opady o 11:15 (loc=4) precipitation=0.07
+2025-11-17 09:08:49,890 WARNING: ALERT: Wykryto możliwe opady o 12:00 (loc=4) precipitation=0.07
+2025-11-17 09:08:49,893 WARNING: ALERT: Wykryto możliwe opady o 14:15 (loc=4) precipitation=0.07
+2025-11-17 09:08:49,896 WARNING: ALERT: Wykryto możliwe opady o 14:30 (loc=4) precipitation=0.07
+2025-11-17 09:08:49,899 WARNING: ALERT: Wykryto możliwe opady o 14:45 (loc=4) precipitation=0.07
+2025-11-17 09:08:49,903 WARNING: ALERT: Wykryto możliwe opady o 15:00 (loc=4) precipitation=0.07
+2025-11-17 09:08:49,906 WARNING: ALERT: Wykryto możliwe opady o 15:15 (loc=4) precipitation=0.07
+2025-11-17 09:08:49,909 WARNING: ALERT: Wykryto możliwe opady o 15:30 (loc=4) precipitation=0.07
+2025-11-17 09:08:49,911 WARNING: ALERT: Wykryto możliwe opady o 15:45 (loc=4) precipitation=0.07
+2025-11-17 09:08:49,914 WARNING: ALERT: Wykryto możliwe opady o 16:00 (loc=4) precipitation=0.07
+2025-11-17 09:08:49,917 WARNING: ALERT: Wykryto możliwe opady o 16:15 (loc=4) precipitation=0.07
+2025-11-17 09:08:49,921 WARNING: ALERT: Wykryto możliwe opady o 16:30 (loc=4) precipitation=0.07
+2025-11-17 09:08:49,924 WARNING: ALERT: Temperatura poniżej -19.0 °C o 17:00 (loc=4) temperature=-19.10
+2025-11-17 09:08:49,927 WARNING: ALERT: Temperatura poniżej -19.0 °C o 17:15 (loc=4) temperature=-19.30
+2025-11-17 09:08:49,929 WARNING: ALERT: Temperatura poniżej -19.0 °C o 17:30 (loc=4) temperature=-19.40
+2025-11-17 09:08:49,933 WARNING: ALERT: Temperatura poniżej -19.0 °C o 17:45 (loc=4) temperature=-19.50
+2025-11-17 09:08:49,939 WARNING: ALERT: Temperatura poniżej -19.0 °C o 18:00 (loc=4) temperature=-19.50
+2025-11-17 09:08:49,943 WARNING: ALERT: Temperatura poniżej -19.0 °C o 18:15 (loc=4) temperature=-19.60
+2025-11-17 09:08:49,946 WARNING: ALERT: Temperatura poniżej -19.0 °C o 18:30 (loc=4) temperature=-19.80
+2025-11-17 09:08:49,950 WARNING: ALERT: Temperatura poniżej -19.0 °C o 18:45 (loc=4) temperature=-19.80
+2025-11-17 09:08:49,955 WARNING: ALERT: Temperatura poniżej -19.0 °C o 19:00 (loc=4) temperature=-19.90
+2025-11-17 09:08:49,958 WARNING: ALERT: Temperatura poniżej -19.0 °C o 19:15 (loc=4) temperature=-19.80
+2025-11-17 09:08:49,961 WARNING: ALERT: Temperatura poniżej -19.0 °C o 19:30 (loc=4) temperature=-19.70
+2025-11-17 09:08:49,965 WARNING: ALERT: Temperatura poniżej -19.0 °C o 19:45 (loc=4) temperature=-19.60
+2025-11-17 09:08:49,969 WARNING: ALERT: Temperatura poniżej -19.0 °C o 20:00 (loc=4) temperature=-19.50
+2025-11-17 09:08:49,973 WARNING: ALERT: Temperatura poniżej -19.0 °C o 20:15 (loc=4) temperature=-19.40
+2025-11-17 09:08:49,976 WARNING: ALERT: Temperatura poniżej -19.0 °C o 20:30 (loc=4) temperature=-19.30
+2025-11-17 09:08:49,979 WARNING: ALERT: Temperatura poniżej -19.0 °C o 20:45 (loc=4) temperature=-19.20
+2025-11-17 09:08:49,982 WARNING: ALERT: Temperatura poniżej -19.0 °C o 21:00 (loc=4) temperature=-19.10
+2025-11-17 09:08:49,986 WARNING: ALERT: Temperatura poniżej -19.0 °C o 21:15 (loc=4) temperature=-19.00
+2025-11-17 09:08:49,989 WARNING: ALERT: Temperatura poniżej -19.0 °C o 04:15 (loc=4) temperature=-19.00
+2025-11-17 09:08:49,992 WARNING: ALERT: Temperatura poniżej -19.0 °C o 04:30 (loc=4) temperature=-19.00
+2025-11-17 09:08:49,995 WARNING: ALERT: Temperatura poniżej -19.0 °C o 04:45 (loc=4) temperature=-19.10
+2025-11-17 09:08:49,998 WARNING: ALERT: Temperatura poniżej -19.0 °C o 05:00 (loc=4) temperature=-19.10
+2025-11-17 09:08:50,003 WARNING: ALERT: Temperatura poniżej -19.0 °C o 05:15 (loc=4) temperature=-19.20
+2025-11-17 09:08:50,006 WARNING: ALERT: Temperatura poniżej -19.0 °C o 05:30 (loc=4) temperature=-19.20
+2025-11-17 09:08:50,009 WARNING: ALERT: Temperatura poniżej -19.0 °C o 05:45 (loc=4) temperature=-19.30
+2025-11-17 09:08:50,012 WARNING: ALERT: Temperatura poniżej -19.0 °C o 06:00 (loc=4) temperature=-19.30
+2025-11-17 09:08:50,015 WARNING: ALERT: Temperatura poniżej -19.0 °C o 06:15 (loc=4) temperature=-19.30
+2025-11-17 09:08:50,019 WARNING: ALERT: Temperatura poniżej -19.0 °C o 06:30 (loc=4) temperature=-19.30
+2025-11-17 09:08:50,023 WARNING: ALERT: Temperatura poniżej -19.0 °C o 06:45 (loc=4) temperature=-19.30
+2025-11-17 09:08:50,023 INFO: Wygenerowano 54 alertów z analizy payloadu dla Dufourspitze
+2025-11-17 09:08:50,024 INFO: Pobieram Mont Blanc
+2025-11-17 09:08:50,439 WARNING: ALERT: Wykryto możliwe opady o 09:00 (loc=5) precipitation=0.49
+2025-11-17 09:08:50,443 WARNING: ALERT: Wykryto możliwe opady o 10:00 (loc=5) precipitation=1.05
+2025-11-17 09:08:50,446 WARNING: ALERT: Wykryto możliwe opady o 11:00 (loc=5) precipitation=1.33
+2025-11-17 09:08:50,451 WARNING: ALERT: Wykryto możliwe opady o 12:00 (loc=5) precipitation=0.91
+2025-11-17 09:08:50,455 WARNING: ALERT: Wykryto możliwe opady o 13:00 (loc=5) precipitation=0.70
+2025-11-17 09:08:50,459 WARNING: ALERT: Wykryto możliwe opady o 14:00 (loc=5) precipitation=0.91
+2025-11-17 09:08:50,462 WARNING: ALERT: Wykryto możliwe opady o 15:00 (loc=5) precipitation=0.98
+2025-11-17 09:08:50,466 WARNING: ALERT: Temperatura poniżej -19.0 °C o 16:00 (loc=5) temperature=-19.10
+2025-11-17 09:08:50,470 WARNING: ALERT: Wykryto możliwe opady o 16:00 (loc=5) precipitation=1.19
+2025-11-17 09:08:50,473 WARNING: ALERT: Temperatura poniżej -19.0 °C o 17:00 (loc=5) temperature=-20.20
+2025-11-17 09:08:50,476 WARNING: ALERT: Wykryto możliwe opady o 17:00 (loc=5) precipitation=0.07
+2025-11-17 09:08:50,479 WARNING: ALERT: Temperatura poniżej -19.0 °C o 18:00 (loc=5) temperature=-19.80
+2025-11-17 09:08:50,483 WARNING: ALERT: Temperatura poniżej -19.0 °C o 19:00 (loc=5) temperature=-19.20
+2025-11-17 09:08:50,488 WARNING: ALERT: Temperatura poniżej -19.0 °C o 03:00 (loc=5) temperature=-19.00
+2025-11-17 09:08:50,491 WARNING: ALERT: Temperatura poniżej -19.0 °C o 04:00 (loc=5) temperature=-19.30
+2025-11-17 09:08:50,494 WARNING: ALERT: Temperatura poniżej -19.0 °C o 05:00 (loc=5) temperature=-19.50
+2025-11-17 09:08:50,496 WARNING: ALERT: Temperatura poniżej -19.0 °C o 06:00 (loc=5) temperature=-19.60
+2025-11-17 09:08:50,500 WARNING: ALERT: Wykryto możliwe opady o 08:30 (loc=5) precipitation=0.07
+2025-11-17 09:08:50,504 WARNING: ALERT: Wykryto możliwe opady o 08:45 (loc=5) precipitation=0.14
+2025-11-17 09:08:50,508 WARNING: ALERT: Wykryto możliwe opady o 09:00 (loc=5) precipitation=0.28
+2025-11-17 09:08:50,511 WARNING: ALERT: Wykryto możliwe opady o 09:15 (loc=5) precipitation=0.35
+2025-11-17 09:08:50,513 WARNING: ALERT: Wykryto możliwe opady o 09:30 (loc=5) precipitation=0.28
+2025-11-17 09:08:50,516 WARNING: ALERT: Wykryto możliwe opady o 09:45 (loc=5) precipitation=0.21
+2025-11-17 09:08:50,520 WARNING: ALERT: Wykryto możliwe opady o 10:00 (loc=5) precipitation=0.21
+2025-11-17 09:08:50,525 WARNING: ALERT: Wykryto możliwe opady o 10:15 (loc=5) precipitation=0.35
+2025-11-17 09:08:50,527 WARNING: ALERT: Wykryto możliwe opady o 10:30 (loc=5) precipitation=0.28
+2025-11-17 09:08:50,530 WARNING: ALERT: Wykryto możliwe opady o 10:45 (loc=5) precipitation=0.42
+2025-11-17 09:08:50,534 WARNING: ALERT: Wykryto możliwe opady o 11:00 (loc=5) precipitation=0.28
+2025-11-17 09:08:50,537 WARNING: ALERT: Wykryto możliwe opady o 11:15 (loc=5) precipitation=0.21
+2025-11-17 09:08:50,540 WARNING: ALERT: Wykryto możliwe opady o 11:30 (loc=5) precipitation=0.28
+2025-11-17 09:08:50,543 WARNING: ALERT: Wykryto możliwe opady o 11:45 (loc=5) precipitation=0.21
+2025-11-17 09:08:50,546 WARNING: ALERT: Wykryto możliwe opady o 12:00 (loc=5) precipitation=0.21
+2025-11-17 09:08:50,550 WARNING: ALERT: Wykryto możliwe opady o 12:15 (loc=5) precipitation=0.21
+2025-11-17 09:08:50,553 WARNING: ALERT: Wykryto możliwe opady o 12:30 (loc=5) precipitation=0.14
+2025-11-17 09:08:50,556 WARNING: ALERT: Wykryto możliwe opady o 12:45 (loc=5) precipitation=0.14
+2025-11-17 09:08:50,559 WARNING: ALERT: Wykryto możliwe opady o 13:00 (loc=5) precipitation=0.21
+2025-11-17 09:08:50,561 WARNING: ALERT: Wykryto możliwe opady o 13:15 (loc=5) precipitation=0.21
+2025-11-17 09:08:50,565 WARNING: ALERT: Wykryto możliwe opady o 13:30 (loc=5) precipitation=0.21
+2025-11-17 09:08:50,569 WARNING: ALERT: Wykryto możliwe opady o 13:45 (loc=5) precipitation=0.28
+2025-11-17 09:08:50,572 WARNING: ALERT: Wykryto możliwe opady o 14:00 (loc=5) precipitation=0.21
+2025-11-17 09:08:50,575 WARNING: ALERT: Wykryto możliwe opady o 14:15 (loc=5) precipitation=0.21
+2025-11-17 09:08:50,578 WARNING: ALERT: Wykryto możliwe opady o 14:30 (loc=5) precipitation=0.21
+2025-11-17 09:08:50,581 WARNING: ALERT: Wykryto możliwe opady o 14:45 (loc=5) precipitation=0.28
+2025-11-17 09:08:50,585 WARNING: ALERT: Wykryto możliwe opady o 15:00 (loc=5) precipitation=0.28
+2025-11-17 09:08:50,589 WARNING: ALERT: Wykryto możliwe opady o 15:15 (loc=5) precipitation=0.28
+2025-11-17 09:08:50,591 WARNING: ALERT: Wykryto możliwe opady o 15:30 (loc=5) precipitation=0.35
+2025-11-17 09:08:50,594 WARNING: ALERT: Wykryto możliwe opady o 15:45 (loc=5) precipitation=0.35
+2025-11-17 09:08:50,597 WARNING: ALERT: Temperatura poniżej -19.0 °C o 16:00 (loc=5) temperature=-19.00
+2025-11-17 09:08:50,601 WARNING: ALERT: Wykryto możliwe opady o 16:00 (loc=5) precipitation=0.21
+2025-11-17 09:08:50,604 WARNING: ALERT: Temperatura poniżej -19.0 °C o 16:15 (loc=5) temperature=-19.40
+2025-11-17 09:08:50,607 WARNING: ALERT: Wykryto możliwe opady o 16:15 (loc=5) precipitation=0.07
+2025-11-17 09:08:50,610 WARNING: ALERT: Temperatura poniżej -19.0 °C o 16:30 (loc=5) temperature=-19.80
+2025-11-17 09:08:50,612 WARNING: ALERT: Temperatura poniżej -19.0 °C o 16:45 (loc=5) temperature=-20.00
+2025-11-17 09:08:50,616 WARNING: ALERT: Temperatura poniżej -19.0 °C o 17:00 (loc=5) temperature=-20.20
+2025-11-17 09:08:50,619 WARNING: ALERT: Temperatura poniżej -19.0 °C o 17:15 (loc=5) temperature=-20.20
+2025-11-17 09:08:50,622 WARNING: ALERT: Temperatura poniżej -19.0 °C o 17:30 (loc=5) temperature=-20.10
+2025-11-17 09:08:50,625 WARNING: ALERT: Temperatura poniżej -19.0 °C o 17:45 (loc=5) temperature=-20.00
+2025-11-17 09:08:50,628 WARNING: ALERT: Temperatura poniżej -19.0 °C o 18:00 (loc=5) temperature=-19.80
+2025-11-17 09:08:50,631 WARNING: ALERT: Temperatura poniżej -19.0 °C o 18:15 (loc=5) temperature=-19.70
+2025-11-17 09:08:50,635 WARNING: ALERT: Temperatura poniżej -19.0 °C o 18:30 (loc=5) temperature=-19.50
+2025-11-17 09:08:50,639 WARNING: ALERT: Temperatura poniżej -19.0 °C o 18:45 (loc=5) temperature=-19.40
+2025-11-17 09:08:50,641 WARNING: ALERT: Temperatura poniżej -19.0 °C o 19:00 (loc=5) temperature=-19.10
+2025-11-17 09:08:50,645 WARNING: ALERT: Temperatura poniżej -19.0 °C o 02:45 (loc=5) temperature=-19.00
+2025-11-17 09:08:50,648 WARNING: ALERT: Temperatura poniżej -19.0 °C o 03:00 (loc=5) temperature=-19.00
+2025-11-17 09:08:50,652 WARNING: ALERT: Temperatura poniżej -19.0 °C o 03:15 (loc=5) temperature=-19.10
+2025-11-17 09:08:50,656 WARNING: ALERT: Temperatura poniżej -19.0 °C o 03:30 (loc=5) temperature=-19.10
+2025-11-17 09:08:50,658 WARNING: ALERT: Temperatura poniżej -19.0 °C o 03:45 (loc=5) temperature=-19.20
+2025-11-17 09:08:50,661 WARNING: ALERT: Temperatura poniżej -19.0 °C o 04:00 (loc=5) temperature=-19.30
+2025-11-17 09:08:50,665 WARNING: ALERT: Temperatura poniżej -19.0 °C o 04:15 (loc=5) temperature=-19.40
+2025-11-17 09:08:50,669 WARNING: ALERT: Temperatura poniżej -19.0 °C o 04:30 (loc=5) temperature=-19.40
+2025-11-17 09:08:50,672 WARNING: ALERT: Temperatura poniżej -19.0 °C o 04:45 (loc=5) temperature=-19.50
+2025-11-17 09:08:50,675 WARNING: ALERT: Temperatura poniżej -19.0 °C o 05:00 (loc=5) temperature=-19.50
+2025-11-17 09:08:50,678 WARNING: ALERT: Temperatura poniżej -19.0 °C o 05:15 (loc=5) temperature=-19.50
+2025-11-17 09:08:50,681 WARNING: ALERT: Temperatura poniżej -19.0 °C o 05:30 (loc=5) temperature=-19.50
+2025-11-17 09:08:50,685 WARNING: ALERT: Temperatura poniżej -19.0 °C o 05:45 (loc=5) temperature=-19.50
+2025-11-17 09:08:50,688 WARNING: ALERT: Temperatura poniżej -19.0 °C o 06:00 (loc=5) temperature=-19.50
+2025-11-17 09:08:50,691 WARNING: ALERT: Temperatura poniżej -19.0 °C o 06:15 (loc=5) temperature=-19.50
+2025-11-17 09:08:50,694 WARNING: ALERT: Temperatura poniżej -19.0 °C o 06:30 (loc=5) temperature=-19.50
+2025-11-17 09:08:50,697 WARNING: ALERT: Temperatura poniżej -19.0 °C o 06:45 (loc=5) temperature=-19.50
+2025-11-17 09:08:50,697 INFO: Wygenerowano 79 alertów z analizy payloadu dla Mont Blanc
+2025-11-17 09:08:50,698 INFO: Pobieram Matterhorn
+2025-11-17 09:08:51,118 WARNING: ALERT: Wykryto możliwe opady o 10:00 (loc=6) precipitation=0.07
+2025-11-17 09:08:51,123 WARNING: ALERT: Wykryto możliwe opady o 11:00 (loc=6) precipitation=0.28
+2025-11-17 09:08:51,128 WARNING: ALERT: Wykryto możliwe opady o 12:00 (loc=6) precipitation=0.35
+2025-11-17 09:08:51,134 WARNING: ALERT: Wykryto możliwe opady o 13:00 (loc=6) precipitation=0.28
+2025-11-17 09:08:51,138 WARNING: ALERT: Wykryto możliwe opady o 14:00 (loc=6) precipitation=0.35
+2025-11-17 09:08:51,142 WARNING: ALERT: Wykryto możliwe opady o 15:00 (loc=6) precipitation=0.56
+2025-11-17 09:08:51,145 WARNING: ALERT: Wykryto możliwe opady o 16:00 (loc=6) precipitation=0.56
+2025-11-17 09:08:51,148 WARNING: ALERT: Wykryto możliwe opady o 17:00 (loc=6) precipitation=0.21
+2025-11-17 09:08:51,153 WARNING: ALERT: Wykryto możliwe opady o 09:30 (loc=6) precipitation=0.07
+2025-11-17 09:08:51,156 WARNING: ALERT: Wykryto możliwe opady o 10:15 (loc=6) precipitation=0.07
+2025-11-17 09:08:51,158 WARNING: ALERT: Wykryto możliwe opady o 10:30 (loc=6) precipitation=0.07
+2025-11-17 09:08:51,162 WARNING: ALERT: Wykryto możliwe opady o 10:45 (loc=6) precipitation=0.07
+2025-11-17 09:08:51,166 WARNING: ALERT: Wykryto możliwe opady o 11:00 (loc=6) precipitation=0.07
+2025-11-17 09:08:51,171 WARNING: ALERT: Wykryto możliwe opady o 11:15 (loc=6) precipitation=0.07
+2025-11-17 09:08:51,176 WARNING: ALERT: Wykryto możliwe opady o 11:30 (loc=6) precipitation=0.07
+2025-11-17 09:08:51,179 WARNING: ALERT: Wykryto możliwe opady o 11:45 (loc=6) precipitation=0.14
+2025-11-17 09:08:51,183 WARNING: ALERT: Wykryto możliwe opady o 12:00 (loc=6) precipitation=0.07
+2025-11-17 09:08:51,186 WARNING: ALERT: Wykryto możliwe opady o 12:15 (loc=6) precipitation=0.07
+2025-11-17 09:08:51,189 WARNING: ALERT: Wykryto możliwe opady o 12:30 (loc=6) precipitation=0.07
+2025-11-17 09:08:51,193 WARNING: ALERT: Wykryto możliwe opady o 12:45 (loc=6) precipitation=0.07
+2025-11-17 09:08:51,196 WARNING: ALERT: Wykryto możliwe opady o 13:00 (loc=6) precipitation=0.07
+2025-11-17 09:08:51,200 WARNING: ALERT: Wykryto możliwe opady o 13:15 (loc=6) precipitation=0.07
+2025-11-17 09:08:51,203 WARNING: ALERT: Wykryto możliwe opady o 13:30 (loc=6) precipitation=0.07
+2025-11-17 09:08:51,206 WARNING: ALERT: Wykryto możliwe opady o 13:45 (loc=6) precipitation=0.07
+2025-11-17 09:08:51,209 WARNING: ALERT: Wykryto możliwe opady o 14:00 (loc=6) precipitation=0.14
+2025-11-17 09:08:51,212 WARNING: ALERT: Wykryto możliwe opady o 14:15 (loc=6) precipitation=0.14
+2025-11-17 09:08:51,215 WARNING: ALERT: Wykryto możliwe opady o 14:30 (loc=6) precipitation=0.14
+2025-11-17 09:08:51,219 WARNING: ALERT: Wykryto możliwe opady o 14:45 (loc=6) precipitation=0.14
+2025-11-17 09:08:51,222 WARNING: ALERT: Wykryto możliwe opady o 15:00 (loc=6) precipitation=0.14
+2025-11-17 09:08:51,225 WARNING: ALERT: Wykryto możliwe opady o 15:15 (loc=6) precipitation=0.14
+2025-11-17 09:08:51,228 WARNING: ALERT: Wykryto możliwe opady o 15:30 (loc=6) precipitation=0.14
+2025-11-17 09:08:51,231 WARNING: ALERT: Wykryto możliwe opady o 15:45 (loc=6) precipitation=0.14
+2025-11-17 09:08:51,235 WARNING: ALERT: Wykryto możliwe opady o 16:00 (loc=6) precipitation=0.14
+2025-11-17 09:08:51,238 WARNING: ALERT: Wykryto możliwe opady o 16:15 (loc=6) precipitation=0.14
+2025-11-17 09:08:51,241 WARNING: ALERT: Wykryto możliwe opady o 16:30 (loc=6) precipitation=0.07
+2025-11-17 09:08:51,241 INFO: Wygenerowano 35 alertów z analizy payloadu dla Matterhorn
+2025-11-17 09:08:51,242 INFO: Pobieram Tryglaw
+2025-11-17 09:08:51,713 WARNING: ALERT: Wykryto możliwe opady o 09:00 (loc=7) precipitation=1.20
+2025-11-17 09:08:51,717 WARNING: ALERT: Wykryto możliwe opady o 10:00 (loc=7) precipitation=0.30
+2025-11-17 09:08:51,721 WARNING: ALERT: Wykryto możliwe opady o 11:00 (loc=7) precipitation=4.55
+2025-11-17 09:08:51,725 WARNING: ALERT: Wykryto możliwe opady o 12:00 (loc=7) precipitation=3.15
+2025-11-17 09:08:51,731 WARNING: ALERT: Wykryto możliwe opady o 13:00 (loc=7) precipitation=1.40
+2025-11-17 09:08:51,738 WARNING: ALERT: Wykryto możliwe opady o 14:00 (loc=7) precipitation=0.42
+2025-11-17 09:08:51,741 WARNING: ALERT: Wykryto możliwe opady o 19:00 (loc=7) precipitation=0.07
+2025-11-17 09:08:51,744 WARNING: ALERT: Wykryto możliwe opady o 20:00 (loc=7) precipitation=0.63
+2025-11-17 09:08:51,748 WARNING: ALERT: Wykryto możliwe opady o 21:00 (loc=7) precipitation=2.73
+2025-11-17 09:08:51,753 WARNING: ALERT: Wykryto możliwe opady o 22:00 (loc=7) precipitation=2.66
+2025-11-17 09:08:51,756 WARNING: ALERT: Wykryto możliwe opady o 23:00 (loc=7) precipitation=1.47
+2025-11-17 09:08:51,759 WARNING: ALERT: Wykryto możliwe opady o 00:00 (loc=7) precipitation=0.21
+2025-11-17 09:08:51,762 WARNING: ALERT: Wykryto możliwe opady o 01:00 (loc=7) precipitation=0.98
+2025-11-17 09:08:51,766 WARNING: ALERT: Wykryto możliwe opady o 02:00 (loc=7) precipitation=0.07
+2025-11-17 09:08:51,770 WARNING: ALERT: Wykryto możliwe opady o 03:00 (loc=7) precipitation=0.14
+2025-11-17 09:08:51,773 WARNING: ALERT: Wykryto możliwe opady o 08:15 (loc=7) precipitation=0.10
+2025-11-17 09:08:51,776 WARNING: ALERT: Wykryto możliwe opady o 08:30 (loc=7) precipitation=0.10
+2025-11-17 09:08:51,779 WARNING: ALERT: Wykryto możliwe opady o 08:45 (loc=7) precipitation=0.80
+2025-11-17 09:08:51,783 WARNING: ALERT: Wykryto możliwe opady o 09:00 (loc=7) precipitation=0.20
+2025-11-17 09:08:51,787 WARNING: ALERT: Wykryto możliwe opady o 09:15 (loc=7) precipitation=0.10
+2025-11-17 09:08:51,790 WARNING: ALERT: Wykryto możliwe opady o 09:30 (loc=7) precipitation=0.10
+2025-11-17 09:08:51,793 WARNING: ALERT: Wykryto możliwe opady o 09:45 (loc=7) precipitation=0.10
+2025-11-17 09:08:51,795 WARNING: ALERT: Wykryto możliwe opady o 10:00 (loc=7) precipitation=0.35
+2025-11-17 09:08:51,798 WARNING: ALERT: Wykryto możliwe opady o 10:15 (loc=7) precipitation=0.91
+2025-11-17 09:08:51,803 WARNING: ALERT: Wykryto możliwe opady o 10:30 (loc=7) precipitation=1.26
+2025-11-17 09:08:51,806 WARNING: ALERT: Wykryto możliwe opady o 10:45 (loc=7) precipitation=1.40
+2025-11-17 09:08:51,809 WARNING: ALERT: Wykryto możliwe opady o 11:00 (loc=7) precipitation=0.98
+2025-11-17 09:08:51,812 WARNING: ALERT: Wykryto możliwe opady o 11:15 (loc=7) precipitation=0.91
+2025-11-17 09:08:51,816 WARNING: ALERT: Wykryto możliwe opady o 11:30 (loc=7) precipitation=0.77
+2025-11-17 09:08:51,821 WARNING: ALERT: Wykryto możliwe opady o 11:45 (loc=7) precipitation=0.77
+2025-11-17 09:08:51,824 WARNING: ALERT: Wykryto możliwe opady o 12:00 (loc=7) precipitation=0.70
+2025-11-17 09:08:51,827 WARNING: ALERT: Wykryto możliwe opady o 12:15 (loc=7) precipitation=0.49
+2025-11-17 09:08:51,829 WARNING: ALERT: Wykryto możliwe opady o 12:30 (loc=7) precipitation=0.42
+2025-11-17 09:08:51,833 WARNING: ALERT: Wykryto możliwe opady o 12:45 (loc=7) precipitation=0.28
+2025-11-17 09:08:51,837 WARNING: ALERT: Wykryto możliwe opady o 13:00 (loc=7) precipitation=0.21
+2025-11-17 09:08:51,840 WARNING: ALERT: Wykryto możliwe opady o 13:15 (loc=7) precipitation=0.21
+2025-11-17 09:08:51,843 WARNING: ALERT: Wykryto możliwe opady o 13:30 (loc=7) precipitation=0.14
+2025-11-17 09:08:51,846 WARNING: ALERT: Wykryto możliwe opady o 13:45 (loc=7) precipitation=0.07
+2025-11-17 09:08:51,850 WARNING: ALERT: Wykryto możliwe opady o 19:00 (loc=7) precipitation=0.07
+2025-11-17 09:08:51,855 WARNING: ALERT: Wykryto możliwe opady o 19:15 (loc=7) precipitation=0.14
+2025-11-17 09:08:51,858 WARNING: ALERT: Wykryto możliwe opady o 19:30 (loc=7) precipitation=0.14
+2025-11-17 09:08:51,861 WARNING: ALERT: Wykryto możliwe opady o 19:45 (loc=7) precipitation=0.14
+2025-11-17 09:08:51,863 WARNING: ALERT: Wykryto możliwe opady o 20:00 (loc=7) precipitation=0.21
+2025-11-17 09:08:51,867 WARNING: ALERT: Wykryto możliwe opady o 20:15 (loc=7) precipitation=0.56
+2025-11-17 09:08:51,871 WARNING: ALERT: Wykryto możliwe opady o 20:30 (loc=7) precipitation=0.84
+2025-11-17 09:08:51,874 WARNING: ALERT: Wykryto możliwe opady o 20:45 (loc=7) precipitation=0.70
+2025-11-17 09:08:51,877 WARNING: ALERT: Wykryto możliwe opady o 21:00 (loc=7) precipitation=0.63
+2025-11-17 09:08:51,880 WARNING: ALERT: Wykryto możliwe opady o 21:15 (loc=7) precipitation=0.70
+2025-11-17 09:08:51,883 WARNING: ALERT: Wykryto możliwe opady o 21:30 (loc=7) precipitation=0.84
+2025-11-17 09:08:51,887 WARNING: ALERT: Wykryto możliwe opady o 21:45 (loc=7) precipitation=0.70
+2025-11-17 09:08:51,890 WARNING: ALERT: Wykryto możliwe opady o 22:00 (loc=7) precipitation=0.42
+2025-11-17 09:08:51,893 WARNING: ALERT: Wykryto możliwe opady o 22:15 (loc=7) precipitation=0.56
+2025-11-17 09:08:51,896 WARNING: ALERT: Wykryto możliwe opady o 22:30 (loc=7) precipitation=0.70
+2025-11-17 09:08:51,899 WARNING: ALERT: Wykryto możliwe opady o 22:45 (loc=7) precipitation=0.14
+2025-11-17 09:08:51,903 WARNING: ALERT: Wykryto możliwe opady o 23:00 (loc=7) precipitation=0.07
+2025-11-17 09:08:51,906 WARNING: ALERT: Wykryto możliwe opady o 23:15 (loc=7) precipitation=0.07
+2025-11-17 09:08:51,909 WARNING: ALERT: Wykryto możliwe opady o 00:00 (loc=7) precipitation=0.14
+2025-11-17 09:08:51,912 WARNING: ALERT: Wykryto możliwe opady o 00:15 (loc=7) precipitation=0.42
+2025-11-17 09:08:51,915 WARNING: ALERT: Wykryto możliwe opady o 00:30 (loc=7) precipitation=0.28
+2025-11-17 09:08:51,919 WARNING: ALERT: Wykryto możliwe opady o 00:45 (loc=7) precipitation=0.07
+2025-11-17 09:08:51,922 WARNING: ALERT: Wykryto możliwe opady o 01:00 (loc=7) precipitation=0.21
+2025-11-17 09:08:51,925 WARNING: ALERT: Wykryto możliwe opady o 01:15 (loc=7) precipitation=0.07
+2025-11-17 09:08:51,928 WARNING: ALERT: Wykryto możliwe opady o 02:30 (loc=7) precipitation=0.14
+2025-11-17 09:08:51,928 INFO: Wygenerowano 63 alertów z analizy payloadu dla Tryglaw
+2025-11-17 09:08:51,929 INFO: Pobieram Zugspitze
+2025-11-17 09:08:53,506 WARNING: ALERT: Wykryto możliwe opady o 09:00 (loc=8) precipitation=0.07
+2025-11-17 09:08:53,510 WARNING: ALERT: Wykryto możliwe opady o 10:00 (loc=8) precipitation=0.35
+2025-11-17 09:08:53,513 WARNING: ALERT: Wykryto możliwe opady o 11:00 (loc=8) precipitation=1.47
+2025-11-17 09:08:53,518 WARNING: ALERT: Wykryto możliwe opady o 12:00 (loc=8) precipitation=1.26
+2025-11-17 09:08:53,526 WARNING: ALERT: Wykryto możliwe opady o 13:00 (loc=8) precipitation=0.77
+2025-11-17 09:08:53,529 WARNING: ALERT: Wykryto możliwe opady o 14:00 (loc=8) precipitation=0.77
+2025-11-17 09:08:53,534 WARNING: ALERT: Wykryto możliwe opady o 15:00 (loc=8) precipitation=0.70
+2025-11-17 09:08:53,538 WARNING: ALERT: Wykryto możliwe opady o 16:00 (loc=8) precipitation=0.28
+2025-11-17 09:08:53,543 WARNING: ALERT: Wykryto możliwe opady o 17:00 (loc=8) precipitation=0.56
+2025-11-17 09:08:53,546 WARNING: ALERT: Wykryto możliwe opady o 18:00 (loc=8) precipitation=0.56
+2025-11-17 09:08:53,550 WARNING: ALERT: Wykryto możliwe opady o 19:00 (loc=8) precipitation=0.49
+2025-11-17 09:08:53,556 WARNING: ALERT: Wykryto możliwe opady o 20:00 (loc=8) precipitation=1.33
+2025-11-17 09:08:53,560 WARNING: ALERT: Wykryto możliwe opady o 21:00 (loc=8) precipitation=0.70
+2025-11-17 09:08:53,563 WARNING: ALERT: Wykryto możliwe opady o 22:00 (loc=8) precipitation=0.77
+2025-11-17 09:08:53,567 WARNING: ALERT: Wykryto możliwe opady o 23:00 (loc=8) precipitation=0.56
+2025-11-17 09:08:53,570 WARNING: ALERT: Wykryto możliwe opady o 00:00 (loc=8) precipitation=0.28
+2025-11-17 09:08:53,574 WARNING: ALERT: Wykryto możliwe opady o 09:00 (loc=8) precipitation=0.07
+2025-11-17 09:08:53,576 WARNING: ALERT: Wykryto możliwe opady o 09:45 (loc=8) precipitation=0.07
+2025-11-17 09:08:53,580 WARNING: ALERT: Wykryto możliwe opady o 10:00 (loc=8) precipitation=0.28
+2025-11-17 09:08:53,584 WARNING: ALERT: Wykryto możliwe opady o 10:15 (loc=8) precipitation=0.35
+2025-11-17 09:08:53,589 WARNING: ALERT: Wykryto możliwe opady o 10:30 (loc=8) precipitation=0.28
+2025-11-17 09:08:53,592 WARNING: ALERT: Wykryto możliwe opady o 10:45 (loc=8) precipitation=0.42
+2025-11-17 09:08:53,595 WARNING: ALERT: Wykryto możliwe opady o 11:00 (loc=8) precipitation=0.42
+2025-11-17 09:08:53,599 WARNING: ALERT: Wykryto możliwe opady o 11:15 (loc=8) precipitation=0.42
+2025-11-17 09:08:53,603 WARNING: ALERT: Wykryto możliwe opady o 11:30 (loc=8) precipitation=0.28
+2025-11-17 09:08:53,606 WARNING: ALERT: Wykryto możliwe opady o 11:45 (loc=8) precipitation=0.21
+2025-11-17 09:08:53,609 WARNING: ALERT: Wykryto możliwe opady o 12:00 (loc=8) precipitation=0.35
+2025-11-17 09:08:53,612 WARNING: ALERT: Wykryto możliwe opady o 12:15 (loc=8) precipitation=0.28
+2025-11-17 09:08:53,615 WARNING: ALERT: Wykryto możliwe opady o 12:30 (loc=8) precipitation=0.21
+2025-11-17 09:08:53,620 WARNING: ALERT: Wykryto możliwe opady o 12:45 (loc=8) precipitation=0.14
+2025-11-17 09:08:53,624 WARNING: ALERT: Wykryto możliwe opady o 13:00 (loc=8) precipitation=0.14
+2025-11-17 09:08:53,627 WARNING: ALERT: Wykryto możliwe opady o 13:15 (loc=8) precipitation=0.21
+2025-11-17 09:08:53,630 WARNING: ALERT: Wykryto możliwe opady o 13:30 (loc=8) precipitation=0.14
+2025-11-17 09:08:53,634 WARNING: ALERT: Wykryto możliwe opady o 13:45 (loc=8) precipitation=0.21
+2025-11-17 09:08:53,638 WARNING: ALERT: Wykryto możliwe opady o 14:00 (loc=8) precipitation=0.21
+2025-11-17 09:08:53,641 WARNING: ALERT: Wykryto możliwe opady o 14:15 (loc=8) precipitation=0.21
+2025-11-17 09:08:53,643 WARNING: ALERT: Wykryto możliwe opady o 14:30 (loc=8) precipitation=0.21
+2025-11-17 09:08:53,646 WARNING: ALERT: Wykryto możliwe opady o 14:45 (loc=8) precipitation=0.14
+2025-11-17 09:08:53,650 WARNING: ALERT: Wykryto możliwe opady o 15:00 (loc=8) precipitation=0.14
+2025-11-17 09:08:53,654 WARNING: ALERT: Wykryto możliwe opady o 15:15 (loc=8) precipitation=0.07
+2025-11-17 09:08:53,657 WARNING: ALERT: Wykryto możliwe opady o 15:30 (loc=8) precipitation=0.07
+2025-11-17 09:08:53,660 WARNING: ALERT: Wykryto możliwe opady o 15:45 (loc=8) precipitation=0.07
+2025-11-17 09:08:53,663 WARNING: ALERT: Wykryto możliwe opady o 16:00 (loc=8) precipitation=0.07
+2025-11-17 09:08:53,667 WARNING: ALERT: Wykryto możliwe opady o 16:15 (loc=8) precipitation=0.14
+2025-11-17 09:08:53,671 WARNING: ALERT: Wykryto możliwe opady o 16:30 (loc=8) precipitation=0.14
+2025-11-17 09:08:53,674 WARNING: ALERT: Wykryto możliwe opady o 16:45 (loc=8) precipitation=0.14
+2025-11-17 09:08:53,676 WARNING: ALERT: Wykryto możliwe opady o 17:00 (loc=8) precipitation=0.14
+2025-11-17 09:08:53,680 WARNING: ALERT: Wykryto możliwe opady o 17:15 (loc=8) precipitation=0.14
+2025-11-17 09:08:53,684 WARNING: ALERT: Wykryto możliwe opady o 17:30 (loc=8) precipitation=0.14
+2025-11-17 09:08:53,688 WARNING: ALERT: Wykryto możliwe opady o 17:45 (loc=8) precipitation=0.14
+2025-11-17 09:08:53,692 WARNING: ALERT: Wykryto możliwe opady o 18:00 (loc=8) precipitation=0.14
+2025-11-17 09:08:53,695 WARNING: ALERT: Wykryto możliwe opady o 18:15 (loc=8) precipitation=0.14
+2025-11-17 09:08:53,697 WARNING: ALERT: Wykryto możliwe opady o 18:30 (loc=8) precipitation=0.14
+2025-11-17 09:08:53,703 WARNING: ALERT: Wykryto możliwe opady o 18:45 (loc=8) precipitation=0.14
+2025-11-17 09:08:53,706 WARNING: ALERT: Wykryto możliwe opady o 19:00 (loc=8) precipitation=0.07
+2025-11-17 09:08:53,709 WARNING: ALERT: Wykryto możliwe opady o 19:15 (loc=8) precipitation=0.28
+2025-11-17 09:08:53,712 WARNING: ALERT: Wykryto możliwe opady o 19:30 (loc=8) precipitation=0.35
+2025-11-17 09:08:53,714 WARNING: ALERT: Wykryto możliwe opady o 19:45 (loc=8) precipitation=0.28
+2025-11-17 09:08:53,719 WARNING: ALERT: Wykryto możliwe opady o 20:00 (loc=8) precipitation=0.42
+2025-11-17 09:08:53,722 WARNING: ALERT: Wykryto możliwe opady o 20:15 (loc=8) precipitation=0.21
+2025-11-17 09:08:53,725 WARNING: ALERT: Wykryto możliwe opady o 20:30 (loc=8) precipitation=0.14
+2025-11-17 09:08:53,729 WARNING: ALERT: Wykryto możliwe opady o 20:45 (loc=8) precipitation=0.14
+2025-11-17 09:08:53,731 WARNING: ALERT: Wykryto możliwe opady o 21:00 (loc=8) precipitation=0.21
+2025-11-17 09:08:53,736 WARNING: ALERT: Wykryto możliwe opady o 21:15 (loc=8) precipitation=0.21
+2025-11-17 09:08:53,739 WARNING: ALERT: Wykryto możliwe opady o 21:30 (loc=8) precipitation=0.21
+2025-11-17 09:08:53,742 WARNING: ALERT: Wykryto możliwe opady o 21:45 (loc=8) precipitation=0.21
+2025-11-17 09:08:53,744 WARNING: ALERT: Wykryto możliwe opady o 22:00 (loc=8) precipitation=0.14
+2025-11-17 09:08:53,747 WARNING: ALERT: Wykryto możliwe opady o 22:15 (loc=8) precipitation=0.14
+2025-11-17 09:08:53,751 WARNING: ALERT: Wykryto możliwe opady o 22:30 (loc=8) precipitation=0.14
+2025-11-17 09:08:53,756 WARNING: ALERT: Wykryto możliwe opady o 22:45 (loc=8) precipitation=0.14
+2025-11-17 09:08:53,760 WARNING: ALERT: Wykryto możliwe opady o 23:00 (loc=8) precipitation=0.14
+2025-11-17 09:08:53,764 WARNING: ALERT: Wykryto możliwe opady o 23:15 (loc=8) precipitation=0.07
+2025-11-17 09:08:53,768 WARNING: ALERT: Wykryto możliwe opady o 23:30 (loc=8) precipitation=0.07
+2025-11-17 09:08:53,772 WARNING: ALERT: Wykryto możliwe opady o 23:45 (loc=8) precipitation=0.07
+2025-11-17 09:08:53,775 WARNING: ALERT: Wykryto możliwe opady o 00:00 (loc=8) precipitation=0.07
+2025-11-17 09:08:53,776 INFO: Wygenerowano 75 alertów z analizy payloadu dla Zugspitze
+2025-11-17 09:08:53,777 INFO: Iteracja zakończona. Wstawiono alertów: 0
+2025-11-17 09:14:29,806 INFO: Uruchamiam fetch (hourly=True, minutely=True) dla: wszystkie
+2025-11-17 09:14:32,990 INFO: Pobieram Grossglockner
+2025-11-17 09:14:33,478 WARNING: ALERT: Wykryto możliwe opady o 09:00 (loc=1) precipitation=1.19
+2025-11-17 09:14:33,483 WARNING: ALERT: Wykryto możliwe opady o 10:00 (loc=1) precipitation=0.91
+2025-11-17 09:14:33,488 WARNING: ALERT: Wykryto możliwe opady o 11:00 (loc=1) precipitation=0.56
+2025-11-17 09:14:33,494 WARNING: ALERT: Wykryto możliwe opady o 12:00 (loc=1) precipitation=0.28
+2025-11-17 09:14:33,500 WARNING: ALERT: Wykryto możliwe opady o 13:00 (loc=1) precipitation=0.49
+2025-11-17 09:14:33,505 WARNING: ALERT: Wykryto możliwe opady o 14:00 (loc=1) precipitation=0.56
+2025-11-17 09:14:33,508 WARNING: ALERT: Wykryto możliwe opady o 15:00 (loc=1) precipitation=0.56
+2025-11-17 09:14:33,511 WARNING: ALERT: Wykryto możliwe opady o 16:00 (loc=1) precipitation=0.35
+2025-11-17 09:14:33,514 WARNING: ALERT: Wykryto możliwe opady o 17:00 (loc=1) precipitation=0.28
+2025-11-17 09:14:33,520 WARNING: ALERT: Wykryto możliwe opady o 18:00 (loc=1) precipitation=0.28
+2025-11-17 09:14:33,524 WARNING: ALERT: Wykryto możliwe opady o 19:00 (loc=1) precipitation=0.28
+2025-11-17 09:14:33,527 WARNING: ALERT: Wykryto możliwe opady o 20:00 (loc=1) precipitation=0.28
+2025-11-17 09:14:33,530 WARNING: ALERT: Wykryto możliwe opady o 21:00 (loc=1) precipitation=0.28
+2025-11-17 09:14:33,535 WARNING: ALERT: Wykryto możliwe opady o 22:00 (loc=1) precipitation=0.28
+2025-11-17 09:14:33,538 WARNING: ALERT: Wykryto możliwe opady o 23:00 (loc=1) precipitation=0.28
+2025-11-17 09:14:33,542 WARNING: ALERT: Temperatura poniżej -19.0 °C o 00:00 (loc=1) temperature=-19.30
+2025-11-17 09:14:33,545 WARNING: ALERT: Wykryto możliwe opady o 00:00 (loc=1) precipitation=0.21
+2025-11-17 09:14:33,548 WARNING: ALERT: Temperatura poniżej -19.0 °C o 01:00 (loc=1) temperature=-19.60
+2025-11-17 09:14:33,553 WARNING: ALERT: Wykryto możliwe opady o 01:00 (loc=1) precipitation=0.07
+2025-11-17 09:14:33,556 WARNING: ALERT: Temperatura poniżej -19.0 °C o 02:00 (loc=1) temperature=-20.30
+2025-11-17 09:14:33,560 WARNING: ALERT: Temperatura poniżej -19.0 °C o 03:00 (loc=1) temperature=-20.50
+2025-11-17 09:14:33,564 WARNING: ALERT: Temperatura poniżej -19.0 °C o 04:00 (loc=1) temperature=-20.50
+2025-11-17 09:14:33,568 WARNING: ALERT: Temperatura poniżej -19.0 °C o 05:00 (loc=1) temperature=-20.00
+2025-11-17 09:14:33,571 WARNING: ALERT: Temperatura poniżej -19.0 °C o 06:00 (loc=1) temperature=-19.50
+2025-11-17 09:14:33,575 WARNING: ALERT: Wykryto możliwe opady o 08:15 (loc=1) precipitation=0.35
+2025-11-17 09:14:33,579 WARNING: ALERT: Wykryto możliwe opady o 08:30 (loc=1) precipitation=0.28
+2025-11-17 09:14:33,583 WARNING: ALERT: Wykryto możliwe opady o 08:45 (loc=1) precipitation=0.28
+2025-11-17 09:14:33,588 WARNING: ALERT: Wykryto możliwe opady o 09:00 (loc=1) precipitation=0.28
+2025-11-17 09:14:33,591 WARNING: ALERT: Wykryto możliwe opady o 09:15 (loc=1) precipitation=0.28
+2025-11-17 09:14:33,594 WARNING: ALERT: Wykryto możliwe opady o 09:30 (loc=1) precipitation=0.28
+2025-11-17 09:14:33,597 WARNING: ALERT: Wykryto możliwe opady o 09:45 (loc=1) precipitation=0.21
+2025-11-17 09:14:33,600 WARNING: ALERT: Wykryto możliwe opady o 10:00 (loc=1) precipitation=0.14
+2025-11-17 09:14:33,604 WARNING: ALERT: Wykryto możliwe opady o 10:15 (loc=1) precipitation=0.21
+2025-11-17 09:14:33,608 WARNING: ALERT: Wykryto możliwe opady o 10:30 (loc=1) precipitation=0.14
+2025-11-17 09:14:33,610 WARNING: ALERT: Wykryto możliwe opady o 10:45 (loc=1) precipitation=0.14
+2025-11-17 09:14:33,613 WARNING: ALERT: Wykryto możliwe opady o 11:00 (loc=1) precipitation=0.07
+2025-11-17 09:14:33,617 WARNING: ALERT: Wykryto możliwe opady o 11:15 (loc=1) precipitation=0.07
+2025-11-17 09:14:33,620 WARNING: ALERT: Wykryto możliwe opady o 11:30 (loc=1) precipitation=0.07
+2025-11-17 09:14:33,624 WARNING: ALERT: Wykryto możliwe opady o 11:45 (loc=1) precipitation=0.07
+2025-11-17 09:14:33,627 WARNING: ALERT: Wykryto możliwe opady o 12:00 (loc=1) precipitation=0.07
+2025-11-17 09:14:33,630 WARNING: ALERT: Wykryto możliwe opady o 12:15 (loc=1) precipitation=0.07
+2025-11-17 09:14:33,634 WARNING: ALERT: Wykryto możliwe opady o 12:30 (loc=1) precipitation=0.07
+2025-11-17 09:14:33,638 WARNING: ALERT: Wykryto możliwe opady o 12:45 (loc=1) precipitation=0.14
+2025-11-17 09:14:33,641 WARNING: ALERT: Wykryto możliwe opady o 13:00 (loc=1) precipitation=0.21
+2025-11-17 09:14:33,645 WARNING: ALERT: Wykryto możliwe opady o 13:15 (loc=1) precipitation=0.21
+2025-11-17 09:14:33,647 WARNING: ALERT: Wykryto możliwe opady o 13:30 (loc=1) precipitation=0.14
+2025-11-17 09:14:33,651 WARNING: ALERT: Wykryto możliwe opady o 13:45 (loc=1) precipitation=0.14
+2025-11-17 09:14:33,655 WARNING: ALERT: Wykryto możliwe opady o 14:00 (loc=1) precipitation=0.07
+2025-11-17 09:14:33,658 WARNING: ALERT: Wykryto możliwe opady o 14:15 (loc=1) precipitation=0.14
+2025-11-17 09:14:33,661 WARNING: ALERT: Wykryto możliwe opady o 14:30 (loc=1) precipitation=0.14
+2025-11-17 09:14:33,664 WARNING: ALERT: Wykryto możliwe opady o 14:45 (loc=1) precipitation=0.14
+2025-11-17 09:14:33,668 WARNING: ALERT: Wykryto możliwe opady o 15:00 (loc=1) precipitation=0.14
+2025-11-17 09:14:33,671 WARNING: ALERT: Wykryto możliwe opady o 15:15 (loc=1) precipitation=0.14
+2025-11-17 09:14:33,674 WARNING: ALERT: Wykryto możliwe opady o 15:30 (loc=1) precipitation=0.07
+2025-11-17 09:14:33,677 WARNING: ALERT: Wykryto możliwe opady o 15:45 (loc=1) precipitation=0.07
+2025-11-17 09:14:33,680 WARNING: ALERT: Wykryto możliwe opady o 16:00 (loc=1) precipitation=0.07
+2025-11-17 09:14:33,683 WARNING: ALERT: Wykryto możliwe opady o 16:15 (loc=1) precipitation=0.07
+2025-11-17 09:14:33,687 WARNING: ALERT: Wykryto możliwe opady o 16:30 (loc=1) precipitation=0.07
+2025-11-17 09:14:33,690 WARNING: ALERT: Wykryto możliwe opady o 16:45 (loc=1) precipitation=0.07
+2025-11-17 09:14:33,693 WARNING: ALERT: Wykryto możliwe opady o 17:00 (loc=1) precipitation=0.07
+2025-11-17 09:14:33,696 WARNING: ALERT: Wykryto możliwe opady o 17:15 (loc=1) precipitation=0.07
+2025-11-17 09:14:33,700 WARNING: ALERT: Wykryto możliwe opady o 17:30 (loc=1) precipitation=0.07
+2025-11-17 09:14:33,704 WARNING: ALERT: Wykryto możliwe opady o 17:45 (loc=1) precipitation=0.07
+2025-11-17 09:14:33,707 WARNING: ALERT: Wykryto możliwe opady o 18:00 (loc=1) precipitation=0.07
+2025-11-17 09:14:33,710 WARNING: ALERT: Wykryto możliwe opady o 18:15 (loc=1) precipitation=0.07
+2025-11-17 09:14:33,713 WARNING: ALERT: Wykryto możliwe opady o 18:30 (loc=1) precipitation=0.07
+2025-11-17 09:14:33,717 WARNING: ALERT: Wykryto możliwe opady o 18:45 (loc=1) precipitation=0.07
+2025-11-17 09:14:33,721 WARNING: ALERT: Wykryto możliwe opady o 19:00 (loc=1) precipitation=0.07
+2025-11-17 09:14:33,724 WARNING: ALERT: Wykryto możliwe opady o 19:15 (loc=1) precipitation=0.07
+2025-11-17 09:14:33,727 WARNING: ALERT: Wykryto możliwe opady o 19:30 (loc=1) precipitation=0.07
+2025-11-17 09:14:33,730 WARNING: ALERT: Wykryto możliwe opady o 19:45 (loc=1) precipitation=0.07
+2025-11-17 09:14:33,734 WARNING: ALERT: Wykryto możliwe opady o 20:00 (loc=1) precipitation=0.07
+2025-11-17 09:14:33,738 WARNING: ALERT: Wykryto możliwe opady o 20:15 (loc=1) precipitation=0.07
+2025-11-17 09:14:33,741 WARNING: ALERT: Wykryto możliwe opady o 20:30 (loc=1) precipitation=0.07
+2025-11-17 09:14:33,744 WARNING: ALERT: Wykryto możliwe opady o 20:45 (loc=1) precipitation=0.07
+2025-11-17 09:14:33,747 WARNING: ALERT: Wykryto możliwe opady o 21:00 (loc=1) precipitation=0.07
+2025-11-17 09:14:33,751 WARNING: ALERT: Wykryto możliwe opady o 21:15 (loc=1) precipitation=0.07
+2025-11-17 09:14:33,755 WARNING: ALERT: Wykryto możliwe opady o 21:30 (loc=1) precipitation=0.07
+2025-11-17 09:14:33,758 WARNING: ALERT: Wykryto możliwe opady o 21:45 (loc=1) precipitation=0.07
+2025-11-17 09:14:33,761 WARNING: ALERT: Wykryto możliwe opady o 22:00 (loc=1) precipitation=0.07
+2025-11-17 09:14:33,763 WARNING: ALERT: Wykryto możliwe opady o 22:15 (loc=1) precipitation=0.07
+2025-11-17 09:14:33,767 WARNING: ALERT: Wykryto możliwe opady o 22:30 (loc=1) precipitation=0.07
+2025-11-17 09:14:33,771 WARNING: ALERT: Wykryto możliwe opady o 22:45 (loc=1) precipitation=0.07
+2025-11-17 09:14:33,774 WARNING: ALERT: Wykryto możliwe opady o 23:00 (loc=1) precipitation=0.07
+2025-11-17 09:14:33,777 WARNING: ALERT: Temperatura poniżej -19.0 °C o 23:15 (loc=1) temperature=-19.00
+2025-11-17 09:14:33,780 WARNING: ALERT: Wykryto możliwe opady o 23:15 (loc=1) precipitation=0.07
+2025-11-17 09:14:33,784 WARNING: ALERT: Temperatura poniżej -19.0 °C o 23:30 (loc=1) temperature=-19.10
+2025-11-17 09:14:33,788 WARNING: ALERT: Wykryto możliwe opady o 23:30 (loc=1) precipitation=0.07
+2025-11-17 09:14:33,791 WARNING: ALERT: Temperatura poniżej -19.0 °C o 23:45 (loc=1) temperature=-19.20
+2025-11-17 09:14:33,794 WARNING: ALERT: Wykryto możliwe opady o 23:45 (loc=1) precipitation=0.07
+2025-11-17 09:14:33,796 WARNING: ALERT: Temperatura poniżej -19.0 °C o 00:00 (loc=1) temperature=-19.30
+2025-11-17 09:14:33,800 WARNING: ALERT: Temperatura poniżej -19.0 °C o 00:15 (loc=1) temperature=-19.40
+2025-11-17 09:14:33,804 WARNING: ALERT: Wykryto możliwe opady o 00:15 (loc=1) precipitation=0.07
+2025-11-17 09:14:33,807 WARNING: ALERT: Temperatura poniżej -19.0 °C o 00:30 (loc=1) temperature=-19.40
+2025-11-17 09:14:33,809 WARNING: ALERT: Temperatura poniżej -19.0 °C o 00:45 (loc=1) temperature=-19.50
+2025-11-17 09:14:33,812 WARNING: ALERT: Temperatura poniżej -19.0 °C o 01:00 (loc=1) temperature=-19.50
+2025-11-17 09:14:33,816 WARNING: ALERT: Temperatura poniżej -19.0 °C o 01:15 (loc=1) temperature=-19.80
+2025-11-17 09:14:33,820 WARNING: ALERT: Temperatura poniżej -19.0 °C o 01:30 (loc=1) temperature=-20.00
+2025-11-17 09:14:33,823 WARNING: ALERT: Temperatura poniżej -19.0 °C o 01:45 (loc=1) temperature=-20.10
+2025-11-17 09:14:33,825 WARNING: ALERT: Temperatura poniżej -19.0 °C o 02:00 (loc=1) temperature=-20.30
+2025-11-17 09:14:33,828 WARNING: ALERT: Temperatura poniżej -19.0 °C o 02:15 (loc=1) temperature=-20.40
+2025-11-17 09:14:33,832 WARNING: ALERT: Temperatura poniżej -19.0 °C o 02:30 (loc=1) temperature=-20.50
+2025-11-17 09:14:33,836 WARNING: ALERT: Temperatura poniżej -19.0 °C o 02:45 (loc=1) temperature=-20.50
+2025-11-17 09:14:33,839 WARNING: ALERT: Temperatura poniżej -19.0 °C o 03:00 (loc=1) temperature=-20.50
+2025-11-17 09:14:33,842 WARNING: ALERT: Temperatura poniżej -19.0 °C o 03:15 (loc=1) temperature=-20.50
+2025-11-17 09:14:33,844 WARNING: ALERT: Temperatura poniżej -19.0 °C o 03:30 (loc=1) temperature=-20.50
+2025-11-17 09:14:33,847 WARNING: ALERT: Temperatura poniżej -19.0 °C o 03:45 (loc=1) temperature=-20.50
+2025-11-17 09:14:33,851 WARNING: ALERT: Temperatura poniżej -19.0 °C o 04:00 (loc=1) temperature=-20.50
+2025-11-17 09:14:33,854 WARNING: ALERT: Temperatura poniżej -19.0 °C o 04:15 (loc=1) temperature=-20.40
+2025-11-17 09:14:33,857 WARNING: ALERT: Temperatura poniżej -19.0 °C o 04:30 (loc=1) temperature=-20.20
+2025-11-17 09:14:33,860 WARNING: ALERT: Temperatura poniżej -19.0 °C o 04:45 (loc=1) temperature=-20.10
+2025-11-17 09:14:33,863 WARNING: ALERT: Temperatura poniżej -19.0 °C o 05:00 (loc=1) temperature=-20.00
+2025-11-17 09:14:33,865 WARNING: ALERT: Temperatura poniżej -19.0 °C o 05:15 (loc=1) temperature=-19.90
+2025-11-17 09:14:33,869 WARNING: ALERT: Temperatura poniżej -19.0 °C o 05:30 (loc=1) temperature=-19.80
+2025-11-17 09:14:33,873 WARNING: ALERT: Temperatura poniżej -19.0 °C o 05:45 (loc=1) temperature=-19.60
+2025-11-17 09:14:33,875 WARNING: ALERT: Temperatura poniżej -19.0 °C o 06:00 (loc=1) temperature=-19.50
+2025-11-17 09:14:33,878 WARNING: ALERT: Temperatura poniżej -19.0 °C o 06:15 (loc=1) temperature=-19.40
+2025-11-17 09:14:33,882 WARNING: ALERT: Temperatura poniżej -19.0 °C o 06:30 (loc=1) temperature=-19.20
+2025-11-17 09:14:33,886 WARNING: ALERT: Temperatura poniżej -19.0 °C o 06:45 (loc=1) temperature=-19.00
+2025-11-17 09:14:33,886 INFO: Wygenerowano 119 alertów z analizy payloadu dla Grossglockner
+2025-11-17 09:14:33,887 INFO: Pobieram Täschhorn
+2025-11-17 09:14:34,322 WARNING: ALERT: Wykryto możliwe opady o 10:00 (loc=2) precipitation=0.21
+2025-11-17 09:14:34,327 WARNING: ALERT: Wykryto możliwe opady o 11:00 (loc=2) precipitation=0.49
+2025-11-17 09:14:34,334 WARNING: ALERT: Wykryto możliwe opady o 12:00 (loc=2) precipitation=0.35
+2025-11-17 09:14:34,338 WARNING: ALERT: Wykryto możliwe opady o 13:00 (loc=2) precipitation=0.49
+2025-11-17 09:14:34,341 WARNING: ALERT: Wykryto możliwe opady o 14:00 (loc=2) precipitation=0.42
+2025-11-17 09:14:34,344 WARNING: ALERT: Wykryto możliwe opady o 15:00 (loc=2) precipitation=0.70
+2025-11-17 09:14:34,347 WARNING: ALERT: Wykryto możliwe opady o 16:00 (loc=2) precipitation=0.49
+2025-11-17 09:14:34,352 WARNING: ALERT: Wykryto możliwe opady o 17:00 (loc=2) precipitation=0.07
+2025-11-17 09:14:34,355 WARNING: ALERT: Wykryto możliwe opady o 09:30 (loc=2) precipitation=0.07
+2025-11-17 09:14:34,358 WARNING: ALERT: Wykryto możliwe opady o 09:45 (loc=2) precipitation=0.07
+2025-11-17 09:14:34,361 WARNING: ALERT: Wykryto możliwe opady o 10:00 (loc=2) precipitation=0.07
+2025-11-17 09:14:34,364 WARNING: ALERT: Wykryto możliwe opady o 10:15 (loc=2) precipitation=0.07
+2025-11-17 09:14:34,369 WARNING: ALERT: Wykryto możliwe opady o 10:30 (loc=2) precipitation=0.14
+2025-11-17 09:14:34,373 WARNING: ALERT: Wykryto możliwe opady o 10:45 (loc=2) precipitation=0.14
+2025-11-17 09:14:34,376 WARNING: ALERT: Wykryto możliwe opady o 11:00 (loc=2) precipitation=0.14
+2025-11-17 09:14:34,379 WARNING: ALERT: Wykryto możliwe opady o 11:15 (loc=2) precipitation=0.14
+2025-11-17 09:14:34,384 WARNING: ALERT: Wykryto możliwe opady o 11:30 (loc=2) precipitation=0.07
+2025-11-17 09:14:34,389 WARNING: ALERT: Wykryto możliwe opady o 11:45 (loc=2) precipitation=0.07
+2025-11-17 09:14:34,395 WARNING: ALERT: Wykryto możliwe opady o 12:00 (loc=2) precipitation=0.07
+2025-11-17 09:14:34,401 WARNING: ALERT: Wykryto możliwe opady o 12:15 (loc=2) precipitation=0.14
+2025-11-17 09:14:34,406 WARNING: ALERT: Wykryto możliwe opady o 12:30 (loc=2) precipitation=0.14
+2025-11-17 09:14:34,413 WARNING: ALERT: Wykryto możliwe opady o 12:45 (loc=2) precipitation=0.14
+2025-11-17 09:14:34,419 WARNING: ALERT: Wykryto możliwe opady o 13:00 (loc=2) precipitation=0.07
+2025-11-17 09:14:34,425 WARNING: ALERT: Wykryto możliwe opady o 13:15 (loc=2) precipitation=0.07
+2025-11-17 09:14:34,430 WARNING: ALERT: Wykryto możliwe opady o 13:30 (loc=2) precipitation=0.07
+2025-11-17 09:14:34,436 WARNING: ALERT: Wykryto możliwe opady o 13:45 (loc=2) precipitation=0.14
+2025-11-17 09:14:34,441 WARNING: ALERT: Wykryto możliwe opady o 14:00 (loc=2) precipitation=0.14
+2025-11-17 09:14:34,453 WARNING: ALERT: Wykryto możliwe opady o 14:15 (loc=2) precipitation=0.21
+2025-11-17 09:14:34,457 WARNING: ALERT: Wykryto możliwe opady o 14:30 (loc=2) precipitation=0.21
+2025-11-17 09:14:34,460 WARNING: ALERT: Wykryto możliwe opady o 14:45 (loc=2) precipitation=0.14
+2025-11-17 09:14:34,462 WARNING: ALERT: Wykryto możliwe opady o 15:00 (loc=2) precipitation=0.14
+2025-11-17 09:14:34,468 WARNING: ALERT: Wykryto możliwe opady o 15:15 (loc=2) precipitation=0.14
+2025-11-17 09:14:34,473 WARNING: ALERT: Wykryto możliwe opady o 15:30 (loc=2) precipitation=0.14
+2025-11-17 09:14:34,476 WARNING: ALERT: Wykryto możliwe opady o 15:45 (loc=2) precipitation=0.07
+2025-11-17 09:14:34,479 WARNING: ALERT: Wykryto możliwe opady o 16:00 (loc=2) precipitation=0.14
+2025-11-17 09:14:34,483 WARNING: ALERT: Wykryto możliwe opady o 16:15 (loc=2) precipitation=0.07
+2025-11-17 09:14:34,484 INFO: Wygenerowano 36 alertów z analizy payloadu dla Täschhorn
+2025-11-17 09:14:34,485 INFO: Pobieram Zumsteinspitze
+2025-11-17 09:14:34,899 WARNING: ALERT: Wykryto możliwe opady o 11:00 (loc=3) precipitation=0.07
+2025-11-17 09:14:34,905 WARNING: ALERT: Wykryto możliwe opady o 12:00 (loc=3) precipitation=0.14
+2025-11-17 09:14:34,910 WARNING: ALERT: Wykryto możliwe opady o 15:00 (loc=3) precipitation=0.28
+2025-11-17 09:14:34,915 WARNING: ALERT: Wykryto możliwe opady o 16:00 (loc=3) precipitation=0.28
+2025-11-17 09:14:34,920 WARNING: ALERT: Wykryto możliwe opady o 17:00 (loc=3) precipitation=0.14
+2025-11-17 09:14:34,925 WARNING: ALERT: Temperatura poniżej -19.0 °C o 18:00 (loc=3) temperature=-19.20
+2025-11-17 09:14:34,929 WARNING: ALERT: Temperatura poniżej -19.0 °C o 19:00 (loc=3) temperature=-19.50
+2025-11-17 09:14:34,934 WARNING: ALERT: Temperatura poniżej -19.0 °C o 20:00 (loc=3) temperature=-19.10
+2025-11-17 09:14:34,938 WARNING: ALERT: Wykryto możliwe opady o 11:00 (loc=3) precipitation=0.07
+2025-11-17 09:14:34,942 WARNING: ALERT: Wykryto możliwe opady o 11:15 (loc=3) precipitation=0.07
+2025-11-17 09:14:34,945 WARNING: ALERT: Wykryto możliwe opady o 12:00 (loc=3) precipitation=0.07
+2025-11-17 09:14:34,949 WARNING: ALERT: Wykryto możliwe opady o 14:15 (loc=3) precipitation=0.07
+2025-11-17 09:14:34,954 WARNING: ALERT: Wykryto możliwe opady o 14:30 (loc=3) precipitation=0.07
+2025-11-17 09:14:34,958 WARNING: ALERT: Wykryto możliwe opady o 14:45 (loc=3) precipitation=0.07
+2025-11-17 09:14:34,962 WARNING: ALERT: Wykryto możliwe opady o 15:00 (loc=3) precipitation=0.07
+2025-11-17 09:14:34,964 WARNING: ALERT: Wykryto możliwe opady o 15:15 (loc=3) precipitation=0.07
+2025-11-17 09:14:34,969 WARNING: ALERT: Wykryto możliwe opady o 15:30 (loc=3) precipitation=0.07
+2025-11-17 09:14:34,974 WARNING: ALERT: Wykryto możliwe opady o 15:45 (loc=3) precipitation=0.07
+2025-11-17 09:14:34,978 WARNING: ALERT: Wykryto możliwe opady o 16:00 (loc=3) precipitation=0.07
+2025-11-17 09:14:34,981 WARNING: ALERT: Wykryto możliwe opady o 16:15 (loc=3) precipitation=0.07
+2025-11-17 09:14:34,987 WARNING: ALERT: Wykryto możliwe opady o 16:30 (loc=3) precipitation=0.07
+2025-11-17 09:14:34,992 WARNING: ALERT: Temperatura poniżej -19.0 °C o 17:15 (loc=3) temperature=-19.00
+2025-11-17 09:14:34,996 WARNING: ALERT: Temperatura poniżej -19.0 °C o 17:30 (loc=3) temperature=-19.00
+2025-11-17 09:14:34,999 WARNING: ALERT: Temperatura poniżej -19.0 °C o 17:45 (loc=3) temperature=-19.10
+2025-11-17 09:14:35,005 WARNING: ALERT: Temperatura poniżej -19.0 °C o 18:00 (loc=3) temperature=-19.20
+2025-11-17 09:14:35,008 WARNING: ALERT: Temperatura poniżej -19.0 °C o 18:15 (loc=3) temperature=-19.30
+2025-11-17 09:14:35,011 WARNING: ALERT: Temperatura poniżej -19.0 °C o 18:30 (loc=3) temperature=-19.40
+2025-11-17 09:14:35,015 WARNING: ALERT: Temperatura poniżej -19.0 °C o 18:45 (loc=3) temperature=-19.50
+2025-11-17 09:14:35,020 WARNING: ALERT: Temperatura poniżej -19.0 °C o 19:00 (loc=3) temperature=-19.50
+2025-11-17 09:14:35,024 WARNING: ALERT: Temperatura poniżej -19.0 °C o 19:15 (loc=3) temperature=-19.50
+2025-11-17 09:14:35,027 WARNING: ALERT: Temperatura poniżej -19.0 °C o 19:30 (loc=3) temperature=-19.40
+2025-11-17 09:14:35,031 WARNING: ALERT: Temperatura poniżej -19.0 °C o 19:45 (loc=3) temperature=-19.20
+2025-11-17 09:14:35,035 WARNING: ALERT: Temperatura poniżej -19.0 °C o 20:00 (loc=3) temperature=-19.10
+2025-11-17 09:14:35,039 WARNING: ALERT: Temperatura poniżej -19.0 °C o 20:15 (loc=3) temperature=-19.00
+2025-11-17 09:14:35,043 WARNING: ALERT: Temperatura poniżej -19.0 °C o 20:30 (loc=3) temperature=-19.00
+2025-11-17 09:14:35,047 WARNING: ALERT: Temperatura poniżej -19.0 °C o 06:00 (loc=3) temperature=-19.00
+2025-11-17 09:14:35,051 WARNING: ALERT: Temperatura poniżej -19.0 °C o 06:15 (loc=3) temperature=-19.00
+2025-11-17 09:14:35,057 WARNING: ALERT: Temperatura poniżej -19.0 °C o 06:30 (loc=3) temperature=-19.00
+2025-11-17 09:14:35,061 WARNING: ALERT: Temperatura poniżej -19.0 °C o 06:45 (loc=3) temperature=-19.00
+2025-11-17 09:14:35,061 INFO: Wygenerowano 39 alertów z analizy payloadu dla Zumsteinspitze
+2025-11-17 09:14:35,062 INFO: Pobieram Dufourspitze
+2025-11-17 09:14:35,517 WARNING: ALERT: Wykryto możliwe opady o 11:00 (loc=4) precipitation=0.07
+2025-11-17 09:14:35,522 WARNING: ALERT: Wykryto możliwe opady o 12:00 (loc=4) precipitation=0.14
+2025-11-17 09:14:35,525 WARNING: ALERT: Wykryto możliwe opady o 15:00 (loc=4) precipitation=0.28
+2025-11-17 09:14:35,529 WARNING: ALERT: Wykryto możliwe opady o 16:00 (loc=4) precipitation=0.28
+2025-11-17 09:14:35,535 WARNING: ALERT: Temperatura poniżej -19.0 °C o 17:00 (loc=4) temperature=-19.10
+2025-11-17 09:14:35,541 WARNING: ALERT: Wykryto możliwe opady o 17:00 (loc=4) precipitation=0.14
+2025-11-17 09:14:35,544 WARNING: ALERT: Temperatura poniżej -19.0 °C o 18:00 (loc=4) temperature=-19.50
+2025-11-17 09:14:35,548 WARNING: ALERT: Temperatura poniżej -19.0 °C o 19:00 (loc=4) temperature=-19.80
+2025-11-17 09:14:35,552 WARNING: ALERT: Temperatura poniżej -19.0 °C o 20:00 (loc=4) temperature=-19.50
+2025-11-17 09:14:35,557 WARNING: ALERT: Temperatura poniżej -19.0 °C o 21:00 (loc=4) temperature=-19.10
+2025-11-17 09:14:35,560 WARNING: ALERT: Temperatura poniżej -19.0 °C o 05:00 (loc=4) temperature=-19.10
+2025-11-17 09:14:35,564 WARNING: ALERT: Temperatura poniżej -19.0 °C o 06:00 (loc=4) temperature=-19.30
+2025-11-17 09:14:35,571 WARNING: ALERT: Wykryto możliwe opady o 11:00 (loc=4) precipitation=0.07
+2025-11-17 09:14:35,575 WARNING: ALERT: Wykryto możliwe opady o 11:15 (loc=4) precipitation=0.07
+2025-11-17 09:14:35,579 WARNING: ALERT: Wykryto możliwe opady o 12:00 (loc=4) precipitation=0.07
+2025-11-17 09:14:35,584 WARNING: ALERT: Wykryto możliwe opady o 14:15 (loc=4) precipitation=0.07
+2025-11-17 09:14:35,588 WARNING: ALERT: Wykryto możliwe opady o 14:30 (loc=4) precipitation=0.07
+2025-11-17 09:14:35,592 WARNING: ALERT: Wykryto możliwe opady o 14:45 (loc=4) precipitation=0.07
+2025-11-17 09:14:35,596 WARNING: ALERT: Wykryto możliwe opady o 15:00 (loc=4) precipitation=0.07
+2025-11-17 09:14:35,600 WARNING: ALERT: Wykryto możliwe opady o 15:15 (loc=4) precipitation=0.07
+2025-11-17 09:14:35,605 WARNING: ALERT: Wykryto możliwe opady o 15:30 (loc=4) precipitation=0.07
+2025-11-17 09:14:35,608 WARNING: ALERT: Wykryto możliwe opady o 15:45 (loc=4) precipitation=0.07
+2025-11-17 09:14:35,611 WARNING: ALERT: Wykryto możliwe opady o 16:00 (loc=4) precipitation=0.07
+2025-11-17 09:14:35,616 WARNING: ALERT: Wykryto możliwe opady o 16:15 (loc=4) precipitation=0.07
+2025-11-17 09:14:35,621 WARNING: ALERT: Wykryto możliwe opady o 16:30 (loc=4) precipitation=0.07
+2025-11-17 09:14:35,625 WARNING: ALERT: Temperatura poniżej -19.0 °C o 17:00 (loc=4) temperature=-19.10
+2025-11-17 09:14:35,629 WARNING: ALERT: Temperatura poniżej -19.0 °C o 17:15 (loc=4) temperature=-19.30
+2025-11-17 09:14:35,633 WARNING: ALERT: Temperatura poniżej -19.0 °C o 17:30 (loc=4) temperature=-19.40
+2025-11-17 09:14:35,638 WARNING: ALERT: Temperatura poniżej -19.0 °C o 17:45 (loc=4) temperature=-19.50
+2025-11-17 09:14:35,643 WARNING: ALERT: Temperatura poniżej -19.0 °C o 18:00 (loc=4) temperature=-19.50
+2025-11-17 09:14:35,646 WARNING: ALERT: Temperatura poniżej -19.0 °C o 18:15 (loc=4) temperature=-19.60
+2025-11-17 09:14:35,651 WARNING: ALERT: Temperatura poniżej -19.0 °C o 18:30 (loc=4) temperature=-19.80
+2025-11-17 09:14:35,656 WARNING: ALERT: Temperatura poniżej -19.0 °C o 18:45 (loc=4) temperature=-19.80
+2025-11-17 09:14:35,660 WARNING: ALERT: Temperatura poniżej -19.0 °C o 19:00 (loc=4) temperature=-19.90
+2025-11-17 09:14:35,664 WARNING: ALERT: Temperatura poniżej -19.0 °C o 19:15 (loc=4) temperature=-19.80
+2025-11-17 09:14:35,669 WARNING: ALERT: Temperatura poniżej -19.0 °C o 19:30 (loc=4) temperature=-19.70
+2025-11-17 09:14:35,674 WARNING: ALERT: Temperatura poniżej -19.0 °C o 19:45 (loc=4) temperature=-19.60
+2025-11-17 09:14:35,679 WARNING: ALERT: Temperatura poniżej -19.0 °C o 20:00 (loc=4) temperature=-19.50
+2025-11-17 09:14:35,684 WARNING: ALERT: Temperatura poniżej -19.0 °C o 20:15 (loc=4) temperature=-19.40
+2025-11-17 09:14:35,690 WARNING: ALERT: Temperatura poniżej -19.0 °C o 20:30 (loc=4) temperature=-19.30
+2025-11-17 09:14:35,694 WARNING: ALERT: Temperatura poniżej -19.0 °C o 20:45 (loc=4) temperature=-19.20
+2025-11-17 09:14:35,700 WARNING: ALERT: Temperatura poniżej -19.0 °C o 21:00 (loc=4) temperature=-19.10
+2025-11-17 09:14:35,705 WARNING: ALERT: Temperatura poniżej -19.0 °C o 21:15 (loc=4) temperature=-19.00
+2025-11-17 09:14:35,710 WARNING: ALERT: Temperatura poniżej -19.0 °C o 04:15 (loc=4) temperature=-19.00
+2025-11-17 09:14:35,715 WARNING: ALERT: Temperatura poniżej -19.0 °C o 04:30 (loc=4) temperature=-19.00
+2025-11-17 09:14:35,720 WARNING: ALERT: Temperatura poniżej -19.0 °C o 04:45 (loc=4) temperature=-19.10
+2025-11-17 09:14:35,725 WARNING: ALERT: Temperatura poniżej -19.0 °C o 05:00 (loc=4) temperature=-19.10
+2025-11-17 09:14:35,729 WARNING: ALERT: Temperatura poniżej -19.0 °C o 05:15 (loc=4) temperature=-19.20
+2025-11-17 09:14:35,734 WARNING: ALERT: Temperatura poniżej -19.0 °C o 05:30 (loc=4) temperature=-19.20
+2025-11-17 09:14:35,739 WARNING: ALERT: Temperatura poniżej -19.0 °C o 05:45 (loc=4) temperature=-19.30
+2025-11-17 09:14:35,743 WARNING: ALERT: Temperatura poniżej -19.0 °C o 06:00 (loc=4) temperature=-19.30
+2025-11-17 09:14:35,747 WARNING: ALERT: Temperatura poniżej -19.0 °C o 06:15 (loc=4) temperature=-19.30
+2025-11-17 09:14:35,751 WARNING: ALERT: Temperatura poniżej -19.0 °C o 06:30 (loc=4) temperature=-19.30
+2025-11-17 09:14:35,756 WARNING: ALERT: Temperatura poniżej -19.0 °C o 06:45 (loc=4) temperature=-19.30
+2025-11-17 09:14:35,756 INFO: Wygenerowano 54 alertów z analizy payloadu dla Dufourspitze
+2025-11-17 09:14:35,757 INFO: Pobieram Mont Blanc
+2025-11-17 09:14:36,187 WARNING: ALERT: Wykryto możliwe opady o 09:00 (loc=5) precipitation=0.49
+2025-11-17 09:14:36,192 WARNING: ALERT: Wykryto możliwe opady o 10:00 (loc=5) precipitation=1.05
+2025-11-17 09:14:36,199 WARNING: ALERT: Wykryto możliwe opady o 11:00 (loc=5) precipitation=1.33
+2025-11-17 09:14:36,206 WARNING: ALERT: Wykryto możliwe opady o 12:00 (loc=5) precipitation=0.91
+2025-11-17 09:14:36,210 WARNING: ALERT: Wykryto możliwe opady o 13:00 (loc=5) precipitation=0.70
+2025-11-17 09:14:36,215 WARNING: ALERT: Wykryto możliwe opady o 14:00 (loc=5) precipitation=0.91
+2025-11-17 09:14:36,220 WARNING: ALERT: Wykryto możliwe opady o 15:00 (loc=5) precipitation=0.98
+2025-11-17 09:14:36,224 WARNING: ALERT: Temperatura poniżej -19.0 °C o 16:00 (loc=5) temperature=-19.10
+2025-11-17 09:14:36,227 WARNING: ALERT: Wykryto możliwe opady o 16:00 (loc=5) precipitation=1.19
+2025-11-17 09:14:36,230 WARNING: ALERT: Temperatura poniżej -19.0 °C o 17:00 (loc=5) temperature=-20.20
+2025-11-17 09:14:36,234 WARNING: ALERT: Wykryto możliwe opady o 17:00 (loc=5) precipitation=0.07
+2025-11-17 09:14:36,239 WARNING: ALERT: Temperatura poniżej -19.0 °C o 18:00 (loc=5) temperature=-19.80
+2025-11-17 09:14:36,242 WARNING: ALERT: Temperatura poniżej -19.0 °C o 19:00 (loc=5) temperature=-19.20
+2025-11-17 09:14:36,245 WARNING: ALERT: Temperatura poniżej -19.0 °C o 03:00 (loc=5) temperature=-19.00
+2025-11-17 09:14:36,247 WARNING: ALERT: Temperatura poniżej -19.0 °C o 04:00 (loc=5) temperature=-19.30
+2025-11-17 09:14:36,252 WARNING: ALERT: Temperatura poniżej -19.0 °C o 05:00 (loc=5) temperature=-19.50
+2025-11-17 09:14:36,256 WARNING: ALERT: Temperatura poniżej -19.0 °C o 06:00 (loc=5) temperature=-19.60
+2025-11-17 09:14:36,259 WARNING: ALERT: Wykryto możliwe opady o 08:30 (loc=5) precipitation=0.07
+2025-11-17 09:14:36,262 WARNING: ALERT: Wykryto możliwe opady o 08:45 (loc=5) precipitation=0.14
+2025-11-17 09:14:36,267 WARNING: ALERT: Wykryto możliwe opady o 09:00 (loc=5) precipitation=0.28
+2025-11-17 09:14:36,271 WARNING: ALERT: Wykryto możliwe opady o 09:15 (loc=5) precipitation=0.35
+2025-11-17 09:14:36,275 WARNING: ALERT: Wykryto możliwe opady o 09:30 (loc=5) precipitation=0.28
+2025-11-17 09:14:36,280 WARNING: ALERT: Wykryto możliwe opady o 09:45 (loc=5) precipitation=0.21
+2025-11-17 09:14:36,288 WARNING: ALERT: Wykryto możliwe opady o 10:00 (loc=5) precipitation=0.21
+2025-11-17 09:14:36,293 WARNING: ALERT: Wykryto możliwe opady o 10:15 (loc=5) precipitation=0.35
+2025-11-17 09:14:36,298 WARNING: ALERT: Wykryto możliwe opady o 10:30 (loc=5) precipitation=0.28
+2025-11-17 09:14:36,302 WARNING: ALERT: Wykryto możliwe opady o 10:45 (loc=5) precipitation=0.42
+2025-11-17 09:14:36,307 WARNING: ALERT: Wykryto możliwe opady o 11:00 (loc=5) precipitation=0.28
+2025-11-17 09:14:36,313 WARNING: ALERT: Wykryto możliwe opady o 11:15 (loc=5) precipitation=0.21
+2025-11-17 09:14:36,317 WARNING: ALERT: Wykryto możliwe opady o 11:30 (loc=5) precipitation=0.28
+2025-11-17 09:14:36,321 WARNING: ALERT: Wykryto możliwe opady o 11:45 (loc=5) precipitation=0.21
+2025-11-17 09:14:36,327 WARNING: ALERT: Wykryto możliwe opady o 12:00 (loc=5) precipitation=0.21
+2025-11-17 09:14:36,331 WARNING: ALERT: Wykryto możliwe opady o 12:15 (loc=5) precipitation=0.21
+2025-11-17 09:14:36,336 WARNING: ALERT: Wykryto możliwe opady o 12:30 (loc=5) precipitation=0.14
+2025-11-17 09:14:36,340 WARNING: ALERT: Wykryto możliwe opady o 12:45 (loc=5) precipitation=0.14
+2025-11-17 09:14:36,344 WARNING: ALERT: Wykryto możliwe opady o 13:00 (loc=5) precipitation=0.21
+2025-11-17 09:14:36,348 WARNING: ALERT: Wykryto możliwe opady o 13:15 (loc=5) precipitation=0.21
+2025-11-17 09:14:36,351 WARNING: ALERT: Wykryto możliwe opady o 13:30 (loc=5) precipitation=0.21
+2025-11-17 09:14:36,355 WARNING: ALERT: Wykryto możliwe opady o 13:45 (loc=5) precipitation=0.28
+2025-11-17 09:14:36,358 WARNING: ALERT: Wykryto możliwe opady o 14:00 (loc=5) precipitation=0.21
+2025-11-17 09:14:36,360 WARNING: ALERT: Wykryto możliwe opady o 14:15 (loc=5) precipitation=0.21
+2025-11-17 09:14:36,366 WARNING: ALERT: Wykryto możliwe opady o 14:30 (loc=5) precipitation=0.21
+2025-11-17 09:14:36,370 WARNING: ALERT: Wykryto możliwe opady o 14:45 (loc=5) precipitation=0.28
+2025-11-17 09:14:36,375 WARNING: ALERT: Wykryto możliwe opady o 15:00 (loc=5) precipitation=0.28
+2025-11-17 09:14:36,379 WARNING: ALERT: Wykryto możliwe opady o 15:15 (loc=5) precipitation=0.28
+2025-11-17 09:14:36,384 WARNING: ALERT: Wykryto możliwe opady o 15:30 (loc=5) precipitation=0.35
+2025-11-17 09:14:36,389 WARNING: ALERT: Wykryto możliwe opady o 15:45 (loc=5) precipitation=0.35
+2025-11-17 09:14:36,393 WARNING: ALERT: Temperatura poniżej -19.0 °C o 16:00 (loc=5) temperature=-19.00
+2025-11-17 09:14:36,397 WARNING: ALERT: Wykryto możliwe opady o 16:00 (loc=5) precipitation=0.21
+2025-11-17 09:14:36,402 WARNING: ALERT: Temperatura poniżej -19.0 °C o 16:15 (loc=5) temperature=-19.40
+2025-11-17 09:14:36,405 WARNING: ALERT: Wykryto możliwe opady o 16:15 (loc=5) precipitation=0.07
+2025-11-17 09:14:36,409 WARNING: ALERT: Temperatura poniżej -19.0 °C o 16:30 (loc=5) temperature=-19.80
+2025-11-17 09:14:36,412 WARNING: ALERT: Temperatura poniżej -19.0 °C o 16:45 (loc=5) temperature=-20.00
+2025-11-17 09:14:36,416 WARNING: ALERT: Temperatura poniżej -19.0 °C o 17:00 (loc=5) temperature=-20.20
+2025-11-17 09:14:36,419 WARNING: ALERT: Temperatura poniżej -19.0 °C o 17:15 (loc=5) temperature=-20.20
+2025-11-17 09:14:36,422 WARNING: ALERT: Temperatura poniżej -19.0 °C o 17:30 (loc=5) temperature=-20.10
+2025-11-17 09:14:36,425 WARNING: ALERT: Temperatura poniżej -19.0 °C o 17:45 (loc=5) temperature=-20.00
+2025-11-17 09:14:36,429 WARNING: ALERT: Temperatura poniżej -19.0 °C o 18:00 (loc=5) temperature=-19.80
+2025-11-17 09:14:36,433 WARNING: ALERT: Temperatura poniżej -19.0 °C o 18:15 (loc=5) temperature=-19.70
+2025-11-17 09:14:36,437 WARNING: ALERT: Temperatura poniżej -19.0 °C o 18:30 (loc=5) temperature=-19.50
+2025-11-17 09:14:36,440 WARNING: ALERT: Temperatura poniżej -19.0 °C o 18:45 (loc=5) temperature=-19.40
+2025-11-17 09:14:36,443 WARNING: ALERT: Temperatura poniżej -19.0 °C o 19:00 (loc=5) temperature=-19.10
+2025-11-17 09:14:36,447 WARNING: ALERT: Temperatura poniżej -19.0 °C o 02:45 (loc=5) temperature=-19.00
+2025-11-17 09:14:36,452 WARNING: ALERT: Temperatura poniżej -19.0 °C o 03:00 (loc=5) temperature=-19.00
+2025-11-17 09:14:36,455 WARNING: ALERT: Temperatura poniżej -19.0 °C o 03:15 (loc=5) temperature=-19.10
+2025-11-17 09:14:36,459 WARNING: ALERT: Temperatura poniżej -19.0 °C o 03:30 (loc=5) temperature=-19.10
+2025-11-17 09:14:36,463 WARNING: ALERT: Temperatura poniżej -19.0 °C o 03:45 (loc=5) temperature=-19.20
+2025-11-17 09:14:36,468 WARNING: ALERT: Temperatura poniżej -19.0 °C o 04:00 (loc=5) temperature=-19.30
+2025-11-17 09:14:36,471 WARNING: ALERT: Temperatura poniżej -19.0 °C o 04:15 (loc=5) temperature=-19.40
+2025-11-17 09:14:36,475 WARNING: ALERT: Temperatura poniżej -19.0 °C o 04:30 (loc=5) temperature=-19.40
+2025-11-17 09:14:36,479 WARNING: ALERT: Temperatura poniżej -19.0 °C o 04:45 (loc=5) temperature=-19.50
+2025-11-17 09:14:36,482 WARNING: ALERT: Temperatura poniżej -19.0 °C o 05:00 (loc=5) temperature=-19.50
+2025-11-17 09:14:36,485 WARNING: ALERT: Temperatura poniżej -19.0 °C o 05:15 (loc=5) temperature=-19.50
+2025-11-17 09:14:36,489 WARNING: ALERT: Temperatura poniżej -19.0 °C o 05:30 (loc=5) temperature=-19.50
+2025-11-17 09:14:36,494 WARNING: ALERT: Temperatura poniżej -19.0 °C o 05:45 (loc=5) temperature=-19.50
+2025-11-17 09:14:36,497 WARNING: ALERT: Temperatura poniżej -19.0 °C o 06:00 (loc=5) temperature=-19.50
+2025-11-17 09:14:36,500 WARNING: ALERT: Temperatura poniżej -19.0 °C o 06:15 (loc=5) temperature=-19.50
+2025-11-17 09:14:36,503 WARNING: ALERT: Temperatura poniżej -19.0 °C o 06:30 (loc=5) temperature=-19.50
+2025-11-17 09:14:36,506 WARNING: ALERT: Temperatura poniżej -19.0 °C o 06:45 (loc=5) temperature=-19.50
+2025-11-17 09:14:36,507 INFO: Wygenerowano 79 alertów z analizy payloadu dla Mont Blanc
+2025-11-17 09:14:36,509 INFO: Pobieram Matterhorn
+2025-11-17 09:14:36,952 WARNING: ALERT: Wykryto możliwe opady o 10:00 (loc=6) precipitation=0.07
+2025-11-17 09:14:36,955 WARNING: ALERT: Wykryto możliwe opady o 11:00 (loc=6) precipitation=0.28
+2025-11-17 09:14:36,959 WARNING: ALERT: Wykryto możliwe opady o 12:00 (loc=6) precipitation=0.35
+2025-11-17 09:14:36,964 WARNING: ALERT: Wykryto możliwe opady o 13:00 (loc=6) precipitation=0.28
+2025-11-17 09:14:36,968 WARNING: ALERT: Wykryto możliwe opady o 14:00 (loc=6) precipitation=0.35
+2025-11-17 09:14:36,972 WARNING: ALERT: Wykryto możliwe opady o 15:00 (loc=6) precipitation=0.56
+2025-11-17 09:14:36,975 WARNING: ALERT: Wykryto możliwe opady o 16:00 (loc=6) precipitation=0.56
+2025-11-17 09:14:36,978 WARNING: ALERT: Wykryto możliwe opady o 17:00 (loc=6) precipitation=0.21
+2025-11-17 09:14:36,982 WARNING: ALERT: Wykryto możliwe opady o 09:30 (loc=6) precipitation=0.07
+2025-11-17 09:14:36,986 WARNING: ALERT: Wykryto możliwe opady o 10:15 (loc=6) precipitation=0.07
+2025-11-17 09:14:36,992 WARNING: ALERT: Wykryto możliwe opady o 10:30 (loc=6) precipitation=0.07
+2025-11-17 09:14:36,996 WARNING: ALERT: Wykryto możliwe opady o 10:45 (loc=6) precipitation=0.07
+2025-11-17 09:14:37,000 WARNING: ALERT: Wykryto możliwe opady o 11:00 (loc=6) precipitation=0.07
+2025-11-17 09:14:37,005 WARNING: ALERT: Wykryto możliwe opady o 11:15 (loc=6) precipitation=0.07
+2025-11-17 09:14:37,009 WARNING: ALERT: Wykryto możliwe opady o 11:30 (loc=6) precipitation=0.07
+2025-11-17 09:14:37,012 WARNING: ALERT: Wykryto możliwe opady o 11:45 (loc=6) precipitation=0.14
+2025-11-17 09:14:37,015 WARNING: ALERT: Wykryto możliwe opady o 12:00 (loc=6) precipitation=0.07
+2025-11-17 09:14:37,019 WARNING: ALERT: Wykryto możliwe opady o 12:15 (loc=6) precipitation=0.07
+2025-11-17 09:14:37,023 WARNING: ALERT: Wykryto możliwe opady o 12:30 (loc=6) precipitation=0.07
+2025-11-17 09:14:37,027 WARNING: ALERT: Wykryto możliwe opady o 12:45 (loc=6) precipitation=0.07
+2025-11-17 09:14:37,030 WARNING: ALERT: Wykryto możliwe opady o 13:00 (loc=6) precipitation=0.07
+2025-11-17 09:14:37,034 WARNING: ALERT: Wykryto możliwe opady o 13:15 (loc=6) precipitation=0.07
+2025-11-17 09:14:37,038 WARNING: ALERT: Wykryto możliwe opady o 13:30 (loc=6) precipitation=0.07
+2025-11-17 09:14:37,043 WARNING: ALERT: Wykryto możliwe opady o 13:45 (loc=6) precipitation=0.07
+2025-11-17 09:14:37,046 WARNING: ALERT: Wykryto możliwe opady o 14:00 (loc=6) precipitation=0.14
+2025-11-17 09:14:37,050 WARNING: ALERT: Wykryto możliwe opady o 14:15 (loc=6) precipitation=0.14
+2025-11-17 09:14:37,053 WARNING: ALERT: Wykryto możliwe opady o 14:30 (loc=6) precipitation=0.14
+2025-11-17 09:14:37,056 WARNING: ALERT: Wykryto możliwe opady o 14:45 (loc=6) precipitation=0.14
+2025-11-17 09:14:37,060 WARNING: ALERT: Wykryto możliwe opady o 15:00 (loc=6) precipitation=0.14
+2025-11-17 09:14:37,062 WARNING: ALERT: Wykryto możliwe opady o 15:15 (loc=6) precipitation=0.14
+2025-11-17 09:14:37,065 WARNING: ALERT: Wykryto możliwe opady o 15:30 (loc=6) precipitation=0.14
+2025-11-17 09:14:37,068 WARNING: ALERT: Wykryto możliwe opady o 15:45 (loc=6) precipitation=0.14
+2025-11-17 09:14:37,071 WARNING: ALERT: Wykryto możliwe opady o 16:00 (loc=6) precipitation=0.14
+2025-11-17 09:14:37,075 WARNING: ALERT: Wykryto możliwe opady o 16:15 (loc=6) precipitation=0.14
+2025-11-17 09:14:37,078 WARNING: ALERT: Wykryto możliwe opady o 16:30 (loc=6) precipitation=0.07
+2025-11-17 09:14:37,078 INFO: Wygenerowano 35 alertów z analizy payloadu dla Matterhorn
+2025-11-17 09:14:37,079 INFO: Pobieram Tryglaw
+2025-11-17 09:14:37,511 WARNING: ALERT: Wykryto możliwe opady o 09:00 (loc=7) precipitation=1.20
+2025-11-17 09:14:37,517 WARNING: ALERT: Wykryto możliwe opady o 10:00 (loc=7) precipitation=0.30
+2025-11-17 09:14:37,522 WARNING: ALERT: Wykryto możliwe opady o 11:00 (loc=7) precipitation=4.55
+2025-11-17 09:14:37,527 WARNING: ALERT: Wykryto możliwe opady o 12:00 (loc=7) precipitation=3.15
+2025-11-17 09:14:37,532 WARNING: ALERT: Wykryto możliwe opady o 13:00 (loc=7) precipitation=1.40
+2025-11-17 09:14:37,535 WARNING: ALERT: Wykryto możliwe opady o 14:00 (loc=7) precipitation=0.42
+2025-11-17 09:14:37,540 WARNING: ALERT: Wykryto możliwe opady o 19:00 (loc=7) precipitation=0.07
+2025-11-17 09:14:37,542 WARNING: ALERT: Wykryto możliwe opady o 20:00 (loc=7) precipitation=0.63
+2025-11-17 09:14:37,545 WARNING: ALERT: Wykryto możliwe opady o 21:00 (loc=7) precipitation=2.73
+2025-11-17 09:14:37,547 WARNING: ALERT: Wykryto możliwe opady o 22:00 (loc=7) precipitation=2.66
+2025-11-17 09:14:37,550 WARNING: ALERT: Wykryto możliwe opady o 23:00 (loc=7) precipitation=1.47
+2025-11-17 09:14:37,554 WARNING: ALERT: Wykryto możliwe opady o 00:00 (loc=7) precipitation=0.21
+2025-11-17 09:14:37,557 WARNING: ALERT: Wykryto możliwe opady o 01:00 (loc=7) precipitation=0.98
+2025-11-17 09:14:37,560 WARNING: ALERT: Wykryto możliwe opady o 02:00 (loc=7) precipitation=0.07
+2025-11-17 09:14:37,562 WARNING: ALERT: Wykryto możliwe opady o 03:00 (loc=7) precipitation=0.14
+2025-11-17 09:14:37,566 WARNING: ALERT: Wykryto możliwe opady o 08:15 (loc=7) precipitation=0.10
+2025-11-17 09:14:37,570 WARNING: ALERT: Wykryto możliwe opady o 08:30 (loc=7) precipitation=0.10
+2025-11-17 09:14:37,573 WARNING: ALERT: Wykryto możliwe opady o 08:45 (loc=7) precipitation=0.80
+2025-11-17 09:14:37,576 WARNING: ALERT: Wykryto możliwe opady o 09:00 (loc=7) precipitation=0.20
+2025-11-17 09:14:37,579 WARNING: ALERT: Wykryto możliwe opady o 09:15 (loc=7) precipitation=0.10
+2025-11-17 09:14:37,582 WARNING: ALERT: Wykryto możliwe opady o 09:30 (loc=7) precipitation=0.10
+2025-11-17 09:14:37,587 WARNING: ALERT: Wykryto możliwe opady o 09:45 (loc=7) precipitation=0.10
+2025-11-17 09:14:37,591 WARNING: ALERT: Wykryto możliwe opady o 10:00 (loc=7) precipitation=0.35
+2025-11-17 09:14:37,594 WARNING: ALERT: Wykryto możliwe opady o 10:15 (loc=7) precipitation=0.91
+2025-11-17 09:14:37,599 WARNING: ALERT: Wykryto możliwe opady o 10:30 (loc=7) precipitation=1.26
+2025-11-17 09:14:37,602 WARNING: ALERT: Wykryto możliwe opady o 10:45 (loc=7) precipitation=1.40
+2025-11-17 09:14:37,605 WARNING: ALERT: Wykryto możliwe opady o 11:00 (loc=7) precipitation=0.98
+2025-11-17 09:14:37,608 WARNING: ALERT: Wykryto możliwe opady o 11:15 (loc=7) precipitation=0.91
+2025-11-17 09:14:37,611 WARNING: ALERT: Wykryto możliwe opady o 11:30 (loc=7) precipitation=0.77
+2025-11-17 09:14:37,614 WARNING: ALERT: Wykryto możliwe opady o 11:45 (loc=7) precipitation=0.77
+2025-11-17 09:14:37,617 WARNING: ALERT: Wykryto możliwe opady o 12:00 (loc=7) precipitation=0.70
+2025-11-17 09:14:37,621 WARNING: ALERT: Wykryto możliwe opady o 12:15 (loc=7) precipitation=0.49
+2025-11-17 09:14:37,624 WARNING: ALERT: Wykryto możliwe opady o 12:30 (loc=7) precipitation=0.42
+2025-11-17 09:14:37,626 WARNING: ALERT: Wykryto możliwe opady o 12:45 (loc=7) precipitation=0.28
+2025-11-17 09:14:37,629 WARNING: ALERT: Wykryto możliwe opady o 13:00 (loc=7) precipitation=0.21
+2025-11-17 09:14:37,632 WARNING: ALERT: Wykryto możliwe opady o 13:15 (loc=7) precipitation=0.21
+2025-11-17 09:14:37,635 WARNING: ALERT: Wykryto możliwe opady o 13:30 (loc=7) precipitation=0.14
+2025-11-17 09:14:37,638 WARNING: ALERT: Wykryto możliwe opady o 13:45 (loc=7) precipitation=0.07
+2025-11-17 09:14:37,641 WARNING: ALERT: Wykryto możliwe opady o 19:00 (loc=7) precipitation=0.07
+2025-11-17 09:14:37,644 WARNING: ALERT: Wykryto możliwe opady o 19:15 (loc=7) precipitation=0.14
+2025-11-17 09:14:37,646 WARNING: ALERT: Wykryto możliwe opady o 19:30 (loc=7) precipitation=0.14
+2025-11-17 09:14:37,649 WARNING: ALERT: Wykryto możliwe opady o 19:45 (loc=7) precipitation=0.14
+2025-11-17 09:14:37,652 WARNING: ALERT: Wykryto możliwe opady o 20:00 (loc=7) precipitation=0.21
+2025-11-17 09:14:37,655 WARNING: ALERT: Wykryto możliwe opady o 20:15 (loc=7) precipitation=0.56
+2025-11-17 09:14:37,658 WARNING: ALERT: Wykryto możliwe opady o 20:30 (loc=7) precipitation=0.84
+2025-11-17 09:14:37,660 WARNING: ALERT: Wykryto możliwe opady o 20:45 (loc=7) precipitation=0.70
+2025-11-17 09:14:37,663 WARNING: ALERT: Wykryto możliwe opady o 21:00 (loc=7) precipitation=0.63
+2025-11-17 09:14:37,665 WARNING: ALERT: Wykryto możliwe opady o 21:15 (loc=7) precipitation=0.70
+2025-11-17 09:14:37,668 WARNING: ALERT: Wykryto możliwe opady o 21:30 (loc=7) precipitation=0.84
+2025-11-17 09:14:37,671 WARNING: ALERT: Wykryto możliwe opady o 21:45 (loc=7) precipitation=0.70
+2025-11-17 09:14:37,674 WARNING: ALERT: Wykryto możliwe opady o 22:00 (loc=7) precipitation=0.42
+2025-11-17 09:14:37,676 WARNING: ALERT: Wykryto możliwe opady o 22:15 (loc=7) precipitation=0.56
+2025-11-17 09:14:37,679 WARNING: ALERT: Wykryto możliwe opady o 22:30 (loc=7) precipitation=0.70
+2025-11-17 09:14:37,681 WARNING: ALERT: Wykryto możliwe opady o 22:45 (loc=7) precipitation=0.14
+2025-11-17 09:14:37,685 WARNING: ALERT: Wykryto możliwe opady o 23:00 (loc=7) precipitation=0.07
+2025-11-17 09:14:37,687 WARNING: ALERT: Wykryto możliwe opady o 23:15 (loc=7) precipitation=0.07
+2025-11-17 09:14:37,690 WARNING: ALERT: Wykryto możliwe opady o 00:00 (loc=7) precipitation=0.14
+2025-11-17 09:14:37,692 WARNING: ALERT: Wykryto możliwe opady o 00:15 (loc=7) precipitation=0.42
+2025-11-17 09:14:37,695 WARNING: ALERT: Wykryto możliwe opady o 00:30 (loc=7) precipitation=0.28
+2025-11-17 09:14:37,697 WARNING: ALERT: Wykryto możliwe opady o 00:45 (loc=7) precipitation=0.07
+2025-11-17 09:14:37,699 WARNING: ALERT: Wykryto możliwe opady o 01:00 (loc=7) precipitation=0.21
+2025-11-17 09:14:37,703 WARNING: ALERT: Wykryto możliwe opady o 01:15 (loc=7) precipitation=0.07
+2025-11-17 09:14:37,705 WARNING: ALERT: Wykryto możliwe opady o 02:30 (loc=7) precipitation=0.14
+2025-11-17 09:14:37,706 INFO: Wygenerowano 63 alertów z analizy payloadu dla Tryglaw
+2025-11-17 09:14:37,706 INFO: Pobieram Zugspitze
+2025-11-17 09:14:38,095 WARNING: ALERT: Wykryto możliwe opady o 09:00 (loc=8) precipitation=0.07
+2025-11-17 09:14:38,099 WARNING: ALERT: Wykryto możliwe opady o 10:00 (loc=8) precipitation=0.35
+2025-11-17 09:14:38,102 WARNING: ALERT: Wykryto możliwe opady o 11:00 (loc=8) precipitation=1.47
+2025-11-17 09:14:38,105 WARNING: ALERT: Wykryto możliwe opady o 12:00 (loc=8) precipitation=1.26
+2025-11-17 09:14:38,110 WARNING: ALERT: Wykryto możliwe opady o 13:00 (loc=8) precipitation=0.77
+2025-11-17 09:14:38,114 WARNING: ALERT: Wykryto możliwe opady o 14:00 (loc=8) precipitation=0.77
+2025-11-17 09:14:38,118 WARNING: ALERT: Wykryto możliwe opady o 15:00 (loc=8) precipitation=0.70
+2025-11-17 09:14:38,121 WARNING: ALERT: Wykryto możliwe opady o 16:00 (loc=8) precipitation=0.28
+2025-11-17 09:14:38,123 WARNING: ALERT: Wykryto możliwe opady o 17:00 (loc=8) precipitation=0.56
+2025-11-17 09:14:38,126 WARNING: ALERT: Wykryto możliwe opady o 18:00 (loc=8) precipitation=0.56
+2025-11-17 09:14:38,128 WARNING: ALERT: Wykryto możliwe opady o 19:00 (loc=8) precipitation=0.49
+2025-11-17 09:14:38,131 WARNING: ALERT: Wykryto możliwe opady o 20:00 (loc=8) precipitation=1.33
+2025-11-17 09:14:38,134 WARNING: ALERT: Wykryto możliwe opady o 21:00 (loc=8) precipitation=0.70
+2025-11-17 09:14:38,137 WARNING: ALERT: Wykryto możliwe opady o 22:00 (loc=8) precipitation=0.77
+2025-11-17 09:14:38,140 WARNING: ALERT: Wykryto możliwe opady o 23:00 (loc=8) precipitation=0.56
+2025-11-17 09:14:38,143 WARNING: ALERT: Wykryto możliwe opady o 00:00 (loc=8) precipitation=0.28
+2025-11-17 09:14:38,146 WARNING: ALERT: Wykryto możliwe opady o 09:00 (loc=8) precipitation=0.07
+2025-11-17 09:14:38,149 WARNING: ALERT: Wykryto możliwe opady o 09:45 (loc=8) precipitation=0.07
+2025-11-17 09:14:38,152 WARNING: ALERT: Wykryto możliwe opady o 10:00 (loc=8) precipitation=0.28
+2025-11-17 09:14:38,155 WARNING: ALERT: Wykryto możliwe opady o 10:15 (loc=8) precipitation=0.35
+2025-11-17 09:14:38,157 WARNING: ALERT: Wykryto możliwe opady o 10:30 (loc=8) precipitation=0.28
+2025-11-17 09:14:38,160 WARNING: ALERT: Wykryto możliwe opady o 10:45 (loc=8) precipitation=0.42
+2025-11-17 09:14:38,162 WARNING: ALERT: Wykryto możliwe opady o 11:00 (loc=8) precipitation=0.42
+2025-11-17 09:14:38,166 WARNING: ALERT: Wykryto możliwe opady o 11:15 (loc=8) precipitation=0.42
+2025-11-17 09:14:38,172 WARNING: ALERT: Wykryto możliwe opady o 11:30 (loc=8) precipitation=0.28
+2025-11-17 09:14:38,175 WARNING: ALERT: Wykryto możliwe opady o 11:45 (loc=8) precipitation=0.21
+2025-11-17 09:14:38,179 WARNING: ALERT: Wykryto możliwe opady o 12:00 (loc=8) precipitation=0.35
+2025-11-17 09:14:38,182 WARNING: ALERT: Wykryto możliwe opady o 12:15 (loc=8) precipitation=0.28
+2025-11-17 09:14:38,187 WARNING: ALERT: Wykryto możliwe opady o 12:30 (loc=8) precipitation=0.21
+2025-11-17 09:14:38,190 WARNING: ALERT: Wykryto możliwe opady o 12:45 (loc=8) precipitation=0.14
+2025-11-17 09:14:38,192 WARNING: ALERT: Wykryto możliwe opady o 13:00 (loc=8) precipitation=0.14
+2025-11-17 09:14:38,195 WARNING: ALERT: Wykryto możliwe opady o 13:15 (loc=8) precipitation=0.21
+2025-11-17 09:14:38,199 WARNING: ALERT: Wykryto możliwe opady o 13:30 (loc=8) precipitation=0.14
+2025-11-17 09:14:38,203 WARNING: ALERT: Wykryto możliwe opady o 13:45 (loc=8) precipitation=0.21
+2025-11-17 09:14:38,206 WARNING: ALERT: Wykryto możliwe opady o 14:00 (loc=8) precipitation=0.21
+2025-11-17 09:14:38,209 WARNING: ALERT: Wykryto możliwe opady o 14:15 (loc=8) precipitation=0.21
+2025-11-17 09:14:38,212 WARNING: ALERT: Wykryto możliwe opady o 14:30 (loc=8) precipitation=0.21
+2025-11-17 09:14:38,214 WARNING: ALERT: Wykryto możliwe opady o 14:45 (loc=8) precipitation=0.14
+2025-11-17 09:14:38,217 WARNING: ALERT: Wykryto możliwe opady o 15:00 (loc=8) precipitation=0.14
+2025-11-17 09:14:38,221 WARNING: ALERT: Wykryto możliwe opady o 15:15 (loc=8) precipitation=0.07
+2025-11-17 09:14:38,224 WARNING: ALERT: Wykryto możliwe opady o 15:30 (loc=8) precipitation=0.07
+2025-11-17 09:14:38,227 WARNING: ALERT: Wykryto możliwe opady o 15:45 (loc=8) precipitation=0.07
+2025-11-17 09:14:38,230 WARNING: ALERT: Wykryto możliwe opady o 16:00 (loc=8) precipitation=0.07
+2025-11-17 09:14:38,232 WARNING: ALERT: Wykryto możliwe opady o 16:15 (loc=8) precipitation=0.14
+2025-11-17 09:14:38,235 WARNING: ALERT: Wykryto możliwe opady o 16:30 (loc=8) precipitation=0.14
+2025-11-17 09:14:38,238 WARNING: ALERT: Wykryto możliwe opady o 16:45 (loc=8) precipitation=0.14
+2025-11-17 09:14:38,241 WARNING: ALERT: Wykryto możliwe opady o 17:00 (loc=8) precipitation=0.14
+2025-11-17 09:14:38,244 WARNING: ALERT: Wykryto możliwe opady o 17:15 (loc=8) precipitation=0.14
+2025-11-17 09:14:38,247 WARNING: ALERT: Wykryto możliwe opady o 17:30 (loc=8) precipitation=0.14
+2025-11-17 09:14:38,250 WARNING: ALERT: Wykryto możliwe opady o 17:45 (loc=8) precipitation=0.14
+2025-11-17 09:14:38,255 WARNING: ALERT: Wykryto możliwe opady o 18:00 (loc=8) precipitation=0.14
+2025-11-17 09:14:38,258 WARNING: ALERT: Wykryto możliwe opady o 18:15 (loc=8) precipitation=0.14
+2025-11-17 09:14:38,261 WARNING: ALERT: Wykryto możliwe opady o 18:30 (loc=8) precipitation=0.14
+2025-11-17 09:14:38,264 WARNING: ALERT: Wykryto możliwe opady o 18:45 (loc=8) precipitation=0.14
+2025-11-17 09:14:38,268 WARNING: ALERT: Wykryto możliwe opady o 19:00 (loc=8) precipitation=0.07
+2025-11-17 09:14:38,272 WARNING: ALERT: Wykryto możliwe opady o 19:15 (loc=8) precipitation=0.28
+2025-11-17 09:14:38,275 WARNING: ALERT: Wykryto możliwe opady o 19:30 (loc=8) precipitation=0.35
+2025-11-17 09:14:38,279 WARNING: ALERT: Wykryto możliwe opady o 19:45 (loc=8) precipitation=0.28
+2025-11-17 09:14:38,281 WARNING: ALERT: Wykryto możliwe opady o 20:00 (loc=8) precipitation=0.42
+2025-11-17 09:14:38,285 WARNING: ALERT: Wykryto możliwe opady o 20:15 (loc=8) precipitation=0.21
+2025-11-17 09:14:38,288 WARNING: ALERT: Wykryto możliwe opady o 20:30 (loc=8) precipitation=0.14
+2025-11-17 09:14:38,290 WARNING: ALERT: Wykryto możliwe opady o 20:45 (loc=8) precipitation=0.14
+2025-11-17 09:14:38,293 WARNING: ALERT: Wykryto możliwe opady o 21:00 (loc=8) precipitation=0.21
+2025-11-17 09:14:38,295 WARNING: ALERT: Wykryto możliwe opady o 21:15 (loc=8) precipitation=0.21
+2025-11-17 09:14:38,298 WARNING: ALERT: Wykryto możliwe opady o 21:30 (loc=8) precipitation=0.21
+2025-11-17 09:14:38,301 WARNING: ALERT: Wykryto możliwe opady o 21:45 (loc=8) precipitation=0.21
+2025-11-17 09:14:38,304 WARNING: ALERT: Wykryto możliwe opady o 22:00 (loc=8) precipitation=0.14
+2025-11-17 09:14:38,306 WARNING: ALERT: Wykryto możliwe opady o 22:15 (loc=8) precipitation=0.14
+2025-11-17 09:14:38,309 WARNING: ALERT: Wykryto możliwe opady o 22:30 (loc=8) precipitation=0.14
+2025-11-17 09:14:38,312 WARNING: ALERT: Wykryto możliwe opady o 22:45 (loc=8) precipitation=0.14
+2025-11-17 09:14:38,314 WARNING: ALERT: Wykryto możliwe opady o 23:00 (loc=8) precipitation=0.14
+2025-11-17 09:14:38,317 WARNING: ALERT: Wykryto możliwe opady o 23:15 (loc=8) precipitation=0.07
+2025-11-17 09:14:38,321 WARNING: ALERT: Wykryto możliwe opady o 23:30 (loc=8) precipitation=0.07
+2025-11-17 09:14:38,323 WARNING: ALERT: Wykryto możliwe opady o 23:45 (loc=8) precipitation=0.07
+2025-11-17 09:14:38,326 WARNING: ALERT: Wykryto możliwe opady o 00:00 (loc=8) precipitation=0.07
+2025-11-17 09:14:38,326 INFO: Wygenerowano 75 alertów z analizy payloadu dla Zugspitze
+2025-11-17 09:14:38,327 INFO: Zakończono. Wstawiono alertów: 0
+2025-11-17 09:14:54,541 INFO: Uruchamiam fetch (hourly=True, minutely=True) dla: wszystkie
+2025-11-17 09:14:57,379 INFO: Pobieram Grossglockner
+2025-11-17 09:14:57,837 WARNING: ALERT: Temperatura poniżej -19.0 °C od 00:00 przez 7h (loc=1) temperature=-19.30
+2025-11-17 09:14:57,843 WARNING: ALERT: Opady od 09:00 przez 17h (loc=1) precipitation=1.19
+2025-11-17 09:14:57,849 WARNING: ALERT: Temperatura poniżej -19.0 °C od 23:15 przez 31h (loc=1) temperature=-19.00
+2025-11-17 09:14:57,856 WARNING: ALERT: Opady od 08:15 przez 63h (loc=1) precipitation=0.35
+2025-11-17 09:14:57,860 WARNING: ALERT: Opady od 00:15 przez 1h (loc=1) precipitation=0.07
+2025-11-17 09:14:57,861 INFO: Wygenerowano 5 alertów z analizy payloadu dla Grossglockner
+2025-11-17 09:14:57,861 INFO: Pobieram Täschhorn
+2025-11-17 09:14:58,297 WARNING: ALERT: Opady od 10:00 przez 8h (loc=2) precipitation=0.21
+2025-11-17 09:14:58,304 WARNING: ALERT: Opady od 09:30 przez 28h (loc=2) precipitation=0.07
+2025-11-17 09:14:58,308 INFO: Wygenerowano 2 alertów z analizy payloadu dla Täschhorn
+2025-11-17 09:14:58,309 INFO: Pobieram Zumsteinspitze
+2025-11-17 09:14:58,728 WARNING: ALERT: Temperatura poniżej -19.0 °C od 18:00 przez 3h (loc=3) temperature=-19.20
+2025-11-17 09:14:58,733 WARNING: ALERT: Opady od 11:00 przez 2h (loc=3) precipitation=0.07
+2025-11-17 09:14:58,738 WARNING: ALERT: Opady od 15:00 przez 3h (loc=3) precipitation=0.28
+2025-11-17 09:14:58,744 WARNING: ALERT: Temperatura poniżej -19.0 °C od 17:15 przez 14h (loc=3) temperature=-19.00
+2025-11-17 09:14:58,748 WARNING: ALERT: Temperatura poniżej -19.0 °C od 06:00 przez 4h (loc=3) temperature=-19.00
+2025-11-17 09:14:58,754 WARNING: ALERT: Opady od 11:00 przez 2h (loc=3) precipitation=0.07
+2025-11-17 09:14:58,758 WARNING: ALERT: Opady od 12:00 przez 1h (loc=3) precipitation=0.07
+2025-11-17 09:14:58,762 WARNING: ALERT: Opady od 14:15 przez 10h (loc=3) precipitation=0.07
+2025-11-17 09:14:58,762 INFO: Wygenerowano 8 alertów z analizy payloadu dla Zumsteinspitze
+2025-11-17 09:14:58,762 INFO: Pobieram Dufourspitze
+2025-11-17 09:14:59,178 WARNING: ALERT: Temperatura poniżej -19.0 °C od 17:00 przez 5h (loc=4) temperature=-19.10
+2025-11-17 09:14:59,182 WARNING: ALERT: Temperatura poniżej -19.0 °C od 05:00 przez 2h (loc=4) temperature=-19.10
+2025-11-17 09:14:59,186 WARNING: ALERT: Opady od 11:00 przez 2h (loc=4) precipitation=0.07
+2025-11-17 09:14:59,191 WARNING: ALERT: Opady od 15:00 przez 3h (loc=4) precipitation=0.28
+2025-11-17 09:14:59,198 WARNING: ALERT: Temperatura poniżej -19.0 °C od 17:00 przez 18h (loc=4) temperature=-19.10
+2025-11-17 09:14:59,204 WARNING: ALERT: Temperatura poniżej -19.0 °C od 04:15 przez 11h (loc=4) temperature=-19.00
+2025-11-17 09:14:59,208 WARNING: ALERT: Opady od 11:00 przez 2h (loc=4) precipitation=0.07
+2025-11-17 09:14:59,211 WARNING: ALERT: Opady od 12:00 przez 1h (loc=4) precipitation=0.07
+2025-11-17 09:14:59,215 WARNING: ALERT: Opady od 14:15 przez 10h (loc=4) precipitation=0.07
+2025-11-17 09:14:59,215 INFO: Wygenerowano 9 alertów z analizy payloadu dla Dufourspitze
+2025-11-17 09:14:59,216 INFO: Pobieram Mont Blanc
+2025-11-17 09:14:59,635 WARNING: ALERT: Temperatura poniżej -19.0 °C od 16:00 przez 4h (loc=5) temperature=-19.10
+2025-11-17 09:14:59,640 WARNING: ALERT: Temperatura poniżej -19.0 °C od 03:00 przez 4h (loc=5) temperature=-19.00
+2025-11-17 09:14:59,643 WARNING: ALERT: Opady od 09:00 przez 9h (loc=5) precipitation=0.49
+2025-11-17 09:14:59,649 WARNING: ALERT: Temperatura poniżej -19.0 °C od 16:00 przez 13h (loc=5) temperature=-19.00
+2025-11-17 09:14:59,654 WARNING: ALERT: Temperatura poniżej -19.0 °C od 02:45 przez 17h (loc=5) temperature=-19.00
+2025-11-17 09:14:59,658 WARNING: ALERT: Opady od 08:30 przez 32h (loc=5) precipitation=0.07
+2025-11-17 09:14:59,658 INFO: Wygenerowano 6 alertów z analizy payloadu dla Mont Blanc
+2025-11-17 09:14:59,659 INFO: Pobieram Matterhorn
+2025-11-17 09:15:00,088 WARNING: ALERT: Opady od 10:00 przez 8h (loc=6) precipitation=0.07
+2025-11-17 09:15:00,093 WARNING: ALERT: Opady od 09:30 przez 1h (loc=6) precipitation=0.07
+2025-11-17 09:15:00,096 WARNING: ALERT: Opady od 10:15 przez 26h (loc=6) precipitation=0.07
+2025-11-17 09:15:00,096 INFO: Wygenerowano 3 alertów z analizy payloadu dla Matterhorn
+2025-11-17 09:15:00,097 INFO: Pobieram Tryglaw
+2025-11-17 09:15:00,673 WARNING: ALERT: Opady od 09:00 przez 6h (loc=7) precipitation=1.20
+2025-11-17 09:15:00,677 WARNING: ALERT: Opady od 19:00 przez 9h (loc=7) precipitation=0.07
+2025-11-17 09:15:00,681 WARNING: ALERT: Opady od 08:30 przez 22h (loc=7) precipitation=0.10
+2025-11-17 09:15:00,685 WARNING: ALERT: Opady od 19:00 przez 18h (loc=7) precipitation=0.07
+2025-11-17 09:15:00,688 WARNING: ALERT: Opady od 00:00 przez 6h (loc=7) precipitation=0.14
+2025-11-17 09:15:00,692 WARNING: ALERT: Opady od 02:30 przez 1h (loc=7) precipitation=0.14
+2025-11-17 09:15:00,692 INFO: Wygenerowano 6 alertów z analizy payloadu dla Tryglaw
+2025-11-17 09:15:00,693 INFO: Pobieram Zugspitze
+2025-11-17 09:15:01,180 WARNING: ALERT: Opady od 09:00 przez 16h (loc=8) precipitation=0.07
+2025-11-17 09:15:01,185 WARNING: ALERT: Opady od 09:00 przez 1h (loc=8) precipitation=0.07
+2025-11-17 09:15:01,188 WARNING: ALERT: Opady od 09:45 przez 58h (loc=8) precipitation=0.07
+2025-11-17 09:15:01,188 INFO: Wygenerowano 3 alertów z analizy payloadu dla Zugspitze
+2025-11-17 09:15:01,190 INFO: Zakończono. Wstawiono alertów: 0

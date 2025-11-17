@@ -1,7 +1,7 @@
 import sqlite3
 import logging
 from datetime import datetime, timedelta
-from typing import Dict, Any
+from typing import Dict, Any, List, Tuple
 
 ALERT_WIND_THRESHOLD = 58.0
 ALERT_TEMP_LOW_THRESHOLD = -19.0
@@ -11,7 +11,6 @@ LOGGER = logging.getLogger("meteofetch")
 
 
 def _extract_hour(ts: str) -> str:
-    """Wyciąga HH:MM z timestampu ISO (np. '2025-11-18T14:00' -> '14:00')."""
     try:
         if "T" not in ts:
             return "?"
@@ -22,7 +21,6 @@ def _extract_hour(ts: str) -> str:
 
 def insert_alert_db(conn: sqlite3.Connection, location_id: int, timestamp: str | None,
                     metric: str, value: float, message: str) -> int:
-    """Wstaw alert do tabeli `alerts` jeśli nie istnieje."""
     try:
         origin = "detected"
         try:
@@ -46,39 +44,32 @@ def insert_alert_db(conn: sqlite3.Connection, location_id: int, timestamp: str |
         return 0
 
 
-def _check_row_for_alerts(location_id: int, ts: str, temp, wind, rain, snow, code,
-                          conn: sqlite3.Connection) -> int:
-    """Sprawdza pojedynczy rekord i zapisuje alerty jeśli trzeba."""
-    added = 0
-    try:
-        hour_str = _extract_hour(ts)
+# --- NOWE FUNKCJE AGREGUJĄCE ---
 
-        if wind is not None and float(wind) > ALERT_WIND_THRESHOLD:
-            added += insert_alert_db(conn, location_id, ts, "wind_speed", float(wind),
-                                     f"Wiatr przekroczył {ALERT_WIND_THRESHOLD} m/s o {hour_str}")
-        if temp is not None and float(temp) <= ALERT_TEMP_LOW_THRESHOLD:
-            added += insert_alert_db(conn, location_id, ts, "temperature", float(temp),
-                                     f"Temperatura poniżej {ALERT_TEMP_LOW_THRESHOLD} °C o {hour_str}")
-        precip = False
-        pr_value = 0.0
-        if rain is not None and float(rain) > 0:
-            precip = True
-            pr_value = float(rain)
-        if snow is not None and float(snow) > 0:
-            precip = True
-            pr_value = float(snow) if pr_value == 0.0 else pr_value
-        if not precip and code is not None and int(code) in ALERT_WEATHER_CODES_PRECIP:
-            precip = True
-        if precip:
-            added += insert_alert_db(conn, location_id, ts, "precipitation",
-                                     pr_value, f"Wykryto możliwe opady o {hour_str}")
-    except Exception:
-        LOGGER.exception("Błąd przy sprawdzaniu rekordu")
-    return added
+def _aggregate_series(times: List[str], values: List[Any], check_fn) -> List[Tuple[str, int, float]]:
+    """
+    Grupuje kolejne punkty czasowe w przedziały.
+    Zwraca listę (start_ts, duration_hours, value).
+    """
+    results = []
+    current = None
+    for i, ts in enumerate(times):
+        val = values[i] if i < len(values) else None
+        if check_fn(val):
+            if current is None:
+                current = {"start": ts, "count": 1, "val": float(val) if val is not None else 0.0}
+            else:
+                current["count"] += 1
+        else:
+            if current:
+                results.append((current["start"], current["count"], current["val"]))
+                current = None
+    if current:
+        results.append((current["start"], current["count"], current["val"]))
+    return results
 
 
 def analyze_payload_and_alert(conn: sqlite3.Connection, location_id: int, payload: Dict[str, Any]) -> int:
-    """Analizuj payload i zapisuj alerty tylko na dziś + 2 dni."""
     added = 0
     try:
         now = datetime.utcnow()
@@ -91,41 +82,69 @@ def analyze_payload_and_alert(conn: sqlite3.Connection, location_id: int, payloa
             except Exception:
                 return False
 
-        # hourly
-        hourly = payload.get("hourly", {})
-        times = hourly.get("time", [])
-        if times:
-            def arr(name): return hourly.get(name, [])
-            temps, winds, rains, snows = arr("temperature_2m"), arr("wind_speed_10m"), arr("rain"), arr("snowfall")
-            codes = arr("weather_code") or arr("weathercode")
-            for i, ts in enumerate(times):
-                if not is_in_range(ts):
-                    continue
-                added += _check_row_for_alerts(location_id, ts,
-                                               temps[i] if i < len(temps) else None,
-                                               winds[i] if i < len(winds) else None,
-                                               rains[i] if i < len(rains) else None,
-                                               snows[i] if i < len(snows) else None,
-                                               codes[i] if i < len(codes) else None,
-                                               conn)
+        def process_block(block: Dict[str, Any]):
+            nonlocal added
+            times = block.get("time", [])
+            if not times:
+                return
+            temps = block.get("temperature_2m", [])
+            winds = block.get("wind_speed_10m", [])
+            rains = block.get("rain", [])
+            snows = block.get("snowfall", [])
+            codes = block.get("weather_code") or block.get("weathercode") or []
 
-        # minutely_15
-        minutely = payload.get("minutely_15", {})
-        times = minutely.get("time", [])
-        if times:
-            def arr2(name): return minutely.get(name, [])
-            temps, winds, rains, snows = arr2("temperature_2m"), arr2("wind_speed_10m"), arr2("rain"), arr2("snowfall")
-            codes = arr2("weather_code") or arr2("weathercode")
-            for i, ts in enumerate(times):
-                if not is_in_range(ts):
-                    continue
-                added += _check_row_for_alerts(location_id, ts,
-                                               temps[i] if i < len(temps) else None,
-                                               winds[i] if i < len(winds) else None,
-                                               rains[i] if i < len(rains) else None,
-                                               snows[i] if i < len(snows) else None,
-                                               codes[i] if i < len(codes) else None,
-                                               conn)
+            # filtrujemy tylko czasy w zakresie
+            valid_idx = [i for i, ts in enumerate(times) if is_in_range(ts)]
+            times = [times[i] for i in valid_idx]
+            temps = [temps[i] if i < len(temps) else None for i in valid_idx]
+            winds = [winds[i] if i < len(winds) else None for i in valid_idx]
+            rains = [rains[i] if i < len(rains) else None for i in valid_idx]
+            snows = [snows[i] if i < len(snows) else None for i in valid_idx]
+            codes = [codes[i] if i < len(codes) else None for i in valid_idx]
+
+            # --- agregacja temperatury ---
+            temp_series = _aggregate_series(times, temps, lambda v: v is not None and float(v) <= ALERT_TEMP_LOW_THRESHOLD)
+            for start, hours, val in temp_series:
+                hour_str = _extract_hour(start)
+                added += insert_alert_db(conn, location_id, start, "temperature", val,
+                                         f"Temperatura poniżej {ALERT_TEMP_LOW_THRESHOLD} °C od {hour_str} przez {hours}h")
+
+            # --- agregacja wiatru ---
+            wind_series = _aggregate_series(times, winds, lambda v: v is not None and float(v) > ALERT_WIND_THRESHOLD)
+            for start, hours, val in wind_series:
+                hour_str = _extract_hour(start)
+                added += insert_alert_db(conn, location_id, start, "wind_speed", val,
+                                         f"Wiatr powyżej {ALERT_WIND_THRESHOLD} m/s od {hour_str} przez {hours}h")
+
+            # --- agregacja opadów ---
+            precip_flags = []
+            for i in range(len(times)):
+                rain = rains[i]
+                snow = snows[i]
+                code = codes[i]
+                precip = False
+                val = 0.0
+                if rain is not None and float(rain) > 0:
+                    precip = True
+                    val = float(rain)
+                if snow is not None and float(snow) > 0:
+                    precip = True
+                    val = float(snow) if val == 0.0 else val
+                if not precip and code is not None and int(code) in ALERT_WEATHER_CODES_PRECIP:
+                    precip = True
+                precip_flags.append(val if precip else None)
+
+            precip_series = _aggregate_series(times, precip_flags, lambda v: v is not None)
+            for start, hours, val in precip_series:
+                hour_str = _extract_hour(start)
+                added += insert_alert_db(conn, location_id, start, "precipitation", val,
+                                         f"Opady od {hour_str} przez {hours}h")
+
+        # obsługa hourly i minutely_15
+        process_block(payload.get("hourly", {}))
+        process_block(payload.get("minutely_15", {}))
+
     except Exception:
         LOGGER.exception("Błąd podczas analizy payloadu")
     return added
+
