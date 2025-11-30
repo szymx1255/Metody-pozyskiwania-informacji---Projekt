@@ -7,97 +7,72 @@ Zawiera funkcje do:
 Komentarze i komunikaty w języku polskim.
 """
 from pathlib import Path
-import json
 from datetime import datetime
-import sqlite3
 from typing import Any, Iterable
-
+import json
+import sqlite3
 
 DATA_DIR = Path("data")
 
 
 def ensure_data_dir() -> None:
-	DATA_DIR.mkdir(parents=True, exist_ok=True)
+    """Upewnij się, że katalog `data/` istnieje."""
+    DATA_DIR.mkdir(parents=True, exist_ok=True)
 
 
 def save_payload_to_json(payload: Any, filename: str | None = None, prefix: str = "payload") -> Path:
-	"""Zapisz `payload` (np. słownik z API) do pliku JSON.
+    """
+    Zapisz `payload` do jednego pliku JSON w katalogu `data/`.
+    - Jeśli `filename` podano, użyty zostanie on jako nazwa pliku (np. 'payload.json').
+    - Jeśli `filename` jest None, używamy domyślnie 'payload.json' (z parametrem prefix: 'payload.json').
+    - Zawsze nadpisujemy plik (nie tworzymy nowych z timestampami).
+    Zwraca Path do zapisanego pliku.
+    """
+    ensure_data_dir()
+    if filename:
+        out = DATA_DIR / filename
+    else:
+        out = DATA_DIR / f"{prefix}.json"
 
-	Parametry:
-	  - payload: obiekt serializowalny do JSON (dict/list)
-	  - filename: jeśli podany, użyty jako nazwa pliku (bez katalogu)
-	  - prefix: używany gdy `filename` jest None (domyślnie 'payload')
+    # Zapisz i nadpisz plik
+    with out.open("w", encoding="utf-8") as f:
+        json.dump(payload, f, ensure_ascii=False, indent=2)
 
-	Zwraca: Path do zapisanego pliku.
-	"""
-	ensure_data_dir()
-	if filename:
-		out = DATA_DIR / filename
-	else:
-		ts = datetime.utcnow().strftime("%Y%m%dT%H%M%SZ")
-		out = DATA_DIR / f"{prefix}-{ts}.json"
-	# Zapisujemy z ensure_ascii=False aby poprawnie zapisać polskie znaki
-	with out.open("w", encoding="utf-8") as f:
-		json.dump(payload, f, ensure_ascii=False, indent=2)
-	return out
+    return out
 
 
 def export_table_to_json(db_path: str | Path, table: str, out_file: str | None = None) -> Path:
-	"""Wyeksportuj całą tabelę SQLite do pliku JSON (lista rekordów jako dicty).
+    """
+    Eksport zawartości tabeli SQLite do pliku JSON.
+    - db_path: ścieżka do pliku bazy danych SQLite
+    - table: nazwa tabeli do eksportu
+    - out_file: jeśli podane, użyj tej nazwy pliku w katalogu data/, inaczej użyj '{table}.json'
+    Plik zostanie nadpisany jeśli istnieje.
+    Zwraca Path do zapisanego pliku.
+    """
+    ensure_data_dir()
+    db_path = Path(db_path)
+    out_path = DATA_DIR / (out_file if out_file else f"{table}.json")
 
-	Parametry:
-	  - db_path: ścieżka do pliku bazy SQLite
-	  - table: nazwa tabeli do wyeksportowania
-	  - out_file: opcjonalna nazwa pliku wynikowego (jeśli None -> użyj data/<table>-<ts>.json)
-	"""
-	ensure_data_dir()
-	conn = sqlite3.connect(str(db_path))
-	cur = conn.cursor()
-	cur.execute(f"SELECT * FROM {table}")
-	rows = cur.fetchall()
-	cols = [d[0] for d in cur.description]
-	records = [dict(zip(cols, r)) for r in rows]
-	conn.close()
+    conn = sqlite3.connect(str(db_path))
+    cur = conn.cursor()
+    cur.execute(f"SELECT * FROM {table}")
+    cols = [d[0] for d in cur.description] if cur.description else []
+    rows = cur.fetchall()
+    conn.close()
 
-	if out_file:
-		out = DATA_DIR / out_file
-	else:
-		ts = datetime.utcnow().strftime("%Y%m%dT%H%M%SZ")
-		out = DATA_DIR / f"{table}-{ts}.json"
+    items = [dict(zip(cols, row)) for row in rows]
 
-	with out.open("w", encoding="utf-8") as f:
-		json.dump(records, f, ensure_ascii=False, indent=2)
-	return out
+    with out_path.open("w", encoding="utf-8") as f:
+        json.dump(items, f, ensure_ascii=False, indent=2)
+
+    return out_path
 
 
 if __name__ == "__main__":
-	# Prostą CLI: jeśli użytkownik poda --db <path> --table <name> to wyeksportujemy tabelę.
-	import argparse, sys
-
-	p = argparse.ArgumentParser(description="Zapis/eksport danych do JSON (helper)")
-	p.add_argument("--db", help="Ścieżka do pliku sqlite do eksportu (opcjonalne)")
-	p.add_argument("--table", help="Nazwa tabeli do eksportu (wymagane jeśli --db podane)")
-	p.add_argument("--out", help="Nazwa pliku wynikowego w katalogu data/")
-	p.add_argument("--stdin", action="store_true", help="Odczytaj JSON ze stdin i zapisz do pliku")
-	args = p.parse_args()
-
-	if args.stdin:
-		try:
-			payload = json.load(sys.stdin)
-		except Exception as e:
-			print("Błąd odczytu JSON ze stdin:", e)
-			raise
-		out = save_payload_to_json(payload, filename=args.out)
-		print("Zapisano:", out)
-		sys.exit(0)
-
-	if args.db:
-		if not args.table:
-			print("Jeśli podajesz --db, musisz także podać --table")
-			sys.exit(2)
-		out = export_table_to_json(args.db, args.table, out_file=args.out)
-		print("Zapisano:", out)
-		sys.exit(0)
-
-	p.print_help()
+    # krótki test manualny
+    ensure_data_dir()
+    sample = {"time": datetime.utcnow().isoformat() + "Z", "sample": True}
+    p = save_payload_to_json(sample)
+    print("Zapisano:", p)
 

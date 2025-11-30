@@ -3,8 +3,10 @@ import logging
 import threading
 import time
 import sys
+import sqlite3
 
 from Api import fetch_and_store_all, DB_PATH, LOCATIONS
+import Alert
 from Login import setup_logger, log_exception
 
 
@@ -49,8 +51,8 @@ def main():
                         fetch_hourly, fetch_minutely, "wszystkie" if selected is None else selected)
 
         ans_cont = input("Uruchomić w trybie ciągłym? [y/N] ").strip().lower()
-        #ans_save = input("Czy zapisać surowe odpowiedzi API do plików JSON na dysku? [y/N] ").strip().lower()
-        #save_payloads = _yes(ans_save)
+        ans_save = input("Czy zapisać surowe odpowiedzi API do plików JSON na dysku? [y/N] ").strip().lower()
+        save_payloads = _yes(ans_save)
 
         if _yes(ans_cont):
             minutes = input("Podaj częstotliwość w minutach (np. 60): ").strip()
@@ -84,28 +86,55 @@ def main():
             try:
                 while not stop_event.is_set():
                     start = time.time()
-                    inserted_alerts = fetch_and_store_all(
+                    inserted_rows = fetch_and_store_all(
                         Path(DB_PATH),
                         fetch_hourly=fetch_hourly,
                         fetch_minutely=fetch_minutely,
                         location_names=selected,
                         save_payloads=save_payloads
                     )
-                    bot_logger.info("Iteracja zakończona. Wstawiono alertów: %d", inserted_alerts)
+                    # po zapisaniu danych: generuj alerty z biblioteki Alert (czyli jeden punkt odpowiedzialny za alerty)
+                    conn = sqlite3.connect(DB_PATH)
+                    alerts_total = 0
+                    for loc in LOCATIONS:
+                        if selected is not None and loc["name"] not in selected:
+                            continue
+                        cur = conn.cursor()
+                        cur.execute("SELECT id FROM locations WHERE name=?", (loc["name"],))
+                        r = cur.fetchone()
+                        if not r:
+                            continue
+                        loc_id = r[0]
+                        alerts_total += Alert.analyze_db_and_alert(conn, loc_id, location_name=loc["name"], horizon_days=3)
+                    conn.close()
+                    bot_logger.info("Iteracja zakończona. Wstawiono alertów: %d (wstawionych wierszy: %d)", alerts_total, inserted_rows)
                     wait_seconds = max(0, interval - (time.time() - start))
                     stop_event.wait(timeout=wait_seconds)
             except Exception as e:
                 log_exception(login_logger, e, context="main.continuous_loop")
                 bot_logger.error("Błąd w trybie ciągłym. Sprawdź logi.")
         else:
-            inserted_alerts = fetch_and_store_all(
+            inserted_rows = fetch_and_store_all(
                 Path(DB_PATH),
                 fetch_hourly=fetch_hourly,
                 fetch_minutely=fetch_minutely,
                 location_names=selected,
                 save_payloads=save_payloads
             )
-            bot_logger.info("Zakończono. Wstawiono alertów: %d", inserted_alerts)
+            conn = sqlite3.connect(DB_PATH)
+            alerts_total = 0
+            for loc in LOCATIONS:
+                if selected is not None and loc["name"] not in selected:
+                    continue
+                cur = conn.cursor()
+                cur.execute("SELECT id FROM locations WHERE name=?", (loc["name"],))
+                r = cur.fetchone()
+                if not r:
+                    continue
+                loc_id = r[0]
+                alerts_total += Alert.analyze_db_and_alert(conn, loc_id, location_name=loc["name"], horizon_days=3)
+            conn.close()
+            bot_logger.info("Zakończono. Wstawiono alertów: %d (wstawionych wierszy: %d)", alerts_total, inserted_rows)
 
     except Exception as e:
         log_exception(login_logger, e, context="main.fetch_and_store_all")

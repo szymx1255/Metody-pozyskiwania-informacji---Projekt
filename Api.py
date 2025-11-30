@@ -1,13 +1,13 @@
 from pathlib import Path
+from datetime import datetime
+from save_json import save_payload_to_json
+
+import logging
 import sqlite3
 import requests
-import time
-from datetime import datetime
-import logging
 import os
-from save_json import save_payload_to_json
-import Alert
-
+import time
+from typing import Any, Dict
 
 DB_PATH = Path("data/meteodata.db")
 
@@ -51,59 +51,6 @@ MINUTELY_15_VARS = ",".join([
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s: %(message)s")
 logger = logging.getLogger("meteofetch")
 
-# Proste progi alertów (można zmienić)
-# Uwaga: wybrałem wartości domyślne; jeśli chcesz inne, powiedz a je zmienię.
-ALERT_WIND_THRESHOLD = 58.0  # m/s - próg wysoki wiatr (zgodnie z prośbą)
-ALERT_TEMP_LOW_THRESHOLD = -10.0  # °C - przyjmujemy, że poniżej tej wartości alarmujemy
-# Jeżeli występują opady deszczu/sniegu > 0 lub weather_code wskazuje opady -> alert
-ALERT_WEATHER_CODES_PRECIP = {51, 53, 55, 61, 63, 65, 80, 81, 82, 95}
-
-
-def insert_alert(conn: sqlite3.Connection, location_id: int, timestamp: str | None, metric: str, value: float, message: str, origin: str | None = None) -> None:
-    """Wstaw prosty alert do tabeli `alerts`.
-
-    Jeśli `origin` nie zostanie podany, próbujemy je wyznaczyć z pola `timestamp`:
-      - jeśli timestamp > teraz => origin='predicted'
-      - w przeciwnym razie => origin='historical'
-      - jeśli parsowanie się nie powiedzie => origin='detected'
-    """
-    try:
-        # wyznacz origin jeśli nie podano
-        if origin is None:
-            origin = "detected"
-            try:
-                if timestamp:
-                    t_dt = datetime.fromisoformat(timestamp.replace("Z", "+00:00"))
-                    origin = "predicted" if t_dt > datetime.utcnow() else "historical"
-            except Exception:
-                pass
-        cur = conn.cursor()
-        cur.execute("INSERT INTO alerts (location_id, timestamp, metric, value, message, origin) VALUES (?, ?, ?, ?, ?, ?)", (location_id, timestamp, metric, value, message, origin))
-        conn.commit()
-        logger.warning("ALERT: %s (loc=%d) %s=%.2f origin=%s", message, location_id, metric, value, origin)
-    except Exception:
-        logger.exception("Nie udało się zapisać alertu")
-    # Opcjonalne wysłanie powiadomienia przez webhook (zmienna środowiskowa ALERT_WEBHOOK_URL)
-    try:
-        webhook = os.environ.get("ALERT_WEBHOOK_URL")
-        if webhook:
-            payload = {
-                "location_id": location_id,
-                "timestamp": timestamp,
-                "metric": metric,
-                "value": value,
-                "message": message,
-                "origin": origin,
-            }
-            # bezpieczne wysłanie POST, nie blokujemy głównego procesu na długi czas
-            try:
-                requests.post(webhook, json=payload, timeout=5)
-            except Exception:
-                logger.exception("Nie udało się wysłać powiadomienia webhook")
-    except Exception:
-        # Nie dopuszczamy żeby błąd powiadomienia przerwał logikę zapisu
-        logger.exception("Błąd przy próbie przygotowania powiadomienia")
-
 
 def ensure_dirs():
     """Upewnij się, że katalog `data/` istnieje."""
@@ -111,7 +58,7 @@ def ensure_dirs():
 
 
 def init_db(conn: sqlite3.Connection):
-    """Utwórz tabele `locations`, `hourly`, `minutely15` jeśli nie istnieją."""
+    """Utwórz tabele `locations`, `hourly`, `minutely15` i `alerts` jeśli nie istnieją."""
     cur = conn.cursor()
     cur.execute(
         """
@@ -156,7 +103,7 @@ def init_db(conn: sqlite3.Connection):
         )
         """
     )
-    # Tabela alertów na nietypowe dane (np. zbyt duży wiatr)
+    # Tabela alertów tworzona tutaj tylko po to, aby inny moduł mógł do niej zapisywać
     cur.execute(
         """
         CREATE TABLE IF NOT EXISTS alerts (
@@ -166,20 +113,21 @@ def init_db(conn: sqlite3.Connection):
             metric TEXT,
             value REAL,
             message TEXT,
-            origin TEXT
+            origin TEXT,
+            UNIQUE(location_id, timestamp, metric, origin)
         )
         """
     )
     conn.commit()
-    # migracja: jeśli tabela istnieje bez kolumny origin, dodajemy ją
+    # migracja: jeśli tabela istnieje bez kolumny origin, spróbuj dodać
     try:
         cur.execute("PRAGMA table_info(alerts)")
-        existing = [r[1] for r in cur.fetchall()]
-        if "origin" not in existing:
+        cols = [r[1] for r in cur.fetchall()]
+        if "origin" not in cols:
             cur.execute("ALTER TABLE alerts ADD COLUMN origin TEXT")
             conn.commit()
     except Exception:
-        logger.exception("Nie udało się sprawdzić/migrować tabeli alerts")
+        logger.debug("Brak potrzeby migracji tabeli alerts albo wystąpił błąd migracji.")
 
 
 def insert_or_get_location(conn: sqlite3.Connection, loc: dict) -> int:
@@ -189,7 +137,7 @@ def insert_or_get_location(conn: sqlite3.Connection, loc: dict) -> int:
     row = cur.fetchone()
     if row:
         return row[0]
-    cur.execute("INSERT INTO locations (name, latitude, longitude) VALUES (?, ?, ?)", (loc["name"], loc["latitude"], loc["longitude"]))
+    cur.execute("INSERT INTO locations (name, latitude, longitude) VALUES (?, ?, ?)", (loc["name"], loc.get("latitude"), loc.get("longitude")))
     conn.commit()
     return cur.lastrowid
 
@@ -202,25 +150,26 @@ def fetch_location(location: dict) -> dict:
     backoff = 1
     for attempt in range(attempts):
         try:
-            logger.info("Pobieram %s", location["name"])
-            r = requests.get(API_URL, params=params, timeout=30)
-            r.raise_for_status()
-            return r.json()
-        except requests.RequestException as e:
-            logger.warning("Błąd sieci dla %s (attempt %d): %s", location["name"], attempt + 1, e)
+            resp = requests.get(API_URL, params=params, timeout=15)
+            resp.raise_for_status()
+            return resp.json()
+        except Exception as e:
+            logger.warning("Błąd pobierania dla %s (attempt %d/%d): %s", location["name"], attempt+1, attempts, e)
             time.sleep(backoff)
             backoff *= 2
     raise RuntimeError(f"Nie udało się pobrać danych dla {location['name']}")
 
 
 def store_hourly(conn: sqlite3.Connection, location_id: int, payload: dict) -> int:
-    """Zapisz tablice `hourly` do tabeli `hourly`. Zwraca liczbę wstawionych wierszy."""
+    """Zapisz tablice `hourly` do tabeli `hourly`. Zwraca liczbę dodanych wierszy (potencjalnie zawiera zduplikowane próby)."""
     hourly = payload.get("hourly", {})
     times = hourly.get("time", [])
     if not times:
         return 0
+
     def arr(name):
         return hourly.get(name, [])
+
     temps = arr("temperature_2m")
     rains = arr("rain")
     snows = arr("snowfall")
@@ -228,67 +177,30 @@ def store_hourly(conn: sqlite3.Connection, location_id: int, payload: dict) -> i
     codes = arr("weather_code") or arr("weathercode")
     dirs = arr("wind_direction_10m")
     uvs = arr("uv_index")
+
     cur = conn.cursor()
     cur.execute("SELECT MAX(timestamp) FROM hourly WHERE location_id=?", (location_id,))
     r = cur.fetchone()
     max_ts = r[0] if r and r[0] is not None else None
+
     rows = []
     for i, t in enumerate(times):
         if max_ts is not None and t <= max_ts:
             continue
-        # Obsługa brakujących danych: jeśli wartość jest None, spróbuj użyć ostatniej znanej wartości z bazy
-        def last_or(value, col_name):
-            if value is not None:
-                return value
-            cur2 = conn.cursor()
-            try:
-                cur2.execute(f"SELECT {col_name} FROM hourly WHERE location_id=? ORDER BY timestamp DESC LIMIT 1", (location_id,))
-                row2 = cur2.fetchone()
-                return row2[0] if row2 else None
-            finally:
-                cur2.close()
-
-        t_temp = last_or(temps[i] if i < len(temps) else None, "temperature")
-        t_rain = last_or(rains[i] if i < len(rains) else None, "rain")
-        t_snow = last_or(snows[i] if i < len(snows) else None, "snowfall")
-        t_wind = last_or(wind[i] if i < len(wind) else None, "wind_speed")
+        t_temp = temps[i] if i < len(temps) else None
+        t_rain = rains[i] if i < len(rains) else None
+        t_snow = snows[i] if i < len(snows) else None
+        t_wind = wind[i] if i < len(wind) else None
         t_code = codes[i] if i < len(codes) else None
         t_dir = dirs[i] if i < len(dirs) else None
         t_uv = uvs[i] if i < len(uvs) else None
         rows.append((location_id, t, t_temp, t_rain, t_snow, t_wind, t_code, t_dir, t_uv))
-        # Alerty: wykryj nietypowe wartości
-        try:
-            # wiatr
-            if t_wind is not None and float(t_wind) > ALERT_WIND_THRESHOLD:
-                insert_alert(conn, location_id, t, "wind_speed", float(t_wind), f"Wiatr przekroczył {ALERT_WIND_THRESHOLD} m/s")
-            # niska temperatura
-            if t_temp is not None:
-                try:
-                    if float(t_temp) <= ALERT_TEMP_LOW_THRESHOLD:
-                        insert_alert(conn, location_id, t, "temperature", float(t_temp), f"Temperatura poniżej {ALERT_TEMP_LOW_THRESHOLD} °C")
-                except Exception:
-                    logger.exception("Błąd przy sprawdzaniu progu temperatury (hourly)")
-            # opady: jeśli mamy bezwzględne wartości deszczu/śniegu > 0 lub weather_code wskazuje opady
-            try:
-                precip = False
-                if t_rain is not None and float(t_rain) > 0:
-                    precip = True
-                if t_snow is not None and float(t_snow) > 0:
-                    precip = True
-                if t_code is not None:
-                    try:
-                        if int(t_code) in ALERT_WEATHER_CODES_PRECIP:
-                            precip = True
-                    except Exception:
-                        pass
-                if precip:
-                    insert_alert(conn, location_id, t, "precipitation", float(t_rain or t_snow or 0.0), "Wykryto możliwe opady")
-            except Exception:
-                logger.exception("Błąd przy sprawdzaniu opadów (hourly)")
-        except Exception:
-            logger.exception("Błąd przy sprawdzaniu alertów (hourly)")
+
     if rows:
-        cur.executemany("INSERT OR REPLACE INTO hourly (location_id, timestamp, temperature, rain, snowfall, wind_speed, weather_code, wind_direction, uv_index) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", rows)
+        cur.executemany(
+            "INSERT OR IGNORE INTO hourly (location_id, timestamp, temperature, rain, snowfall, wind_speed, weather_code, wind_direction, uv_index) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            rows
+        )
         conn.commit()
     return len(rows)
 
@@ -299,127 +211,75 @@ def store_minutely15(conn: sqlite3.Connection, location_id: int, payload: dict) 
     times = minutely.get("time", [])
     if not times:
         return 0
+
     def arr(name):
         return minutely.get(name, [])
+
     temps = arr("temperature_2m")
     wind = arr("wind_speed_10m")
     rains = arr("rain")
     snows = arr("snowfall")
     dirs = arr("wind_direction_10m")
     codes = arr("weather_code") or arr("weathercode")
+
     cur = conn.cursor()
     cur.execute("SELECT MAX(timestamp) FROM minutely15 WHERE location_id=?", (location_id,))
     r = cur.fetchone()
     max_ts = r[0] if r and r[0] is not None else None
+
     rows = []
     for i, t in enumerate(times):
         if max_ts is not None and t <= max_ts:
             continue
-        # Obsługa brakujących danych analogicznie do hourly
-        def last_or(value, col_name):
-            if value is not None:
-                return value
-            cur2 = conn.cursor()
-            try:
-                cur2.execute(f"SELECT {col_name} FROM minutely15 WHERE location_id=? ORDER BY timestamp DESC LIMIT 1", (location_id,))
-                row2 = cur2.fetchone()
-                return row2[0] if row2 else None
-            finally:
-                cur2.close()
-
-        t_temp = last_or(temps[i] if i < len(temps) else None, "temperature")
-        t_wind = last_or(wind[i] if i < len(wind) else None, "wind_speed")
-        t_rain = last_or(rains[i] if i < len(rains) else None, "rain")
-        t_snow = last_or(snows[i] if i < len(snows) else None, "snowfall")
+        t_temp = temps[i] if i < len(temps) else None
+        t_wind = wind[i] if i < len(wind) else None
+        t_rain = rains[i] if i < len(rains) else None
+        t_snow = snows[i] if i < len(snows) else None
         t_dir = dirs[i] if i < len(dirs) else None
         t_code = codes[i] if i < len(codes) else None
-
         rows.append((location_id, t, t_temp, t_wind, t_rain, t_snow, t_dir, t_code))
-        # Alerty analogiczne do hourly
-        try:
-            if t_wind is not None and float(t_wind) > ALERT_WIND_THRESHOLD:
-                insert_alert(conn, location_id, t, "wind_speed", float(t_wind), f"Wiatr przekroczył {ALERT_WIND_THRESHOLD} m/s")
-            if t_temp is not None:
-                try:
-                    if float(t_temp) <= ALERT_TEMP_LOW_THRESHOLD:
-                        insert_alert(conn, location_id, t, "temperature", float(t_temp), f"Temperatura poniżej {ALERT_TEMP_LOW_THRESHOLD} °C")
-                except Exception:
-                    logger.exception("Błąd przy sprawdzaniu progu temperatury (minutely)")
-            try:
-                precip = False
-                if t_rain is not None and float(t_rain) > 0:
-                    precip = True
-                if t_snow is not None and float(t_snow) > 0:
-                    precip = True
-                if t_code is not None:
-                    try:
-                        if int(t_code) in ALERT_WEATHER_CODES_PRECIP:
-                            precip = True
-                    except Exception:
-                        pass
-                if precip:
-                    insert_alert(conn, location_id, t, "precipitation", float(t_rain or t_snow or 0.0), "Wykryto możliwe opady")
-            except Exception:
-                logger.exception("Błąd przy sprawdzaniu opadów (minutely)")
-        except Exception:
-            logger.exception("Błąd przy sprawdzaniu alertów (minutely)")
+
     if rows:
-        cur.executemany("INSERT OR REPLACE INTO minutely15 (location_id, timestamp, temperature, wind_speed, rain, snowfall, wind_direction, weather_code) VALUES (?, ?, ?, ?, ?, ?, ?, ?)", rows)
+        cur.executemany(
+            "INSERT OR IGNORE INTO minutely15 (location_id, timestamp, temperature, wind_speed, rain, snowfall, wind_direction, weather_code) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+            rows
+        )
         conn.commit()
     return len(rows)
 
 
 def fetch_and_store_all(db_path: Path, *, fetch_hourly: bool = True, fetch_minutely: bool = True, location_names: list[str] | None = None, save_payloads: bool = False) -> int:
     """Pobierz i zapisz dane dla wskazanych lokalizacji.
-
-    Parametry:
-      - db_path: ścieżka do pliku SQLite
-      - fetch_hourly: czy zapisać dane godzinowe
-      - fetch_minutely: czy zapisać dane 15-minutowe
-      - location_names: opcjonalna lista nazw lokalizacji do pobrania (jeśli None => wszystkie)
-
-    Zwraca liczbę wstawionych/ zaktualizowanych wierszy.
-    """
+    Zwraca łączną liczbę dodanych wierszy (hourly + minutely)."""
     if not fetch_hourly and not fetch_minutely:
-        raise ValueError("Przynajmniej jedna z opcji fetch_hourly lub fetch_minutely musi być True")
+        return 0
 
     ensure_dirs()
     conn = sqlite3.connect(db_path)
     init_db(conn)
     total = 0
     for loc in LOCATIONS:
-        if location_names is not None and loc.get("name") not in location_names:
+        if location_names is not None and loc["name"] not in location_names:
             continue
-        loc_id = insert_or_get_location(conn, loc)
-        payload = fetch_location(loc)
-        # Analiza payloadu pod kątem alertów (np. nadchodzące/obecne warunki)
         try:
-            alerts_added = Alert.analyze_payload_and_alert(conn, loc_id, payload)
-            if alerts_added:
-                logger.info("Wygenerowano %d alertów z analizy payloadu dla %s", alerts_added, loc.get("name"))
-        except Exception:
-            logger.exception("Błąd przy analizie payloadu pod kątem alertów")
-
-        # opcjonalnie zapisz surowy payload do pliku JSON na dysku
-        if save_payloads:
-            try:
-                ts = datetime.utcnow().strftime("%Y%m%dT%H%M%SZ")
-                safe_name = loc.get("name", "unknown").replace(" ", "_")
-                fname = f"{safe_name}-{ts}.json"
-                save_payload_to_json(payload, filename=fname, prefix=safe_name)
-                logger.info("Zapisano payload do %s", fname)
-            except Exception:
-                logger.exception("Nie udało się zapisać payloadu do JSON")
-
-        if fetch_hourly:
-            total += store_hourly(conn, loc_id, payload)
-        if fetch_minutely:
-            total += store_minutely15(conn, loc_id, payload)
+            loc_id = insert_or_get_location(conn, loc)
+            payload = fetch_location(loc)
+            if save_payloads:
+                try:
+                    save_payload_to_json(payload, prefix=loc["name"].replace(" ", "_"))
+                except Exception:
+                    logger.debug("Nie udało się zapisać payloadu do JSON dla %s", loc["name"])
+            if fetch_hourly:
+                total += store_hourly(conn, loc_id, payload)
+            if fetch_minutely:
+                total += store_minutely15(conn, loc_id, payload)
+        except Exception as e:
+            logger.exception("Błąd podczas fetch/store dla %s: %s", loc["name"], e)
     conn.close()
     return total
 
 
 if __name__ == "__main__":
     # Prosty program: wykonaj jedno pobranie i zakończ.
-    inserted = fetch_and_store_all(DB_PATH)
-    logger.info("Wstawiono/ zaktualizowano %d wierszy", inserted)
+    inserted = fetch_and_store_all(DB_PATH, fetch_hourly=True, fetch_minutely=True, save_payloads=False)
+    logger.info("Wstawiono rekordów: %d", inserted)
