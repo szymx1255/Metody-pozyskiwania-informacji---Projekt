@@ -155,27 +155,32 @@ def analyze_payload_and_alert(conn: sqlite3.Connection, location_id: int, payloa
         # dla każdego bloku zbierz tylko wartości które spełniały odpowiedni warunek
         for start_i, end_i in blocks:
             # indeksy od start_i do end_i inclusive
-            temps_block = [float(temps[j]) for j in range(start_i, end_i + 1) if j < len(temps) and temp_flag[j] and temps[j] is not None]
-            winds_block = [float(winds[j]) for j in range(start_i, end_i + 1) if j < len(winds) and wind_flag[j] and winds[j] is not None]
-            rain_block = [float(rains[j]) for j in range(start_i, end_i + 1) if j < len(rains) and precip_flag[j] and rains[j] is not None]
-            snow_block = [float(snows[j]) for j in range(start_i, end_i + 1) if j < len(snows) and precip_flag[j] and snows[j] is not None]
-            codes_block = [codes[j] for j in range(start_i, end_i + 1) if j < len(codes) and codes[j] is not None]
+            block_temps = [float(temps[j]) for j in range(start_i, end_i+1) if j < len(temps) and temp_flag[j] and temps[j] is not None]
+            block_winds = [float(winds[j]) for j in range(start_i, end_i+1) if j < len(winds) and wind_flag[j] and winds[j] is not None]
+            # listy pojedynczych wartości dla opadów, potem ich sumy (bez ryzyka podwójnego sumowania)
+            block_rain_values = [float(rains[j]) for j in range(start_i, end_i+1) if j < len(rains) and precip_flag[j] and rains[j] is not None]
+            block_snow_values = [float(snows[j]) for j in range(start_i, end_i+1) if j < len(snows) and precip_flag[j] and snows[j] is not None]
+            block_rain_sum = sum(block_rain_values) if block_rain_values else 0.0
+            block_snow_sum = sum(block_snow_values) if block_snow_values else 0.0
 
             parts: List[str] = []
             rep_value = 0.0
 
-            if temps_block:
-                min_temp = min(temps_block)
-                parts.append(f"temperatura do {min_temp:.0f}°C")
-                rep_value = float(min_temp)
-            if winds_block:
-                max_wind = max(winds_block)
+            if block_temps:
+                tmin = min(block_temps)
+                tmax = max(block_temps)
+                if abs(tmax - tmin) < 0.5:
+                    parts.append(f"temperatura {tmin:.0f}°C")
+                else:
+                    parts.append(f"temperatura od {tmin:.0f}°C do {tmax:.0f}°C")
+                rep_value = float(tmin)
+            if block_winds:
+                max_wind = max(block_winds)
                 parts.append(f"wiatr do {max_wind:.0f} m/s")
                 rep_value = max(rep_value, float(max_wind))
-            if rain_block or snow_block or any((int(c) in ALERT_WEATHER_CODES_PRECIP) for c in codes_block if isinstance(c, (int, str))):
-                total_precip = sum(rain_block) + sum(snow_block)
+            if block_rain_sum > 0 or block_snow_sum > 0:
                 parts.append("opady (deszcz/śnieg)")
-                rep_value = max(rep_value, float(total_precip))
+                rep_value = max(rep_value, float(block_rain_sum + block_snow_sum))
 
             # jeśli brak części (nie powinno się zdarzyć), pomiń
             if not parts:

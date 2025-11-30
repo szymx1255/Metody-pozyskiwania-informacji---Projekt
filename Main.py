@@ -8,6 +8,7 @@ import sqlite3
 from Api import fetch_and_store_all, DB_PATH, LOCATIONS
 import Alert
 from Login import setup_logger, log_exception
+import quota
 
 
 def _attach_handlers(src_logger_name: str, dst_logger_name: str) -> None:
@@ -86,13 +87,24 @@ def main():
             try:
                 while not stop_event.is_set():
                     start = time.time()
-                    inserted_rows = fetch_and_store_all(
-                        Path(DB_PATH),
-                        fetch_hourly=fetch_hourly,
-                        fetch_minutely=fetch_minutely,
-                        location_names=selected,
-                        save_payloads=save_payloads
-                    )
+                    # quota check: każdorazowe fetch liczymy jako WEIGHT_PER_QUERY
+                    if not quota.can_consume(quota.WEIGHT_PER_QUERY):
+                        bot_logger.warning("Brak budżetu API na dziś (pozostało %d) — pomijam fetch.", quota.remaining())
+                        inserted_rows = 0
+                    else:
+                        try:
+                            quota.consume(quota.WEIGHT_PER_QUERY)
+                        except RuntimeError:
+                            bot_logger.warning("Quota exhausted upon consume attempt — pomijam fetch.")
+                            inserted_rows = 0
+                        else:
+                            inserted_rows = fetch_and_store_all(
+                                Path(DB_PATH),
+                                fetch_hourly,
+                                fetch_minutely,
+                                selected,
+                                save_payloads
+                            )
                     # po zapisaniu danych: generuj alerty z biblioteki Alert (czyli jeden punkt odpowiedzialny za alerty)
                     conn = sqlite3.connect(DB_PATH)
                     alerts_total = 0
@@ -114,14 +126,24 @@ def main():
                 log_exception(login_logger, e, context="main.continuous_loop")
                 bot_logger.error("Błąd w trybie ciągłym. Sprawdź logi.")
         else:
-            inserted_rows = fetch_and_store_all(
-                Path(DB_PATH),
-                fetch_hourly=fetch_hourly,
-                fetch_minutely=fetch_minutely,
-                location_names=selected,
-                save_payloads=save_payloads
-            )
-            conn = sqlite3.connect(DB_PATH)
+            if not quota.can_consume(quota.WEIGHT_PER_QUERY):
+                bot_logger.warning("Brak budżetu API na dziś (pozostało %d) — pomijam fetch.", quota.remaining())
+                inserted_rows = 0
+            else:
+                try:
+                    quota.consume(quota.WEIGHT_PER_QUERY)
+                except RuntimeError:
+                    bot_logger.warning("Quota exhausted upon consume attempt — pomijam fetch.")
+                    inserted_rows = 0
+                else:
+                    inserted_rows = fetch_and_store_all(
+                        Path(DB_PATH),
+                        fetch_hourly,
+                        fetch_minutely,
+                        selected,
+                        save_payloads
+                    )
+            conn = sqlite3.connect(str(DB_PATH))
             alerts_total = 0
             for loc in LOCATIONS:
                 if selected is not None and loc["name"] not in selected:

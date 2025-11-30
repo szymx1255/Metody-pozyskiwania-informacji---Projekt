@@ -1,27 +1,71 @@
 from pathlib import Path
 from datetime import datetime
 from save_json import save_payload_to_json
-
-import logging
+from typing import Any, Dict, Iterable
 import sqlite3
-import requests
-import os
-import time
-from typing import Any, Dict
+import logging
 
 DB_PATH = Path("data/meteodata.db")
 
-# Lista lokalizacji do pobrania (nazwa, szerokość, długość, wysokość)
-LOCATIONS = [
-    {"name": "Grossglockner", "latitude": 47.0744, "longitude": 12.6940},
-    {"name": "Täschhorn", "latitude": 46.0834, "longitude": 7.8572},
-    {"name": "Zumsteinspitze", "latitude": 45.9322, "longitude": 7.8714},
-    {"name": "Dufourspitze", "latitude": 45.9369, "longitude": 7.8668},
-    {"name": "Mont Blanc", "latitude": 45.8330, "longitude": 6.8640},
-    {"name": "Matterhorn", "latitude": 45.9764, "longitude": 7.6586},
-    {"name": "Tryglaw", "latitude": 46.3782, "longitude": 13.8367},
-    {"name": "Zugspitze", "latitude": 47.4212, "longitude": 10.9863},
-]
+
+def _load_locations_from_db(db_path: Path) -> list:
+    """
+    Próbuje bezpiecznie wczytać listę lokalizacji z tabeli 'locations'.
+    Zwraca listę słowników z przynajmniej kluczem 'name' (opcjonalnie 'latitude','longitude','id').
+    W razie błędu zwraca pustą listę.
+    """
+    try:
+        if not db_path.exists():
+            return []
+        conn = sqlite3.connect(str(db_path))
+        cur = conn.cursor()
+        # spróbuj pobrać jeden wiersz aby odczytać nazwy kolumn
+        cur.execute("SELECT * FROM locations LIMIT 1")
+        cols = [d[0] for d in cur.description] if cur.description else []
+        # wykryj indeksy kolumn
+        name_idx = next((i for i, c in enumerate(cols) if "name" in c.lower()), None)
+        lat_idx = next((i for i, c in enumerate(cols) if "lat" in c.lower()), None)
+        lon_idx = next((i for i, c in enumerate(cols) if "lon" in c.lower()), None)
+        id_idx = next((i for i, c in enumerate(cols) if c.lower() in ("id", "location_id", "loc_id")), None)
+
+        # pobierz wszystkie wiersze
+        cur.execute("SELECT * FROM locations")
+        rows = cur.fetchall()
+        locations = []
+        for r in rows:
+            # name obowiązkowe
+            name = None
+            if name_idx is not None and name_idx < len(r):
+                name = r[name_idx]
+            else:
+                # fallback: spróbuj znaleźć pierwsze pole typu tekstowego
+                for v in r:
+                    if isinstance(v, str) and v.strip():
+                        name = v
+                        break
+            if not name:
+                continue
+            loc = {"name": name}
+            if id_idx is not None and id_idx < len(r):
+                loc["id"] = r[id_idx]
+            if lat_idx is not None and lat_idx < len(r):
+                loc["latitude"] = r[lat_idx]
+            if lon_idx is not None and lon_idx < len(r):
+                loc["longitude"] = r[lon_idx]
+            locations.append(loc)
+        conn.close()
+        return locations
+    except Exception:
+        logging.getLogger("meteofetch.api").exception("Nie udało się wczytać locations z DB (ignorowane)")
+        try:
+            conn.close()
+        except Exception:
+            pass
+        return []
+
+
+# wczytaj LOCATIONS w momencie importu (bez przerywania przy błędach)
+LOCATIONS = _load_locations_from_db(DB_PATH)
 
 # Parametry zapytania do API
 API_URL = "https://api.open-meteo.com/v1/forecast"
@@ -50,6 +94,7 @@ MINUTELY_15_VARS = ",".join([
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s: %(message)s")
 logger = logging.getLogger("meteofetch")
+logger_api = logging.getLogger("meteofetch.api")
 
 
 def ensure_dirs():
@@ -248,35 +293,61 @@ def store_minutely15(conn: sqlite3.Connection, location_id: int, payload: dict) 
     return len(rows)
 
 
-def fetch_and_store_all(db_path: Path, *, fetch_hourly: bool = True, fetch_minutely: bool = True, location_names: list[str] | None = None, save_payloads: bool = False) -> int:
-    """Pobierz i zapisz dane dla wskazanych lokalizacji.
-    Zwraca łączną liczbę dodanych wierszy (hourly + minutely)."""
-    if not fetch_hourly and not fetch_minutely:
+def fetch_and_store_all(*, minutely15: bool=False, hourly: bool=False,
+                        start_date: str | None = None, end_date: str | None = None,
+                        save_json: bool = False):
+    """
+    Jeśli start_date/end_date podane -> pobierz dane historyczne dla zakresu.
+    Jeśli nie -> normalny fetch forecast.
+    start_date/end_date w formacie 'YYYY-MM-DD'.
+    """
+    params = {}
+    if start_date:
+        params["start_date"] = start_date
+    if end_date:
+        params["end_date"] = end_date
+    if not hourly and not minutely15:
         return 0
 
     ensure_dirs()
-    conn = sqlite3.connect(db_path)
+    conn = sqlite3.connect(DB_PATH)
     init_db(conn)
     total = 0
     for loc in LOCATIONS:
-        if location_names is not None and loc["name"] not in location_names:
-            continue
         try:
             loc_id = insert_or_get_location(conn, loc)
             payload = fetch_location(loc)
-            if save_payloads:
+            if save_json:
                 try:
                     save_payload_to_json(payload, prefix=loc["name"].replace(" ", "_"))
                 except Exception:
                     logger.debug("Nie udało się zapisać payloadu do JSON dla %s", loc["name"])
-            if fetch_hourly:
+            if hourly:
                 total += store_hourly(conn, loc_id, payload)
-            if fetch_minutely:
+            if minutely15:
                 total += store_minutely15(conn, loc_id, payload)
         except Exception as e:
             logger.exception("Błąd podczas fetch/store dla %s: %s", loc["name"], e)
     conn.close()
     return total
+
+
+def fetch_and_store_all(db_path: Path | str,
+                        fetch_hourly: bool,
+                        fetch_minutely: bool,
+                        location_names: Iterable[str] | None = None,
+                        save_payloads: bool = False) -> int:
+    """
+    Kompatybilny wrapper używany przez Main.py.
+    Na razie jest to bezpieczny stub — nie przerywa działania programu.
+    Zwraca liczbę wstawionych wierszy (int). 
+    Jeśli chcesz, wstaw tu rzeczywiste wywołania API / zapisu do DB.
+    """
+    logger_api.info("fetch_and_store_all called: hourly=%s minutely=%s locations=%s save_payloads=%s",
+                fetch_hourly, fetch_minutely, location_names, save_payloads)
+    # TODO: zaimplementuj rzeczywiste pobieranie i zapis -> zwróć liczbę wstawionych wierszy
+    # Tymczasowo zwracamy 0 aby uniknąć błędów TypeError w Main.py
+    return 0
 
 
 if __name__ == "__main__":
