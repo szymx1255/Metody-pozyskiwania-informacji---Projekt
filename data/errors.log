@@ -1,0 +1,124 @@
+2025-11-30 13:56:42,683 ERROR: Błąd podczas fetch+store
+Traceback (most recent call last):
+  File "c:\Users\szymo\Desktop\studia\Metody pozyskiwania informacjoi\Metody-pozyskiwania-informacji---Projekt\Main.py", line 52, in job_cycle
+TypeError: fetch_and_store_all() missing 1 required positional argument: 'db_path'
+2025-11-30 13:57:23,045 ERROR: Błąd podczas fetch/store dla Grossglockner: Nie udało się pobrać danych dla Grossglockner
+Traceback (most recent call last):
+  File "c:\Users\szymo\Desktop\studia\Metody pozyskiwania informacjoi\Metody-pozyskiwania-informacji---Projekt\Api.py", line 269, in fetch_and_store_all
+    payload = fetch_location(loc)
+  File "c:\Users\szymo\Desktop\studia\Metody pozyskiwania informacjoi\Metody-pozyskiwania-informacji---Projekt\Api.py", line 163, in fetch_location
+    raise RuntimeError(f"Nie udało się pobrać danych dla {location['name']}")
+RuntimeError: Nie udało się pobrać danych dla Grossglockner
+2025-11-30 13:57:30,280 ERROR: Błąd podczas fetch/store dla Täschhorn: Nie udało się pobrać danych dla Täschhorn
+Traceback (most recent call last):
+  File "c:\Users\szymo\Desktop\studia\Metody pozyskiwania informacjoi\Metody-pozyskiwania-informacji---Projekt\Api.py", line 269, in fetch_and_store_all
+    payload = fetch_location(loc)
+  File "c:\Users\szymo\Desktop\studia\Metody pozyskiwania informacjoi\Metody-pozyskiwania-informacji---Projekt\Api.py", line 163, in fetch_location
+    raise RuntimeError(f"Nie udało się pobrać danych dla {location['name']}")
+RuntimeError: Nie udało się pobrać danych dla Täschhorn
+2025-11-30 13:57:37,496 ERROR: Błąd podczas fetch/store dla Zumsteinspitze: Nie udało się pobrać danych dla Zumsteinspitze
+Traceback (most recent call last):
+  File "c:\Users\szymo\Desktop\studia\Metody pozyskiwania informacjoi\Metody-pozyskiwania-informacji---Projekt\Api.py", line 269, in fetch_and_store_all
+    payload = fetch_location(loc)
+  File "c:\Users\szymo\Desktop\studia\Metody pozyskiwania informacjoi\Metody-pozyskiwania-informacji---Projekt\Api.py", line 163, in fetch_location
+    raise RuntimeError(f"Nie udało się pobrać danych dla {location['name']}")
+RuntimeError: Nie udało się pobrać danych dla Zumsteinspitze
+2025-11-30 13:57:44,792 ERROR: Błąd podczas fetch/store dla Dufourspitze: Nie udało się pobrać danych dla Dufourspitze
+Traceback (most recent call last):
+  File "c:\Users\szymo\Desktop\studia\Metody pozyskiwania informacjoi\Metody-pozyskiwania-informacji---Projekt\Api.py", line 269, in fetch_and_store_all
+    payload = fetch_location(loc)
+  File "c:\Users\szymo\Desktop\studia\Metody pozyskiwania informacjoi\Metody-pozyskiwania-informacji---Projekt\Api.py", line 163, in fetch_location
+    raise RuntimeError(f"Nie udało się pobrać danych dla {location['name']}")
+RuntimeError: Nie udało się pobrać danych dla Dufourspitze
+2025-11-30 13:57:51,969 ERROR: Błąd podczas fetch/store dla Mont Blanc: Nie udało się pobrać danych dla Mont Blanc
+Traceback (most recent call last):
+  File "c:\Users\szymo\Desktop\studia\Metody pozyskiwania informacjoi\Metody-pozyskiwania-informacji---Projekt\Api.py", line 269, in fetch_and_store_all
+    payload = fetch_location(loc)
+  File "c:\Users\szymo\Desktop\studia\Metody pozyskiwania informacjoi\Metody-pozyskiwania-informacji---Projekt\Api.py", line 163, in fetch_location
+    raise RuntimeError(f"Nie udało się pobrać danych dla {location['name']}")
+RuntimeError: Nie udało się pobrać danych dla Mont Blanc
+2025-11-30 13:57:59,235 ERROR: Błąd podczas fetch/store dla Matterhorn: Nie udało się pobrać danych dla Matterhorn
+Traceback (most recent call last):
+  File "c:\Users\szymo\Desktop\studia\Metody pozyskiwania informacjoi\Metody-pozyskiwania-informacji---Projekt\Api.py", line 269, in fetch_and_store_all
+    payload = fetch_location(loc)
+  File "c:\Users\szymo\Desktop\studia\Metody pozyskiwania informacjoi\Metody-pozyskiwania-informacji---Projekt\Api.py", line 163, in fetch_location
+    raise RuntimeError(f"Nie udało się pobrać danych dla {location['name']}")
+RuntimeError: Nie udało się pobrać danych dla Matterhorn
+2025-11-30 13:58:06,421 ERROR: Błąd podczas fetch/store dla Tryglaw: Nie udało się pobrać danych dla Tryglaw
+Traceback (most recent call last):
+  File "c:\Users\szymo\Desktop\studia\Metody pozyskiwania informacjoi\Metody-pozyskiwania-informacji---Projekt\Api.py", line 269, in fetch_and_store_all
+    payload = fetch_location(loc)
+  File "c:\Users\szymo\Desktop\studia\Metody pozyskiwania informacjoi\Metody-pozyskiwania-informacji---Projekt\Api.py", line 163, in fetch_location
+    raise RuntimeError(f"Nie udało się pobrać danych dla {location['name']}")
+RuntimeError: Nie udało się pobrać danych dla Tryglaw
+2025-11-30 13:58:13,610 ERROR: Błąd podczas fetch/store dla Zugspitze: Nie udało się pobrać danych dla Zugspitze
+Traceback (most recent call last):
+  File "c:\Users\szymo\Desktop\studia\Metody pozyskiwania informacjoi\Metody-pozyskiwania-informacji---Projekt\Api.py", line 269, in fetch_and_store_all
+    payload = fetch_location(loc)
+  File "c:\Users\szymo\Desktop\studia\Metody pozyskiwania informacjoi\Metody-pozyskiwania-informacji---Projekt\Api.py", line 163, in fetch_location
+    raise RuntimeError(f"Nie udało się pobrać danych dla {location['name']}")
+RuntimeError: Nie udało się pobrać danych dla Zugspitze
+2025-11-30 13:59:24,462 ERROR: Błąd podczas fetch/store dla Grossglockner: name 'build_url_and_params_for_location' is not defined
+Traceback (most recent call last):
+  File "c:\Users\szymo\Desktop\studia\Metody pozyskiwania informacjoi\Metody-pozyskiwania-informacji---Projekt\Api.py", line 279, in fetch_and_store_all
+    payload = fetch_location(loc)
+  File "c:\Users\szymo\Desktop\studia\Metody pozyskiwania informacjoi\Metody-pozyskiwania-informacji---Projekt\Api.py", line 72, in fetch_location
+    url, params = build_url_and_params_for_location(location)  # <-- utrzymaj swoją funkcję/zależność
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+NameError: name 'build_url_and_params_for_location' is not defined
+2025-11-30 13:59:24,472 ERROR: Błąd podczas fetch/store dla Täschhorn: name 'build_url_and_params_for_location' is not defined
+Traceback (most recent call last):
+  File "c:\Users\szymo\Desktop\studia\Metody pozyskiwania informacjoi\Metody-pozyskiwania-informacji---Projekt\Api.py", line 279, in fetch_and_store_all
+    payload = fetch_location(loc)
+  File "c:\Users\szymo\Desktop\studia\Metody pozyskiwania informacjoi\Metody-pozyskiwania-informacji---Projekt\Api.py", line 72, in fetch_location
+    url, params = build_url_and_params_for_location(location)  # <-- utrzymaj swoją funkcję/zależność
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+NameError: name 'build_url_and_params_for_location' is not defined
+2025-11-30 13:59:24,474 ERROR: Błąd podczas fetch/store dla Zumsteinspitze: name 'build_url_and_params_for_location' is not defined
+Traceback (most recent call last):
+  File "c:\Users\szymo\Desktop\studia\Metody pozyskiwania informacjoi\Metody-pozyskiwania-informacji---Projekt\Api.py", line 279, in fetch_and_store_all
+    payload = fetch_location(loc)
+  File "c:\Users\szymo\Desktop\studia\Metody pozyskiwania informacjoi\Metody-pozyskiwania-informacji---Projekt\Api.py", line 72, in fetch_location
+    url, params = build_url_and_params_for_location(location)  # <-- utrzymaj swoją funkcję/zależność
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+NameError: name 'build_url_and_params_for_location' is not defined
+2025-11-30 13:59:24,475 ERROR: Błąd podczas fetch/store dla Dufourspitze: name 'build_url_and_params_for_location' is not defined
+Traceback (most recent call last):
+  File "c:\Users\szymo\Desktop\studia\Metody pozyskiwania informacjoi\Metody-pozyskiwania-informacji---Projekt\Api.py", line 279, in fetch_and_store_all
+    payload = fetch_location(loc)
+  File "c:\Users\szymo\Desktop\studia\Metody pozyskiwania informacjoi\Metody-pozyskiwania-informacji---Projekt\Api.py", line 72, in fetch_location
+    url, params = build_url_and_params_for_location(location)  # <-- utrzymaj swoją funkcję/zależność
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+NameError: name 'build_url_and_params_for_location' is not defined
+2025-11-30 13:59:24,477 ERROR: Błąd podczas fetch/store dla Mont Blanc: name 'build_url_and_params_for_location' is not defined
+Traceback (most recent call last):
+  File "c:\Users\szymo\Desktop\studia\Metody pozyskiwania informacjoi\Metody-pozyskiwania-informacji---Projekt\Api.py", line 279, in fetch_and_store_all
+    payload = fetch_location(loc)
+  File "c:\Users\szymo\Desktop\studia\Metody pozyskiwania informacjoi\Metody-pozyskiwania-informacji---Projekt\Api.py", line 72, in fetch_location
+    url, params = build_url_and_params_for_location(location)  # <-- utrzymaj swoją funkcję/zależność
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+NameError: name 'build_url_and_params_for_location' is not defined
+2025-11-30 13:59:24,479 ERROR: Błąd podczas fetch/store dla Matterhorn: name 'build_url_and_params_for_location' is not defined
+Traceback (most recent call last):
+  File "c:\Users\szymo\Desktop\studia\Metody pozyskiwania informacjoi\Metody-pozyskiwania-informacji---Projekt\Api.py", line 279, in fetch_and_store_all
+    payload = fetch_location(loc)
+  File "c:\Users\szymo\Desktop\studia\Metody pozyskiwania informacjoi\Metody-pozyskiwania-informacji---Projekt\Api.py", line 72, in fetch_location
+    url, params = build_url_and_params_for_location(location)  # <-- utrzymaj swoją funkcję/zależność
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+NameError: name 'build_url_and_params_for_location' is not defined
+2025-11-30 13:59:24,480 ERROR: Błąd podczas fetch/store dla Tryglaw: name 'build_url_and_params_for_location' is not defined
+Traceback (most recent call last):
+  File "c:\Users\szymo\Desktop\studia\Metody pozyskiwania informacjoi\Metody-pozyskiwania-informacji---Projekt\Api.py", line 279, in fetch_and_store_all
+    payload = fetch_location(loc)
+  File "c:\Users\szymo\Desktop\studia\Metody pozyskiwania informacjoi\Metody-pozyskiwania-informacji---Projekt\Api.py", line 72, in fetch_location
+    url, params = build_url_and_params_for_location(location)  # <-- utrzymaj swoją funkcję/zależność
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+NameError: name 'build_url_and_params_for_location' is not defined
+2025-11-30 13:59:24,481 ERROR: Błąd podczas fetch/store dla Zugspitze: name 'build_url_and_params_for_location' is not defined
+Traceback (most recent call last):
+  File "c:\Users\szymo\Desktop\studia\Metody pozyskiwania informacjoi\Metody-pozyskiwania-informacji---Projekt\Api.py", line 279, in fetch_and_store_all
+    payload = fetch_location(loc)
+  File "c:\Users\szymo\Desktop\studia\Metody pozyskiwania informacjoi\Metody-pozyskiwania-informacji---Projekt\Api.py", line 72, in fetch_location
+    url, params = build_url_and_params_for_location(location)  # <-- utrzymaj swoją funkcję/zależność
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+NameError: name 'build_url_and_params_for_location' is not defined
