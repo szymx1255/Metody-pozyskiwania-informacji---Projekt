@@ -1,77 +1,166 @@
 from pathlib import Path
-import logging, sqlite3, time, argparse
+import logging
+import threading
+import time
+import sys
+import sqlite3
+
 from Api import fetch_and_store_all, DB_PATH, LOCATIONS
-from Login import setup_logger, log_exception
-from backup_db import backup_db
 import Alert
+from Login import setup_logger, log_exception
+import quota
+
+
+def _attach_handlers(src_logger_name: str, dst_logger_name: str) -> None:
+    src = logging.getLogger(src_logger_name)
+    dst = logging.getLogger(dst_logger_name)
+    dst.handlers = list(src.handlers)
+    dst.propagate = False
 
 
 def _yes(ans: str) -> bool:
-    return ans.strip().lower() in {"y","t","tak"}
+    return ans.strip().lower() in {"y", "t", "tak"}
 
 
 def main():
-    setup_logger()
-    logger = logging.getLogger("meteofetch")
-    logger.setLevel(logging.INFO)
+    login_logger = setup_logger()
+    _attach_handlers("login", "meteofetch")
 
-    p = argparse.ArgumentParser()
-    p.add_argument("--once", action="store_true")
-    p.add_argument("--interval", type=int, default=15, help="minuty")
-    p.add_argument("--start-date", type=str, default=None, help="YYYY-MM-DD — jeśli ustawione pobierze dane historyczne (archive). Domyślnie: prognoza")
-    p.add_argument("--end-date", type=str, default=None, help="YYYY-MM-DD — koniec zakresu (używane z --start-date)")
-    args = p.parse_args()
+    bot_logger = logging.getLogger("meteofetch")
+    bot_logger.setLevel(logging.INFO)
 
     try:
         fetch_minutely = _yes(input("Czy pobrać dane 15-minutowe (minutely_15)? [y/N] "))
         fetch_hourly = _yes(input("Czy pobrać dane godzinowe (hourly)? [y/N] "))
+
         if not fetch_minutely and not fetch_hourly:
-            logger.info("Brak danych do pobrania.")
-            return
-        all_loc = _yes(input("Czy pobrać dla wszystkich lokalizacji? [Y/n] ") or "y")
-        save_json = _yes(input("Czy zapisać surowe odpowiedzi API do plików JSON na dysku? [y/N] "))
-        # domyślnie pobieramy prognozę; jeśli podano --start-date użyjemy archival (historyczne)
-        start_date = args.start_date
-        end_date = args.end_date or (args.start_date if args.start_date else None)
-
-        locations = LOCATIONS if all_loc else [LOCATIONS[0]]
-
-        def run_once_cycle():
-            try:
-                backup_db(DB_PATH, keep=7)
-            except Exception:
-                logger.warning("Backup DB nieudany.")
-            inserted = fetch_and_store_all(fetch_minutely=fetch_minutely, fetch_hourly=fetch_hourly,
-                                           start_date=start_date, end_date=end_date, save_json=save_json,
-                                           locations=locations)
-            logger.info("Wstawionych wierszy: %d", inserted)
-            try:
-                conn = sqlite3.connect(DB_PATH)
-                total_alerts = 0
-                for loc in locations:
-                    # domyślnie analizujemy alerty na najbliższe 2 dni
-                    total_alerts += Alert.analyze_db_and_alert(conn, loc["id"], location_name=loc.get("name"))
-                conn.close()
-                logger.info("Wygenerowanych alertów: %d", total_alerts)
-            except Exception:
-                logger.exception("Błąd analizy alertów")
-        if args.once:
-            run_once_cycle()
+            bot_logger.info("Nie wybrano żadnego trybu pobierania. Kończę.")
             return
 
-        print("Uruchomić w trybie ciągłym? [y/N] ", end="")
-        if _yes(input() or ""):
-            logger.info("Start loop co %d minut", args.interval)
-            try:
-                while True:
-                    run_once_cycle()
-                    time.sleep(args.interval * 60)
-            except KeyboardInterrupt:
-                logger.info("Przerwano przez użytkownika")
+        ans_all = input("Czy pobrać dla wszystkich lokalizacji? [Y/n] ").strip().lower()
+        if ans_all in {"", "y", "tak"}:
+            selected = None
         else:
-            run_once_cycle()
+            print("Wybierz numery lokalizacji oddzielone przecinkami (np. 1,3,5):")
+            for i, loc in enumerate(LOCATIONS, start=1):
+                print(f"{i}. {loc['name']}")
+            s = input().strip()
+            nums = [int(x.strip()) for x in s.split(",") if x.strip().isdigit()]
+            selected = [LOCATIONS[n-1]["name"] for n in nums if 1 <= n <= len(LOCATIONS)]
+
+        bot_logger.info("Uruchamiam fetch (hourly=%s, minutely=%s) dla: %s",
+                        fetch_hourly, fetch_minutely, "wszystkie" if selected is None else selected)
+
+        ans_cont = input("Uruchomić w trybie ciągłym? [y/N] ").strip().lower()
+        ans_save = input("Czy zapisać surowe odpowiedzi API do plików JSON na dysku? [y/N] ").strip().lower()
+        save_payloads = _yes(ans_save)
+
+        if _yes(ans_cont):
+            minutes = input("Podaj częstotliwość w minutach (np. 60): ").strip()
+            try:
+                interval = max(1, int(minutes) * 60) if minutes else 3600
+            except Exception:
+                interval = 3600
+
+            stop_event = threading.Event()
+
+            def control_thread():
+                print("Tryb ciągły uruchomiony. Wpisz 'freq <min>' aby zmienić częstotliwość lub 'q' aby zakończyć.")
+                while not stop_event.is_set():
+                    line = sys.stdin.readline()
+                    if not line:
+                        continue
+                    cmd = line.strip().lower()
+                    if cmd in {"q", "quit"}:
+                        stop_event.set()
+                        break
+                    if cmd.startswith("freq"):
+                        parts = cmd.split()
+                        if len(parts) >= 2 and parts[1].isdigit():
+                            newm = int(parts[1])
+                            nonlocal interval
+                            interval = max(1, newm * 60)
+                            print(f"Nowa częstotliwość: {newm} minut")
+
+            threading.Thread(target=control_thread, daemon=True).start()
+
+            try:
+                while not stop_event.is_set():
+                    start = time.time()
+                    # quota check: każdorazowe fetch liczymy jako WEIGHT_PER_QUERY
+                    if not quota.can_consume(quota.WEIGHT_PER_QUERY):
+                        bot_logger.warning("Brak budżetu API na dziś (pozostało %d) — pomijam fetch.", quota.remaining())
+                        inserted_rows = 0
+                    else:
+                        try:
+                            quota.consume(quota.WEIGHT_PER_QUERY)
+                        except RuntimeError:
+                            bot_logger.warning("Quota exhausted upon consume attempt — pomijam fetch.")
+                            inserted_rows = 0
+                        else:
+                            inserted_rows = fetch_and_store_all(
+                                Path(DB_PATH),
+                                fetch_hourly,
+                                fetch_minutely,
+                                selected,
+                                save_payloads
+                            )
+                    # po zapisaniu danych: generuj alerty z biblioteki Alert (czyli jeden punkt odpowiedzialny za alerty)
+                    conn = sqlite3.connect(DB_PATH)
+                    alerts_total = 0
+                    for loc in LOCATIONS:
+                        if selected is not None and loc["name"] not in selected:
+                            continue
+                        cur = conn.cursor()
+                        cur.execute("SELECT id FROM locations WHERE name=?", (loc["name"],))
+                        r = cur.fetchone()
+                        if not r:
+                            continue
+                        loc_id = r[0]
+                        alerts_total += Alert.analyze_db_and_alert(conn, loc_id, location_name=loc["name"], horizon_days=3)
+                    conn.close()
+                    bot_logger.info("Iteracja zakończona. Wstawiono alertów: %d (wstawionych wierszy: %d)", alerts_total, inserted_rows)
+                    wait_seconds = max(0, interval - (time.time() - start))
+                    stop_event.wait(timeout=wait_seconds)
+            except Exception as e:
+                log_exception(login_logger, e, context="main.continuous_loop")
+                bot_logger.error("Błąd w trybie ciągłym. Sprawdź logi.")
+        else:
+            if not quota.can_consume(quota.WEIGHT_PER_QUERY):
+                bot_logger.warning("Brak budżetu API na dziś (pozostało %d) — pomijam fetch.", quota.remaining())
+                inserted_rows = 0
+            else:
+                try:
+                    quota.consume(quota.WEIGHT_PER_QUERY)
+                except RuntimeError:
+                    bot_logger.warning("Quota exhausted upon consume attempt — pomijam fetch.")
+                    inserted_rows = 0
+                else:
+                    inserted_rows = fetch_and_store_all(
+                        Path(DB_PATH),
+                        fetch_hourly,
+                        fetch_minutely,
+                        selected,
+                        save_payloads
+                    )
+            conn = sqlite3.connect(str(DB_PATH))
+            alerts_total = 0
+            for loc in LOCATIONS:
+                if selected is not None and loc["name"] not in selected:
+                    continue
+                cur = conn.cursor()
+                cur.execute("SELECT id FROM locations WHERE name=?", (loc["name"],))
+                r = cur.fetchone()
+                if not r:
+                    continue
+                loc_id = r[0]
+                alerts_total += Alert.analyze_db_and_alert(conn, loc_id, location_name=loc["name"], horizon_days=3)
+            conn.close()
+            bot_logger.info("Zakończono. Wstawiono alertów: %d (wstawionych wierszy: %d)", alerts_total, inserted_rows)
+
     except Exception as e:
-        log_exception(logging.getLogger("login"), e, context="main")
+        log_exception(login_logger, e, context="main.fetch_and_store_all")
+        bot_logger.error("Wystąpił krytyczny błąd podczas pobierania danych. Sprawdź data/login.log")
 
 
 if __name__ == "__main__":

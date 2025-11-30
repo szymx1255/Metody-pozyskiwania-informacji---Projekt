@@ -1,58 +1,98 @@
+from datetime import datetime, timedelta
+from typing import Dict, Any, List, Tuple
 import logging
 import sqlite3
-from datetime import datetime, timedelta
-from typing import Dict, Any
+import os
+try:
+    from telegram import send_message as telegram_send_message
+except Exception:
+    telegram_send_message = None
 
-LOGGER = logging.getLogger("meteofetch.alerts")
+# Progi alertów - centralnie w bibliotece alertów
+ALERT_WIND_THRESHOLD = 50.0
+ALERT_TEMP_LOW_THRESHOLD = -17.0
+ALERT_WEATHER_CODES_PRECIP = {51, 53, 55, 61, 63, 65, 80, 81, 82, 95}
 
-# nowe progi zgodnie z wymaganiem
-ALERT_TEMP_LOW_THRESHOLD = -15.0   # temp < -5°C
-ALERT_WIND_THRESHOLD = 35.0        # wiatr > 10 m/s
-ALERT_WEATHER_CODES_PRECIP = {51,53,55,61,63,65,80,81,82,95}
+LOGGER = logging.getLogger("meteofetch")
+
+
+def _extract_hour(ts: str) -> str:
+    try:
+        if "T" not in ts:
+            return ts
+        return ts.split("T")[1][:5]
+    except Exception:
+        return "?"
+
 
 def insert_alert_db(conn: sqlite3.Connection, location_id: int, timestamp: str | None,
-                    metric: str, value: float, message: str, origin: str | None = None) -> int:
+                    metric: str, value: float, message: str, origin: str | None = None, location_name: str | None = None) -> int:
+    """
+    Wstaw alert do tabeli alerts. Zwraca 1 jeśli wstawiono, 0 jeśli zignorowano/już istnieje.
+    Używa INSERT OR IGNORE; ustala origin na 'predicted'/'historical'/'detected'.
+    """
     try:
         if origin is None:
             origin = "detected"
+            try:
+                if timestamp:
+                    t_dt = datetime.fromisoformat(timestamp.replace("Z", "+00:00"))
+                    origin = "predicted" if t_dt > datetime.utcnow() else "historical"
+            except Exception:
+                origin = "detected"
         cur = conn.cursor()
         cur.execute(
             "INSERT OR IGNORE INTO alerts (location_id, timestamp, metric, value, message, origin) VALUES (?, ?, ?, ?, ?, ?)",
             (location_id, timestamp, metric, value, message, origin)
         )
         conn.commit()
-        return 1 if cur.lastrowid else 0
+        inserted = 1 if cur.lastrowid else 0
+
+        # wysyłamy Telegram tylko do użytkowników, którzy ustawili tę górę
+        try:
+            if inserted and location_name:
+                try:
+                    from telegram import get_users_for_mountain, send_message
+                    users = get_users_for_mountain(location_name)
+                    for chat in users:
+                        send_message(f"{message}\n\nGóra: {location_name}", chat_id=str(chat))
+                except Exception:
+                    LOGGER.exception("Błąd przy wysyłaniu telegramów dla alertu")
+        except Exception:
+            LOGGER.exception("Błąd przy przygotowaniu powiadomień Telegram")
+
+        return inserted
     except Exception:
         LOGGER.exception("Nie udało się zapisać alertu do DB")
         return 0
 
-def analyze_payload_and_alert(conn: sqlite3.Connection, location_id: int, payload: Dict[str, Any],
-                              location_name: str | None = None, horizon_days: int = 2) -> int:
+
+def analyze_payload_and_alert(conn: sqlite3.Connection, location_id: int, payload: Dict[str, Any], location_name: str | None = None, horizon_days: int = 3) -> int:
     """
-    Generuje alerty jeśli w okresie horizon_days wystąpi:
-      - temperatura < -18°C
-      - wiatr > 50 m/s
-      - opady deszczu/śniegu (rain>0 lub snowfall>0 lub odpowiedni weathercode)
-    Alerty są konsolidowane w bloki godzinowe i zapisywane w tabeli alerts.
-    Komunikat zawiera nazwę góry (location_name) jeśli dostępna.
+    Analizuj payload['hourly'] i generuj skonsolidowane alerty:
+      - alert gdy temp < ALERT_TEMP_LOW_THRESHOLD OR wind >= ALERT_WIND_THRESHOLD OR opady (rain/snow>0 or weather_code)
+      - konsolidacja kolejnych godzin z warunkiem w jeden alert
+      - w komunikacie uwzględniane są tylko metryki które faktycznie spełniały próg w danym bloku
+    Zwraca liczbę wstawionych alertów.
     """
     added = 0
     try:
         hourly = payload.get("hourly", {})
-        times = hourly.get("time", [])
+        times: List[str] = hourly.get("time", [])
         if not times:
             return 0
 
-        temps = hourly.get("temperature_2m", [])
-        rains = hourly.get("rain", [])
-        snows = hourly.get("snowfall", [])
-        winds = hourly.get("wind_speed_10m", [])
-        codes = hourly.get("weathercode", []) or hourly.get("weather_code", [])
+        temps: List[Any] = hourly.get("temperature_2m", [])
+        rains: List[Any] = hourly.get("rain", [])
+        snows: List[Any] = hourly.get("snowfall", [])
+        winds: List[Any] = hourly.get("wind_speed_10m", [])
+        codes: List[Any] = hourly.get("weather_code", []) or hourly.get("weathercode", [])
 
         now = datetime.utcnow()
         max_dt = now + timedelta(days=horizon_days)
 
-        flags = []
+        flags: List[bool] = []
+        # per-hour condition flags for each metric (used later to compute representative values)
         temp_flag = []
         wind_flag = []
         precip_flag = []
@@ -61,9 +101,14 @@ def analyze_payload_and_alert(conn: sqlite3.Connection, location_id: int, payloa
             try:
                 t_dt = datetime.fromisoformat(ts.replace("Z", "+00:00"))
             except Exception:
+                # jeśli nieparsowalne, traktuj jako w przyszłość w zakresie analizy
                 t_dt = now
             if t_dt > max_dt:
-                flags.append(False); temp_flag.append(False); wind_flag.append(False); precip_flag.append(False); continue
+                flags.append(False)
+                temp_flag.append(False)
+                wind_flag.append(False)
+                precip_flag.append(False)
+                continue
 
             t = temps[i] if i < len(temps) else None
             r = rains[i] if i < len(rains) else 0
@@ -72,7 +117,7 @@ def analyze_payload_and_alert(conn: sqlite3.Connection, location_id: int, payloa
             c = codes[i] if i < len(codes) else None
 
             cond_t = (t is not None and float(t) < ALERT_TEMP_LOW_THRESHOLD)
-            cond_w = (w is not None and float(w) > ALERT_WIND_THRESHOLD)  # strict >
+            cond_w = (w is not None and float(w) >= ALERT_WIND_THRESHOLD)
             cond_p = False
             try:
                 if (r is not None and float(r) > 0) or (s is not None and float(s) > 0):
@@ -92,7 +137,7 @@ def analyze_payload_and_alert(conn: sqlite3.Connection, location_id: int, payloa
             precip_flag.append(bool(cond_p))
 
         # grupowanie kolejnych godzin, gdzie flags True
-        blocks = []
+        blocks: List[Tuple[int, int]] = []
         cur_block = None
         for i, f in enumerate(flags):
             if f:
@@ -107,66 +152,71 @@ def analyze_payload_and_alert(conn: sqlite3.Connection, location_id: int, payloa
         if cur_block is not None:
             blocks.append((cur_block[0], cur_block[1]))
 
-        detected = 0   # licznik wykrytych bloków/alertów (niezależnie od DB)
+        # dla każdego bloku zbierz tylko wartości które spełniały odpowiedni warunek
         for start_i, end_i in blocks:
-            detected += 1
-            parts = []
-            rep_value = 0.0
-            # zbierz konkretne wartości spełniające warunki w bloku
+            # indeksy od start_i do end_i inclusive
             block_temps = [float(temps[j]) for j in range(start_i, end_i+1) if j < len(temps) and temp_flag[j] and temps[j] is not None]
             block_winds = [float(winds[j]) for j in range(start_i, end_i+1) if j < len(winds) and wind_flag[j] and winds[j] is not None]
-            block_rain = sum([float(rains[j]) for j in range(start_i, end_i+1) if j < len(rains) and precip_flag[j] and rains[j] is not None])
-            block_snow = sum([float(snows[j]) for j in range(start_i, end_i+1) if j < len(snows) and precip_flag[j] and snows[j] is not None])
+            # listy pojedynczych wartości dla opadów, potem ich sumy (bez ryzyka podwójnego sumowania)
+            block_rain_values = [float(rains[j]) for j in range(start_i, end_i+1) if j < len(rains) and precip_flag[j] and rains[j] is not None]
+            block_snow_values = [float(snows[j]) for j in range(start_i, end_i+1) if j < len(snows) and precip_flag[j] and snows[j] is not None]
+            block_rain_sum = sum(block_rain_values) if block_rain_values else 0.0
+            block_snow_sum = sum(block_snow_values) if block_snow_values else 0.0
+
+            parts: List[str] = []
+            rep_value = 0.0
 
             if block_temps:
-                parts.append(f"temperatura do {min(block_temps):.0f}°C")
-                rep_value = min(block_temps)
+                tmin = min(block_temps)
+                tmax = max(block_temps)
+                if abs(tmax - tmin) < 0.5:
+                    parts.append(f"temperatura {tmin:.0f}°C")
+                else:
+                    parts.append(f"temperatura od {tmin:.0f}°C do {tmax:.0f}°C")
+                rep_value = float(tmin)
             if block_winds:
-                parts.append(f"wiatr do {max(block_winds):.0f} m/s")
-                rep_value = max(rep_value, max(block_winds))
-            if block_rain > 0 or block_snow > 0:
+                max_wind = max(block_winds)
+                parts.append(f"wiatr do {max_wind:.0f} m/s")
+                rep_value = max(rep_value, float(max_wind))
+            if block_rain_sum > 0 or block_snow_sum > 0:
                 parts.append("opady (deszcz/śnieg)")
-                rep_value = max(rep_value, float(block_rain + block_snow))
+                rep_value = max(rep_value, float(block_rain_sum + block_snow_sum))
 
+            # jeśli brak części (nie powinno się zdarzyć), pomiń
             if not parts:
                 continue
 
             start_ts = times[start_i]
             end_ts = times[end_i]
+            # format czasowy w komunikacie
             try:
                 sd = datetime.fromisoformat(start_ts.replace("Z", "+00:00"))
                 ed = datetime.fromisoformat(end_ts.replace("Z", "+00:00"))
-                if sd.date() != ed.date():
+                if sd.date() != ed.date() or (ed - sd).days >= 1:
                     time_str = f"od {sd.date()} do {ed.date()}"
                 else:
                     time_str = f"od {sd.strftime('%Y-%m-%d %H:%M')} do {ed.strftime('%Y-%m-%d %H:%M')}"
             except Exception:
                 time_str = f"od {start_ts} do {end_ts}"
 
-            mountain_str = f"Góra: {location_name} — " if location_name else ""
-            message = f"{mountain_str}W okresie {time_str} wystąpi: " + ", ".join(parts)
-
-            # ZAWSZE powiadom (log/print). Zapis do DB wykona się tylko jeśli alert jeszcze nie istnieje.
-            LOGGER.warning("ALERT (loc=%s name=%s): %s", location_id, location_name, message)
-            print(f"[ALERT] {message}")
+            prefix = f"Dla góry {location_name}: " if location_name else ""
+            message = prefix + f"W okresie {time_str} wystąpi: " + ", ".join(parts)
             try:
-                inserted = insert_alert_db(conn, location_id, start_ts, "combined", float(rep_value or 0.0), message)
-                if not inserted:
-                    LOGGER.debug("Alert już istniał (loc=%s name=%s): %s", location_id, location_name, message)
-                added += inserted
+                added += insert_alert_db(conn, location_id, start_ts, "combined", float(rep_value or 0.0), message)
+                LOGGER.warning("ALERT (loc=%d): %s", location_id, message)
             except Exception:
-                LOGGER.exception("Błąd przy wstawianiu alertu")
-
-        # dodatkowy log: ile wykryto, ile faktycznie wstawiono nowych
-        LOGGER.info("Dla location_id=%s wykryto alertów: %d, wstawiono nowych: %d", location_id, detected, added)
-        print(f"[ALERT SUMMARY] location_id={location_id} wykryto={detected} nowe_wstawione={added}")
+                LOGGER.exception("Błąd przy wstawianiu alertu dla loc=%s", location_id)
 
         return added
     except Exception:
         LOGGER.exception("Błąd w analyze_payload_and_alert")
         return added
 
-def analyze_db_and_alert(conn: sqlite3.Connection, location_id: int, location_name: str | None = None, horizon_days: int = 2) -> int:
+
+def analyze_db_and_alert(conn: sqlite3.Connection, location_id: int, location_name: str | None = None, horizon_days: int = 3) -> int:
+    """
+    Pobierz przyszłe godziny z tabeli hourly (zapisane przez Api.py) i uruchom analyze_payload_and_alert.
+    """
     try:
         cur = conn.cursor()
         now = datetime.utcnow().replace(microsecond=0)
@@ -178,12 +228,13 @@ def analyze_db_and_alert(conn: sqlite3.Connection, location_id: int, location_na
         rows = cur.fetchall()
         if not rows:
             return 0
-        payload = {"hourly": {"time": [r[0] for r in rows],
-                              "temperature_2m": [r[1] for r in rows],
-                              "rain": [r[2] for r in rows],
-                              "snowfall": [r[3] for r in rows],
-                              "wind_speed_10m": [r[4] for r in rows],
-                              "weathercode": [r[5] for r in rows]}}
+        times = [r[0] for r in rows]
+        temps = [r[1] for r in rows]
+        rains = [r[2] for r in rows]
+        snows = [r[3] for r in rows]
+        winds = [r[4] for r in rows]
+        codes = [r[5] for r in rows]
+        payload = {"hourly": {"time": times, "temperature_2m": temps, "rain": rains, "snowfall": snows, "wind_speed_10m": winds, "weather_code": codes}}
         return analyze_payload_and_alert(conn, location_id, payload, location_name=location_name, horizon_days=horizon_days)
     except Exception:
         LOGGER.exception("Błąd w analyze_db_and_alert")
