@@ -3,10 +3,6 @@ from typing import Dict, Any, List, Tuple
 import logging
 import sqlite3
 import os
-try:
-    from telegram import send_message as telegram_send_message
-except Exception:
-    telegram_send_message = None
 
 # Prog predkosci wiatru powyzej ktorego generowany jest alert
 ALERT_WIND_THRESHOLD = 50.0
@@ -31,7 +27,6 @@ def _extract_hour(ts: str) -> str:
 
 # Wstawia alert do tabeli alerts w bazie danych
 # Ustawia origin na predicted historical lub detected w zaleznosci od daty
-# Opcjonalnie wysyla powiadomienie Telegram do uzytkownikow sledzacych dana gore
 # Zwraca 1 jesli alert zostal wstawiony lub 0 jesli juz istnial
 def insert_alert_db(conn: sqlite3.Connection, location_id: int, timestamp: str | None,
                     metric: str, value: float, message: str, origin: str | None = None, location_name: str | None = None) -> int:
@@ -52,20 +47,6 @@ def insert_alert_db(conn: sqlite3.Connection, location_id: int, timestamp: str |
         )
         conn.commit()
         inserted = 1 if cur.lastrowid else 0
-
-        # Wyslij powiadomienie Telegram jesli alert zostal dodany
-        try:
-            if inserted and location_name:
-                try:
-                    from telegram import get_users_for_mountain, send_message
-                    users = get_users_for_mountain(location_name)
-                    for chat in users:
-                        send_message(f"{message}\n\nGóra: {location_name}", chat_id=str(chat))
-                except Exception:
-                    LOGGER.exception("Błąd przy wysyłaniu telegramów dla alertu")
-        except Exception:
-            LOGGER.exception("Błąd przy przygotowaniu powiadomień Telegram")
-
         return inserted
     except Exception:
         LOGGER.exception("Nie udało się zapisać alertu do DB")
