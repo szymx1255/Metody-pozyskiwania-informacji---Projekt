@@ -279,6 +279,27 @@ class WeatherMonitorGUI:
             self.history_alerts_text.delete(1.0, tk.END)
             self.history_alerts_text.insert(tk.END, f"Blad: {str(e)}\n")
     
+    # Oblicza interwał trybu ciągłego na podstawie wybranych typów danych
+    # Zwraca interwał w sekundach
+    def _calculate_continuous_interval(self) -> int:
+        hourly_selected = self.hourly_var.get()
+        minutely_selected = self.minutely_var.get()
+        
+        # Jesli oba są włączone to 60 minut
+        if hourly_selected and minutely_selected:
+            return 60 * 60  # 60 minut w sekundach
+        
+        # Jeśli tylko minutely_15 to 15 minut
+        if minutely_selected:
+            return 15 * 60  # 15 minut w sekundach
+        
+        # Jeśli tylko hourly to 60 minut
+        if hourly_selected:
+            return 60 * 60  # 60 minut w sekundach
+        
+        # Domyślnie 60 minut jeśli nic nie wybrano
+        return 60 * 60
+    
     # Tworzy wszystkie widgety interfejsu uzytkownika
     # Obejmuje naglowek panele ustawien logi i alerty
     def _create_widgets(self):
@@ -519,11 +540,14 @@ class WeatherMonitorGUI:
     # Uruchamia tryb ciagly pobierajacy dane co 60 minut
     # Sprawdza quota przed kazda iteracja i generuje alerty
     def _start_continuous(self):
+        interval_seconds = self._calculate_continuous_interval()
+        interval_minutes = interval_seconds // 60
+        
         self.is_running = True
         self.continuous_btn.config(text="⏹️ Stop trybu ciągłego", bg="#c0392b")
         self.fetch_btn.config(state=tk.DISABLED)
-        self.status_bar.config(text="Tryb ciągły aktywny (interwał: 60 minut)")
-        self._log("Uruchomiono tryb ciągły", "INFO")
+        self.status_bar.config(text=f"Tryb ciągły aktywny (interwał: {interval_minutes} minut)")
+        self._log(f"Uruchomiono tryb ciągły z interwałem {interval_minutes} minut", "INFO")
         
         def continuous_loop():
             while self.is_running:
@@ -567,11 +591,12 @@ class WeatherMonitorGUI:
                 else:
                     self._log("Brak quota - pomijam iterację", "WARNING")
                 
-                # Czekaj 60 minut podzielone na minutowe interwaly
-                for _ in range(60):
-                    if not self.is_running:
-                        break
-                    threading.Event().wait(60)
+                # Czekaj dynamicznie obliczony interwał podzielony na sekundowe czeki
+                remaining_seconds = interval_seconds
+                while remaining_seconds > 0 and self.is_running:
+                    sleep_time = min(1, remaining_seconds)  # Czekaj maksymalnie 1 sekundę na raz
+                    threading.Event().wait(sleep_time)
+                    remaining_seconds -= sleep_time
         
         self.fetch_thread = threading.Thread(target=continuous_loop, daemon=True)
         self.fetch_thread.start()
@@ -582,7 +607,7 @@ class WeatherMonitorGUI:
         self.continuous_btn.config(text="▶️ Start trybu ciągłego", bg="#e74c3c")
         self.fetch_btn.config(state=tk.NORMAL)
         self.status_bar.config(text="Gotowy")
-        self._log("Zatrzymano tryb ciągły", "INFO")
+        self._log("Zatrzymano tryb ciąły", "INFO")
     
     # Odswierza wyswietlanie alertow pobierajac je z bazy danych
     # Pokazuje tylko alerty od dzisiejszego dnia w przod
