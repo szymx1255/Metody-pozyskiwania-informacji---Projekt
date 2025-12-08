@@ -4,6 +4,8 @@ from save_json import save_payload_to_json
 from typing import Any, Dict, Iterable
 import sqlite3
 import logging
+import requests
+import time
 
 DB_PATH = Path("data/meteodata.db")
 
@@ -293,45 +295,6 @@ def store_minutely15(conn: sqlite3.Connection, location_id: int, payload: dict) 
     return len(rows)
 
 
-def fetch_and_store_all(*, minutely15: bool=False, hourly: bool=False,
-                        start_date: str | None = None, end_date: str | None = None,
-                        save_json: bool = False):
-    """
-    Jeśli start_date/end_date podane -> pobierz dane historyczne dla zakresu.
-    Jeśli nie -> normalny fetch forecast.
-    start_date/end_date w formacie 'YYYY-MM-DD'.
-    """
-    params = {}
-    if start_date:
-        params["start_date"] = start_date
-    if end_date:
-        params["end_date"] = end_date
-    if not hourly and not minutely15:
-        return 0
-
-    ensure_dirs()
-    conn = sqlite3.connect(DB_PATH)
-    init_db(conn)
-    total = 0
-    for loc in LOCATIONS:
-        try:
-            loc_id = insert_or_get_location(conn, loc)
-            payload = fetch_location(loc)
-            if save_json:
-                try:
-                    save_payload_to_json(payload, prefix=loc["name"].replace(" ", "_"))
-                except Exception:
-                    logger.debug("Nie udało się zapisać payloadu do JSON dla %s", loc["name"])
-            if hourly:
-                total += store_hourly(conn, loc_id, payload)
-            if minutely15:
-                total += store_minutely15(conn, loc_id, payload)
-        except Exception as e:
-            logger.exception("Błąd podczas fetch/store dla %s: %s", loc["name"], e)
-    conn.close()
-    return total
-
-
 def fetch_and_store_all(db_path: Path | str,
                         fetch_hourly: bool,
                         fetch_minutely: bool,
@@ -339,15 +302,47 @@ def fetch_and_store_all(db_path: Path | str,
                         save_payloads: bool = False) -> int:
     """
     Kompatybilny wrapper używany przez Main.py.
-    Na razie jest to bezpieczny stub — nie przerywa działania programu.
-    Zwraca liczbę wstawionych wierszy (int). 
-    Jeśli chcesz, wstaw tu rzeczywiste wywołania API / zapisu do DB.
+    Pobiera dane dla wybranych lokalizacji i zapisuje do bazy.
+    Zwraca liczbę wstawionych wierszy (int).
     """
     logger_api.info("fetch_and_store_all called: hourly=%s minutely=%s locations=%s save_payloads=%s",
                 fetch_hourly, fetch_minutely, location_names, save_payloads)
-    # TODO: zaimplementuj rzeczywiste pobieranie i zapis -> zwróć liczbę wstawionych wierszy
-    # Tymczasowo zwracamy 0 aby uniknąć błędów TypeError w Main.py
-    return 0
+    
+    if not fetch_hourly and not fetch_minutely:
+        return 0
+    
+    ensure_dirs()
+    conn = sqlite3.connect(str(db_path) if isinstance(db_path, Path) else db_path)
+    init_db(conn)
+    total = 0
+    
+    # Wybierz lokalizacje do pobrania
+    locations_to_fetch = LOCATIONS
+    if location_names:
+        locations_to_fetch = [loc for loc in LOCATIONS if loc["name"] in location_names]
+    
+    for loc in locations_to_fetch:
+        try:
+            loc_id = insert_or_get_location(conn, loc)
+            payload = fetch_location(loc)
+            
+            if save_payloads:
+                try:
+                    save_payload_to_json(payload, prefix=loc["name"].replace(" ", "_"))
+                except Exception:
+                    logger.debug("Nie udało się zapisać payloadu do JSON dla %s", loc["name"])
+            
+            if fetch_hourly:
+                total += store_hourly(conn, loc_id, payload)
+            if fetch_minutely:
+                total += store_minutely15(conn, loc_id, payload)
+                
+            logger.info("Pobrano dane dla %s", loc["name"])
+        except Exception as e:
+            logger.exception("Błąd podczas fetch/store dla %s: %s", loc["name"], e)
+    
+    conn.close()
+    return total
 
 
 if __name__ == "__main__":

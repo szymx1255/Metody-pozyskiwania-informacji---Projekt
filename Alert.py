@@ -10,7 +10,7 @@ except Exception:
 
 # Progi alertów - centralnie w bibliotece alertów
 ALERT_WIND_THRESHOLD = 50.0
-ALERT_TEMP_LOW_THRESHOLD = -17.0
+ALERT_TEMP_LOW_THRESHOLD = -10.0
 ALERT_WEATHER_CODES_PRECIP = {51, 53, 55, 61, 63, 65, 80, 81, 82, 95}
 
 LOGGER = logging.getLogger("meteofetch")
