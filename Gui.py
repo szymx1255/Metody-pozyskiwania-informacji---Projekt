@@ -4,12 +4,13 @@ import threading
 import logging
 from pathlib import Path
 import sqlite3
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from Api import fetch_and_store_all, DB_PATH, LOCATIONS
 import Alert
 from Login import setup_logger
 import quota
+import history  # Nowy import
 
 
 # Glowna klasa aplikacji GUI do monitorowania pogody
@@ -151,6 +152,263 @@ class WeatherMonitorGUI:
         self.status_bar = tk.Label(self.root, text="Gotowy", bd=1, relief=tk.SUNKEN, 
                                   anchor=tk.W, bg="#34495e", fg="white", font=("Arial", 9))
         self.status_bar.pack(side=tk.BOTTOM, fill=tk.X)
+        
+        # Zakladki
+        self.tab_control = ttk.Notebook(main_frame)
+        self.tab_control.pack(fill=tk.BOTH, expand=True)
+        
+        # Zakladka z danymi biezacymi
+        self.current_data_tab = tk.Frame(self.tab_control)
+        self.tab_control.add(self.current_data_tab, text="Dane biezace")
+        
+        # Zakladka z historia
+        self.history_tab = tk.Frame(self.tab_control)
+        self.tab_control.add(self.history_tab, text="Historia")
+        
+        # Tworzenie interfejsu zakladki z historia
+        self._create_history_tab(self.history_tab)
+    
+    # Tworzy zakladke z historia danych i alertami
+    def _create_history_tab(self, parent):
+        main_frame = tk.Frame(parent, padx=20, pady=20)
+        main_frame.pack(fill=tk.BOTH, expand=True)
+        
+        # Panel wyboru daty i lokalizacji
+        control_frame = tk.LabelFrame(main_frame, text="Filtry historyczne", 
+                                     font=("Arial", 11, "bold"), padx=15, pady=15)
+        control_frame.pack(fill=tk.X, pady=(0, 10))
+        
+        # Wybor daty
+        date_frame = tk.Frame(control_frame)
+        date_frame.pack(fill=tk.X, pady=(0, 10))
+        
+        tk.Label(date_frame, text="Data:", font=("Arial", 10, "bold")).pack(side=tk.LEFT, padx=(0, 5))
+        self.history_date_entry = tk.Entry(date_frame, width=12, font=("Arial", 10))
+        self.history_date_entry.pack(side=tk.LEFT, padx=(0, 10))
+        self.history_date_entry.insert(0, datetime.now().strftime("%Y-%m-%d"))
+        
+        tk.Button(date_frame, text="Dzisiaj", command=lambda: self._set_history_date(0),
+                 bg="#3498db", fg="white", font=("Arial", 9)).pack(side=tk.LEFT, padx=(0, 3))
+        tk.Button(date_frame, text="Wczoraj", command=lambda: self._set_history_date(1),
+                 bg="#3498db", fg="white", font=("Arial", 9)).pack(side=tk.LEFT, padx=(0, 3))
+        tk.Button(date_frame, text="7 dni temu", command=lambda: self._set_history_date(7),
+                 bg="#3498db", fg="white", font=("Arial", 9)).pack(side=tk.LEFT, padx=(0, 3))
+        tk.Button(date_frame, text="30 dni temu", command=lambda: self._set_history_date(30),
+                 bg="#3498db", fg="white", font=("Arial", 9)).pack(side=tk.LEFT)
+        
+        # Wybor lokalizacji
+        loc_frame = tk.Frame(control_frame)
+        loc_frame.pack(fill=tk.X, pady=(0, 10))
+        
+        tk.Label(loc_frame, text="Lokalizacja:", font=("Arial", 10, "bold")).pack(side=tk.LEFT, padx=(0, 5))
+        self.history_location_var = tk.StringVar()
+        location_names = [loc['name'] for loc in LOCATIONS]
+        if location_names:
+            self.history_location_var.set(location_names[0])
+        self.history_location_combo = ttk.Combobox(loc_frame, textvariable=self.history_location_var, 
+                                                   values=location_names, state="readonly", width=20)
+        self.history_location_combo.pack(side=tk.LEFT, padx=(0, 10))
+        
+        # Przycisk zaladowania
+        tk.Button(control_frame, text="Zaladuj historie", command=self._load_history_data,
+                 bg="#27ae60", fg="white", font=("Arial", 10, "bold")).pack(side=tk.LEFT)
+        
+        # Panel wyswietlania danych
+        content_frame = tk.Frame(main_frame)
+        content_frame.pack(fill=tk.BOTH, expand=True)
+        
+        # Dane godzinowe
+        hourly_frame = tk.LabelFrame(content_frame, text="Dane godzinowe z wybranego dnia", 
+                                    font=("Arial", 11, "bold"), padx=10, pady=10)
+        hourly_frame.pack(fill=tk.BOTH, expand=True, pady=(0, 10))
+        
+        self.history_hourly_text = scrolledtext.ScrolledText(hourly_frame, height=10, 
+                                                            font=("Courier", 9), bg="#ecf0f1")
+        self.history_hourly_text.pack(fill=tk.BOTH, expand=True)
+        
+        # Alerty
+        alerts_frame = tk.LabelFrame(content_frame, text="Alerty pogodowe z wybranego dnia", 
+                                    font=("Arial", 11, "bold"), padx=10, pady=10)
+        alerts_frame.pack(fill=tk.BOTH, expand=True)
+        
+        self.history_alerts_text = scrolledtext.ScrolledText(alerts_frame, height=8, 
+                                                            font=("Courier", 9), bg="#fff3cd")
+        self.history_alerts_text.pack(fill=tk.BOTH, expand=True)
+    
+    # Ustawia date w polu historii na N dni wstecz
+    def _set_history_date(self, days_ago: int):
+        date = datetime.now() - timedelta(days=days_ago)
+        self.history_date_entry.delete(0, tk.END)
+        self.history_date_entry.insert(0, date.strftime("%Y-%m-%d"))
+    
+    # Laduje dane historyczne z bazy dla wybranej daty i lokalizacji
+    # Wykorzystuje funkcje z biblioteki history
+    def _load_history_data(self):
+        selected_date = self.history_date_entry.get().strip()
+        selected_location = self.history_location_var.get()
+        
+        if not selected_location:
+            messagebox.showwarning("Blad", "Wybierz lokalizacje")
+            return
+        
+        # Zaladuj dane w osobnym watku
+        threading.Thread(target=self._fetch_history_data, args=(selected_date, selected_location), daemon=True).start()
+    
+    # Pobiera dane historyczne z bazy danych korzystajac z biblioteki history
+    def _fetch_history_data(self, selected_date: str, selected_location: str):
+        try:
+            # Wyczysc pola przed zaladowaniem
+            self.history_hourly_text.delete(1.0, tk.END)
+            self.history_alerts_text.delete(1.0, tk.END)
+            
+            self.history_hourly_text.insert(tk.END, f"Ladowanie danych dla {selected_location} z dnia {selected_date}...\n")
+            
+            # Wykorzystaj funkcje z biblioteki history
+            hourly_text, alerts_text = history.load_history_data(DB_PATH, selected_location, selected_date)
+            
+            # Wyswietl dane
+            self.history_hourly_text.delete(1.0, tk.END)
+            self.history_hourly_text.insert(tk.END, hourly_text)
+            
+            self.history_alerts_text.delete(1.0, tk.END)
+            self.history_alerts_text.insert(tk.END, alerts_text)
+            
+        except Exception as e:
+            self.history_hourly_text.delete(1.0, tk.END)
+            self.history_hourly_text.insert(tk.END, f"Blad: {str(e)}\n")
+            self.history_alerts_text.delete(1.0, tk.END)
+            self.history_alerts_text.insert(tk.END, f"Blad: {str(e)}\n")
+    
+    # Tworzy wszystkie widgety interfejsu uzytkownika
+    # Obejmuje naglowek panele ustawien logi i alerty
+    def _create_widgets(self):
+        # Naglowek aplikacji
+        header = tk.Frame(self.root, bg="#2c3e50", height=60)
+        header.pack(fill=tk.X)
+        
+        title = tk.Label(header, text="⛰️ Weather Monitor System", 
+                        font=("Arial", 18, "bold"), bg="#2c3e50", fg="white")
+        title.pack(pady=15)
+        
+        # Glowny kontener
+        main_frame = tk.Frame(self.root, padx=20, pady=20)
+        main_frame.pack(fill=tk.BOTH, expand=True)
+        
+        # Lewy panel z ustawieniami pobierania
+        left_panel = tk.LabelFrame(main_frame, text="Ustawienia pobierania", 
+                                   font=("Arial", 11, "bold"), padx=15, pady=15)
+        left_panel.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=(0, 10))
+        
+        # Wybor typu danych
+        tk.Label(left_panel, text="Typ danych:", font=("Arial", 10, "bold")).pack(anchor=tk.W, pady=(0, 5))
+        
+        self.hourly_var = tk.BooleanVar(value=True)
+        tk.Checkbutton(left_panel, text="Dane godzinowe (hourly)", 
+                      variable=self.hourly_var, font=("Arial", 10)).pack(anchor=tk.W)
+        
+        self.minutely_var = tk.BooleanVar(value=False)
+        tk.Checkbutton(left_panel, text="Dane 15-minutowe (minutely_15)", 
+                      variable=self.minutely_var, font=("Arial", 10)).pack(anchor=tk.W, pady=(0, 15))
+        
+        # Wybor lokalizacji z lista wielokrotnego wyboru
+        tk.Label(left_panel, text="Lokalizacje:", font=("Arial", 10, "bold")).pack(anchor=tk.W, pady=(0, 5))
+        
+        locations_frame = tk.Frame(left_panel)
+        locations_frame.pack(fill=tk.BOTH, expand=True)
+        
+        scrollbar = tk.Scrollbar(locations_frame)
+        scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+        
+        self.locations_listbox = tk.Listbox(locations_frame, selectmode=tk.MULTIPLE, 
+                                            yscrollcommand=scrollbar.set, height=8)
+        self.locations_listbox.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+        scrollbar.config(command=self.locations_listbox.yview)
+        
+        # Wypelnij liste lokalizacjami z bazy
+        for loc in LOCATIONS:
+            self.locations_listbox.insert(tk.END, loc['name'])
+        
+        # Przyciski zaznaczania lokalizacji
+        btn_frame = tk.Frame(left_panel)
+        btn_frame.pack(fill=tk.X, pady=(5, 15))
+        
+        tk.Button(btn_frame, text="Zaznacz wszystkie", command=self._select_all_locations,
+                 bg="#3498db", fg="white", font=("Arial", 9)).pack(side=tk.LEFT, padx=(0, 5))
+        tk.Button(btn_frame, text="Odznacz wszystkie", command=self._deselect_all_locations,
+                 bg="#95a5a6", fg="white", font=("Arial", 9)).pack(side=tk.LEFT)
+        
+        # Opcja zapisu surowych danych JSON
+        self.save_json_var = tk.BooleanVar(value=False)
+        tk.Checkbutton(left_panel, text="Zapisz surowe JSON", 
+                      variable=self.save_json_var, font=("Arial", 10)).pack(anchor=tk.W, pady=(0, 15))
+        
+        # Panel informacyjny o quota API
+        quota_frame = tk.LabelFrame(left_panel, text="API Quota", font=("Arial", 10, "bold"), padx=10, pady=10)
+        quota_frame.pack(fill=tk.X, pady=(0, 15))
+        
+        self.quota_label = tk.Label(quota_frame, text="", font=("Arial", 9))
+        self.quota_label.pack()
+        
+        # Przyciski akcji
+        self.fetch_btn = tk.Button(left_panel, text="🔄 Pobierz dane raz", 
+                                   command=self._fetch_once, bg="#27ae60", fg="white",
+                                   font=("Arial", 11, "bold"), height=2)
+        self.fetch_btn.pack(fill=tk.X, pady=(0, 5))
+        
+        self.continuous_btn = tk.Button(left_panel, text="▶️ Start trybu ciągłego", 
+                                       command=self._toggle_continuous, bg="#e74c3c", fg="white",
+                                       font=("Arial", 11, "bold"), height=2)
+        self.continuous_btn.pack(fill=tk.X)
+        
+        # Prawy panel z logami i alertami
+        right_panel = tk.Frame(main_frame)
+        right_panel.pack(side=tk.RIGHT, fill=tk.BOTH, expand=True)
+        
+        # Panel logow systemowych
+        logs_frame = tk.LabelFrame(right_panel, text="Logi systemowe", 
+                                  font=("Arial", 11, "bold"), padx=10, pady=10)
+        logs_frame.pack(fill=tk.BOTH, expand=True, pady=(0, 10))
+        
+        self.log_text = scrolledtext.ScrolledText(logs_frame, height=15, 
+                                                  font=("Courier", 9), bg="#ecf0f1")
+        self.log_text.pack(fill=tk.BOTH, expand=True)
+        
+        # Panel alertow pogodowych
+        alerts_frame = tk.LabelFrame(right_panel, text="Alerty pogodowe", 
+                                    font=("Arial", 11, "bold"), padx=10, pady=10)
+        alerts_frame.pack(fill=tk.BOTH, expand=True)
+        
+        self.alerts_text = scrolledtext.ScrolledText(alerts_frame, height=12, 
+                                                     font=("Courier", 9), bg="#fff3cd")
+        self.alerts_text.pack(fill=tk.BOTH, expand=True)
+        
+        btn_frame2 = tk.Frame(alerts_frame)
+        btn_frame2.pack(fill=tk.X, pady=(5, 0))
+        
+        tk.Button(btn_frame2, text="Odśwież alerty", command=self._refresh_alerts,
+                 bg="#f39c12", fg="white", font=("Arial", 9)).pack(side=tk.LEFT)
+        tk.Button(btn_frame2, text="Wyczyść", command=lambda: self.alerts_text.delete(1.0, tk.END),
+                 bg="#95a5a6", fg="white", font=("Arial", 9)).pack(side=tk.LEFT, padx=(5, 0))
+        
+        # Pasek statusu na dole okna
+        self.status_bar = tk.Label(self.root, text="Gotowy", bd=1, relief=tk.SUNKEN, 
+                                  anchor=tk.W, bg="#34495e", fg="white", font=("Arial", 9))
+        self.status_bar.pack(side=tk.BOTTOM, fill=tk.X)
+        
+        # Zakladki
+        self.tab_control = ttk.Notebook(main_frame)
+        self.tab_control.pack(fill=tk.BOTH, expand=True)
+        
+        # Zakladka z danymi biezacymi
+        self.current_data_tab = tk.Frame(self.tab_control)
+        self.tab_control.add(self.current_data_tab, text="Dane biezace")
+        
+        # Zakladka z historia
+        self.history_tab = tk.Frame(self.tab_control)
+        self.tab_control.add(self.history_tab, text="Historia")
+        
+        # Tworzenie interfejsu zakladki z historia
+        self._create_history_tab(self.history_tab)
     
     # Zaznacza wszystkie lokalizacje na liscie
     def _select_all_locations(self):
