@@ -11,6 +11,8 @@ from Login import setup_logger, log_exception
 import quota
 
 
+# Przypisuje handlery loggera zrodlowego do docelowego
+# Uzywa sie do synchronizacji handlerow miedzy roznymi loggerami
 def _attach_handlers(src_logger_name: str, dst_logger_name: str) -> None:
     src = logging.getLogger(src_logger_name)
     dst = logging.getLogger(dst_logger_name)
@@ -18,10 +20,15 @@ def _attach_handlers(src_logger_name: str, dst_logger_name: str) -> None:
     dst.propagate = False
 
 
+# Sprawdza czy odpowiedz uzytkownika oznacza potwierdzenie
+# Akceptuje y t tak jako potwierdzajace odpowiedzi
 def _yes(ans: str) -> bool:
     return ans.strip().lower() in {"y", "t", "tak"}
 
 
+# Glowna funkcja programu obslugujaca interaktywne pobieranie danych pogodowych
+# Umozliwia wybor trybu pobierania lokalizacji i czestotliwosci
+# Obsluguje tryb jednorazowy i ciagle pobieranie z dynamiczna czestotliwoscia
 def main():
     login_logger = setup_logger()
     _attach_handlers("login", "meteofetch")
@@ -30,6 +37,7 @@ def main():
     bot_logger.setLevel(logging.INFO)
 
     try:
+        # Pytaj uzytkownika o typ danych do pobrania
         fetch_minutely = _yes(input("Czy pobrać dane 15-minutowe (minutely_15)? [y/N] "))
         fetch_hourly = _yes(input("Czy pobrać dane godzinowe (hourly)? [y/N] "))
 
@@ -37,6 +45,7 @@ def main():
             bot_logger.info("Nie wybrano żadnego trybu pobierania. Kończę.")
             return
 
+        # Pytaj o lokalizacje do pobrania
         ans_all = input("Czy pobrać dla wszystkich lokalizacji? [Y/n] ").strip().lower()
         if ans_all in {"", "y", "tak"}:
             selected = None
@@ -51,11 +60,13 @@ def main():
         bot_logger.info("Uruchamiam fetch (hourly=%s, minutely=%s) dla: %s",
                         fetch_hourly, fetch_minutely, "wszystkie" if selected is None else selected)
 
+        # Pytaj o tryb pracy i opcje zapisu
         ans_cont = input("Uruchomić w trybie ciągłym? [y/N] ").strip().lower()
         ans_save = input("Czy zapisać surowe odpowiedzi API do plików JSON na dysku? [y/N] ").strip().lower()
         save_payloads = _yes(ans_save)
 
         if _yes(ans_cont):
+            # Tryb ciagly z dynamiczna czestotliwoscia
             minutes = input("Podaj częstotliwość w minutach (np. 60): ").strip()
             try:
                 interval = max(1, int(minutes) * 60) if minutes else 3600
@@ -64,6 +75,7 @@ def main():
 
             stop_event = threading.Event()
 
+            # Watek kontrolny pozwalajacy na zmiane czestotliwosci i zatrzymanie
             def control_thread():
                 print("Tryb ciągły uruchomiony. Wpisz 'freq <min>' aby zmienić częstotliwość lub 'q' aby zakończyć.")
                 while not stop_event.is_set():
@@ -87,7 +99,7 @@ def main():
             try:
                 while not stop_event.is_set():
                     start = time.time()
-                    # quota check: każdorazowe fetch liczymy jako WEIGHT_PER_QUERY
+                    # Sprawdz quota przed pobraniem danych
                     if not quota.can_consume(quota.WEIGHT_PER_QUERY):
                         bot_logger.warning("Brak budżetu API na dziś (pozostało %d) — pomijam fetch.", quota.remaining())
                         inserted_rows = 0
@@ -105,7 +117,7 @@ def main():
                                 selected,
                                 save_payloads
                             )
-                    # po zapisaniu danych: generuj alerty z biblioteki Alert (czyli jeden punkt odpowiedzialny za alerty)
+                    # Generuj alerty po zapisaniu danych
                     conn = sqlite3.connect(DB_PATH)
                     alerts_total = 0
                     for loc in LOCATIONS:
@@ -120,12 +132,14 @@ def main():
                         alerts_total += Alert.analyze_db_and_alert(conn, loc_id, location_name=loc["name"], horizon_days=3)
                     conn.close()
                     bot_logger.info("Iteracja zakończona. Wstawiono alertów: %d (wstawionych wierszy: %d)", alerts_total, inserted_rows)
+                    # Czekaj do nastepnej iteracji
                     wait_seconds = max(0, interval - (time.time() - start))
                     stop_event.wait(timeout=wait_seconds)
             except Exception as e:
                 log_exception(login_logger, e, context="main.continuous_loop")
                 bot_logger.error("Błąd w trybie ciągłym. Sprawdź logi.")
         else:
+            # Tryb jednorazowy
             if not quota.can_consume(quota.WEIGHT_PER_QUERY):
                 bot_logger.warning("Brak budżetu API na dziś (pozostało %d) — pomijam fetch.", quota.remaining())
                 inserted_rows = 0
@@ -143,6 +157,7 @@ def main():
                         selected,
                         save_payloads
                     )
+            # Generuj alerty po pobraniu danych
             conn = sqlite3.connect(str(DB_PATH))
             alerts_total = 0
             for loc in LOCATIONS:

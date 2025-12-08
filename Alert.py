@@ -8,14 +8,18 @@ try:
 except Exception:
     telegram_send_message = None
 
-# Progi alertów - centralnie w bibliotece alertów
+# Prog predkosci wiatru powyzej ktorego generowany jest alert
 ALERT_WIND_THRESHOLD = 50.0
+# Prog temperatury ponizej ktorego generowany jest alert
 ALERT_TEMP_LOW_THRESHOLD = -10.0
+# Kody pogodowe wskazujace na opady wymagajace alertu
 ALERT_WEATHER_CODES_PRECIP = {51, 53, 55, 61, 63, 65, 80, 81, 82, 95}
 
 LOGGER = logging.getLogger("meteofetch")
 
 
+# Wyciaga godzine z timestampu w formacie ISO
+# Zwraca string HH:MM lub znak zapytania w przypadku bledu
 def _extract_hour(ts: str) -> str:
     try:
         if "T" not in ts:
@@ -25,13 +29,14 @@ def _extract_hour(ts: str) -> str:
         return "?"
 
 
+# Wstawia alert do tabeli alerts w bazie danych
+# Ustawia origin na predicted historical lub detected w zaleznosci od daty
+# Opcjonalnie wysyla powiadomienie Telegram do uzytkownikow sledzacych dana gore
+# Zwraca 1 jesli alert zostal wstawiony lub 0 jesli juz istnial
 def insert_alert_db(conn: sqlite3.Connection, location_id: int, timestamp: str | None,
                     metric: str, value: float, message: str, origin: str | None = None, location_name: str | None = None) -> int:
-    """
-    Wstaw alert do tabeli alerts. Zwraca 1 jeśli wstawiono, 0 jeśli zignorowano/już istnieje.
-    Używa INSERT OR IGNORE; ustala origin na 'predicted'/'historical'/'detected'.
-    """
     try:
+        # Okresl typ alertu na podstawie znacznika czasu
         if origin is None:
             origin = "detected"
             try:
@@ -48,7 +53,7 @@ def insert_alert_db(conn: sqlite3.Connection, location_id: int, timestamp: str |
         conn.commit()
         inserted = 1 if cur.lastrowid else 0
 
-        # wysyłamy Telegram tylko do użytkowników, którzy ustawili tę górę
+        # Wyslij powiadomienie Telegram jesli alert zostal dodany
         try:
             if inserted and location_name:
                 try:
@@ -67,14 +72,11 @@ def insert_alert_db(conn: sqlite3.Connection, location_id: int, timestamp: str |
         return 0
 
 
+# Analizuje dane pogodowe z payload i generuje skonsolidowane alerty
+# Sprawdza warunki niskiej temperatury wysokiego wiatru i opadow
+# Laczy kolejne godziny spelniajace warunki w jeden alert z zakresem czasowym
+# Zwraca liczbe wygenerowanych alertow
 def analyze_payload_and_alert(conn: sqlite3.Connection, location_id: int, payload: Dict[str, Any], location_name: str | None = None, horizon_days: int = 3) -> int:
-    """
-    Analizuj payload['hourly'] i generuj skonsolidowane alerty:
-      - alert gdy temp < ALERT_TEMP_LOW_THRESHOLD OR wind >= ALERT_WIND_THRESHOLD OR opady (rain/snow>0 or weather_code)
-      - konsolidacja kolejnych godzin z warunkiem w jeden alert
-      - w komunikacie uwzględniane są tylko metryki które faktycznie spełniały próg w danym bloku
-    Zwraca liczbę wstawionych alertów.
-    """
     added = 0
     try:
         hourly = payload.get("hourly", {})
@@ -91,18 +93,19 @@ def analyze_payload_and_alert(conn: sqlite3.Connection, location_id: int, payloa
         now = datetime.utcnow()
         max_dt = now + timedelta(days=horizon_days)
 
+        # Listy flag okreslajacych czy dana godzina spelnia warunki alertu
         flags: List[bool] = []
-        # per-hour condition flags for each metric (used later to compute representative values)
         temp_flag = []
         wind_flag = []
         precip_flag = []
 
+        # Przejdz przez wszystkie godziny i sprawdz warunki alertu
         for i, ts in enumerate(times):
             try:
                 t_dt = datetime.fromisoformat(ts.replace("Z", "+00:00"))
             except Exception:
-                # jeśli nieparsowalne, traktuj jako w przyszłość w zakresie analizy
                 t_dt = now
+            # Pomijaj dane poza horyzontem prognozy
             if t_dt > max_dt:
                 flags.append(False)
                 temp_flag.append(False)
@@ -116,8 +119,11 @@ def analyze_payload_and_alert(conn: sqlite3.Connection, location_id: int, payloa
             w = winds[i] if i < len(winds) else None
             c = codes[i] if i < len(codes) else None
 
+            # Sprawdz warunek niskiej temperatury
             cond_t = (t is not None and float(t) < ALERT_TEMP_LOW_THRESHOLD)
+            # Sprawdz warunek silnego wiatru
             cond_w = (w is not None and float(w) >= ALERT_WIND_THRESHOLD)
+            # Sprawdz warunek opadow na podstawie deszczu sniegu lub kodu pogodowego
             cond_p = False
             try:
                 if (r is not None and float(r) > 0) or (s is not None and float(s) > 0):
@@ -136,7 +142,7 @@ def analyze_payload_and_alert(conn: sqlite3.Connection, location_id: int, payloa
             wind_flag.append(bool(cond_w))
             precip_flag.append(bool(cond_p))
 
-        # grupowanie kolejnych godzin, gdzie flags True
+        # Znajdz ciagłe bloki godzin spelniajacych warunki
         blocks: List[Tuple[int, int]] = []
         cur_block = None
         for i, f in enumerate(flags):
@@ -152,12 +158,11 @@ def analyze_payload_and_alert(conn: sqlite3.Connection, location_id: int, payloa
         if cur_block is not None:
             blocks.append((cur_block[0], cur_block[1]))
 
-        # dla każdego bloku zbierz tylko wartości które spełniały odpowiedni warunek
+        # Dla kazdego bloku utworz skonsolidowany alert
         for start_i, end_i in blocks:
-            # indeksy od start_i do end_i inclusive
+            # Zbierz wartosci tylko z godzin spelniajacych dany warunek
             block_temps = [float(temps[j]) for j in range(start_i, end_i+1) if j < len(temps) and temp_flag[j] and temps[j] is not None]
             block_winds = [float(winds[j]) for j in range(start_i, end_i+1) if j < len(winds) and wind_flag[j] and winds[j] is not None]
-            # listy pojedynczych wartości dla opadów, potem ich sumy (bez ryzyka podwójnego sumowania)
             block_rain_values = [float(rains[j]) for j in range(start_i, end_i+1) if j < len(rains) and precip_flag[j] and rains[j] is not None]
             block_snow_values = [float(snows[j]) for j in range(start_i, end_i+1) if j < len(snows) and precip_flag[j] and snows[j] is not None]
             block_rain_sum = sum(block_rain_values) if block_rain_values else 0.0
@@ -166,6 +171,7 @@ def analyze_payload_and_alert(conn: sqlite3.Connection, location_id: int, payloa
             parts: List[str] = []
             rep_value = 0.0
 
+            # Dodaj informacje o temperaturze jesli warunek byl spelniony
             if block_temps:
                 tmin = min(block_temps)
                 tmax = max(block_temps)
@@ -174,21 +180,23 @@ def analyze_payload_and_alert(conn: sqlite3.Connection, location_id: int, payloa
                 else:
                     parts.append(f"temperatura od {tmin:.0f}°C do {tmax:.0f}°C")
                 rep_value = float(tmin)
+            # Dodaj informacje o wietrze jesli warunek byl spelniony
             if block_winds:
                 max_wind = max(block_winds)
                 parts.append(f"wiatr do {max_wind:.0f} m/s")
                 rep_value = max(rep_value, float(max_wind))
+            # Dodaj informacje o opadach jesli warunek byl spelniony
             if block_rain_sum > 0 or block_snow_sum > 0:
                 parts.append("opady (deszcz/śnieg)")
                 rep_value = max(rep_value, float(block_rain_sum + block_snow_sum))
 
-            # jeśli brak części (nie powinno się zdarzyć), pomiń
+            # Pomin blok jesli nie ma zadnych warunkow
             if not parts:
                 continue
 
             start_ts = times[start_i]
             end_ts = times[end_i]
-            # format czasowy w komunikacie
+            # Sformatuj zakres czasowy w czytelny sposob
             try:
                 sd = datetime.fromisoformat(start_ts.replace("Z", "+00:00"))
                 ed = datetime.fromisoformat(end_ts.replace("Z", "+00:00"))
@@ -202,7 +210,7 @@ def analyze_payload_and_alert(conn: sqlite3.Connection, location_id: int, payloa
             prefix = f"Dla góry {location_name}: " if location_name else ""
             message = prefix + f"W okresie {time_str} wystąpi: " + ", ".join(parts)
             try:
-                added += insert_alert_db(conn, location_id, start_ts, "combined", float(rep_value or 0.0), message)
+                added += insert_alert_db(conn, location_id, start_ts, "combined", float(rep_value or 0.0), message, location_name=location_name)
                 LOGGER.warning("ALERT (loc=%d): %s", location_id, message)
             except Exception:
                 LOGGER.exception("Błąd przy wstawianiu alertu dla loc=%s", location_id)
@@ -213,14 +221,15 @@ def analyze_payload_and_alert(conn: sqlite3.Connection, location_id: int, payloa
         return added
 
 
+# Pobiera dane godzinowe z bazy dla danej lokalizacji i horyzontu prognozy
+# Wywoluje analyze_payload_and_alert aby wygenerowac alerty
+# Zwraca liczbe wygenerowanych alertow
 def analyze_db_and_alert(conn: sqlite3.Connection, location_id: int, location_name: str | None = None, horizon_days: int = 3) -> int:
-    """
-    Pobierz przyszłe godziny z tabeli hourly (zapisane przez Api.py) i uruchom analyze_payload_and_alert.
-    """
     try:
         cur = conn.cursor()
         now = datetime.utcnow().replace(microsecond=0)
         max_dt = now + timedelta(days=horizon_days)
+        # Pobierz dane z tabeli hourly w zakresie prognozy
         cur.execute(
             "SELECT timestamp, temperature, rain, snowfall, wind_speed, weather_code FROM hourly WHERE location_id=? AND timestamp>? AND timestamp<=? ORDER BY timestamp ASC",
             (location_id, now.isoformat() + "Z", max_dt.isoformat() + "Z")
@@ -228,6 +237,7 @@ def analyze_db_and_alert(conn: sqlite3.Connection, location_id: int, location_na
         rows = cur.fetchall()
         if not rows:
             return 0
+        # Przeksztalc wiersze bazy w format payload
         times = [r[0] for r in rows]
         temps = [r[1] for r in rows]
         rains = [r[2] for r in rows]

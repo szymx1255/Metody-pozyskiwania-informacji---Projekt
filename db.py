@@ -4,6 +4,8 @@ import sqlite3
 from typing import Dict, Iterable, List, Optional
 
 
+# Schemat SQL definiujacy strukture bazy danych
+# Zawiera tabele fetches locations hourly daily oraz indeksy
 DB_SCHEMA_SQL = [
     """
     CREATE TABLE IF NOT EXISTS fetches (
@@ -63,11 +65,9 @@ DB_SCHEMA_SQL = [
 ]
 
 
+# Inicjalizuje strukture bazy danych tworzac wszystkie tabele i indeksy
+# Tworzy katalog dla pliku bazy jesli nie istnieje
 def init_db(path: str) -> None:
-    """Utwórz strukturę bazy danych na dysku jeśli nie istnieje.
-
-    Tworzy plik bazy (katalog jeśli potrzeba) i wykonuje schemat z DB_SCHEMA_SQL.
-    """
     os.makedirs(os.path.dirname(path) or ".", exist_ok=True)
     conn = sqlite3.connect(path)
     cur = conn.cursor()
@@ -77,19 +77,14 @@ def init_db(path: str) -> None:
     conn.close()
 
 
+# Dodaje lokalizacje do bazy lub zwraca id istniejącej
+# Sprawdza czy lokalizacja o podanych wspolrzednych juz istnieje
+# Zwraca id lokalizacji jako int
 def insert_location(path: str, latitude: float, longitude: float, elevation: Optional[float] = None, timezone: Optional[str] = None) -> int:
-    """Dodaj lokalizację lub zwróć istniejący identyfikator.
-
-    Parametry:
-      - path: ścieżka do pliku bazy
-      - latitude, longitude: współrzędne
-      - elevation, timezone: opcjonalne metadane
-    Zwraca: id lokalizacji (int)
-    """
     init_db(path)
     conn = sqlite3.connect(path)
     cur = conn.cursor()
-    # try to find existing
+    # Szukaj istniejącej lokalizacji o tych samych koordynatach
     cur.execute("SELECT id FROM locations WHERE latitude=? AND longitude=?", (latitude, longitude))
     row = cur.fetchone()
     if row:
@@ -102,9 +97,10 @@ def insert_location(path: str, latitude: float, longitude: float, elevation: Opt
     return loc_id
 
 
+# Wstawia wiele wierszy danych godzinowych do tabeli hourly
+# Przyjmuje iterowalny zbior slownikow z kluczami odpowiadajacymi kolumnom
+# Wykonuje transakcje grupowa dla wszystkich wierszy
 def insert_hourly_bulk(path: str, location_id: int, rows: Iterable[Dict]) -> None:
-    """Rows is iterable of dicts with keys matching hourly columns (timestamp, temperature_2m, ...)."""
-    # Przygotuj i wstaw wiele wierszy do tabeli `hourly`.
     init_db(path)
     conn = sqlite3.connect(path)
     cur = conn.cursor()
@@ -136,8 +132,10 @@ def insert_hourly_bulk(path: str, location_id: int, rows: Iterable[Dict]) -> Non
     conn.close()
 
 
+# Wstawia wiele wierszy danych dziennych do tabeli daily
+# Przyjmuje iterowalny zbior slownikow z kluczami odpowiadajacymi kolumnom
+# Wykonuje transakcje grupowa dla wszystkich wierszy
 def insert_daily_bulk(path: str, location_id: int, rows: Iterable[Dict]) -> None:
-    # Wstaw wiele wierszy do tabeli `daily` (zbiorcze wartości dzienne).
     init_db(path)
     conn = sqlite3.connect(path)
     cur = conn.cursor()
@@ -163,11 +161,10 @@ def insert_daily_bulk(path: str, location_id: int, rows: Iterable[Dict]) -> None
     conn.close()
 
 
+# Zapisuje metadane o wykonanym pobraniu danych do tabeli fetches
+# Przechowuje informacje o czasie zrodle typie parametrach i notatkach
+# Przydatne do audytu i sledzenia historii operacji pobierania
 def save_fetch_meta(path: str, fetched_at: str, source: str, fetch_type: str, params: Optional[Dict] = None, note: Optional[str] = None) -> None:
-    """Zapisz metadane o wykonanym pobraniu (np. czas, źródło, parametry).
-
-    Przydatne do audytu i śledzenia historii fetchów.
-    """
     init_db(path)
     conn = sqlite3.connect(path)
     cur = conn.cursor()

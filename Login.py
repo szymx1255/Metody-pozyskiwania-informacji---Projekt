@@ -1,3 +1,4 @@
+# Login.py
 from pathlib import Path
 import logging
 import traceback
@@ -12,26 +13,27 @@ except Exception:
     REQUESTS_AVAILABLE = False
 
 
+# Konfiguruje system logowania dla aplikacji
+# Tworzy dwa handlery stdout dla INFO i plik errors.log dla ERROR
+# Zwraca skonfigurowany logger gotowy do uzycia
 def setup_logger() -> logging.Logger:
-    """Skonfiguruj logger:
-    - stdout: INFO+ (krótkie komunikaty dla operatora),
-    - plik data/errors.log: tylko ERROR+ (tylko wyjątki/błędy).
-    """
     data_dir = Path("data")
     data_dir.mkdir(parents=True, exist_ok=True)
 
     logger = logging.getLogger("login")
     logger.setLevel(logging.INFO)
 
-    # usuń stare handlery, żeby nie duplikować wpisów
+    # Usun stare handlery aby uniknac duplikacji wpisow
     logger.handlers.clear()
 
     fmt = logging.Formatter("%(asctime)s %(levelname)s: %(message)s")
 
+    # Handler do pliku tylko dla bledow i wyzszych poziomow
     fh = logging.FileHandler(data_dir / "errors.log", encoding="utf-8")
     fh.setLevel(logging.ERROR)
     fh.setFormatter(fmt)
 
+    # Handler do konsoli dla wszystkich komunikatow INFO i wyzszych
     sh = logging.StreamHandler(sys.stdout)
     sh.setLevel(logging.INFO)
     sh.setFormatter(fmt)
@@ -39,31 +41,28 @@ def setup_logger() -> logging.Logger:
     logger.addHandler(sh)
     logger.addHandler(fh)
 
-    # Nie propaguj do root loggera
+    # Wylacz propagacje do root loggera
     logger.propagate = False
 
     return logger
 
 
+# Loguje wyjatek wraz z pelnym sladem stosu
+# Komunikat krotki trafia do konsoli pelny traceback do pliku errors.log
+# Opcjonalnie dodaje informacje o kontekscie w ktorym wystapil blad
 def log_exception(logger: logging.Logger, exc: Exception, context: str | None = None) -> None:
-    """Zapisz wyjątek wraz ze śladem stosu do pliku błędów (ERROR) i poinformuj konsolę.
-
-    Plik błędów będzie zawierać pełny traceback (logger.exception).
-    Konsola dostanie krótki komunikat o błędzie (logger.error).
-    """
     if context:
         logger.error("Błąd w kontekście '%s': %s", context, exc)
     else:
         logger.error("Błąd: %s", exc)
-    # pełny ślad stosu zapisany przez logger.exception (trafi do pliku errors.log)
+    # Pelny slad stosu zapisany przez logger.exception trafia do pliku
     logger.exception("Szczegóły wyjątku:")
 
 
+# Loguje bledy polaczenia z API z specjalna obsluga RequestException
+# Rozpoznaje bledy sieciowe po typie wyjatku lub heurystycznie po tresci
+# Dla zwyklych bledow wywoluje standardowe log_exception
 def log_api_exception(logger: logging.Logger, exc: Exception, context: str | None = None) -> None:
-    """Specjalne logowanie błędów połączenia z API (jeśli biblioteka requests jest dostępna,
-    rozpoznajemy RequestException i traktujemy jako błąd połączenia).
-    Jeśli to nie jest błąd sieciowy, podajemy normalne log_exception.
-    """
     is_api_error = False
     if REQUESTS_AVAILABLE:
         try:
@@ -72,7 +71,7 @@ def log_api_exception(logger: logging.Logger, exc: Exception, context: str | Non
                 is_api_error = True
         except Exception:
             is_api_error = False
-    # dodatkowa heurystyka na podstawie treści wyjątku
+    # Heurystyka sprawdzajaca tresc wyjatku pod katem slow kluczowych
     if not is_api_error:
         msg = str(exc).lower()
         if any(k in msg for k in ("connection", "timeout", "name or service not known", "failed to establish", "http")):
@@ -85,37 +84,40 @@ def log_api_exception(logger: logging.Logger, exc: Exception, context: str | Non
             logger.error("Błąd połączenia z API: %s", exc)
         logger.exception("Szczegóły błędu połączenia z API:")
     else:
-        # zwykły wyjątek aplikacji
+        # Zwykly wyjatek aplikacji
         log_exception(logger, exc, context=context)
 
 
+# Dekorator przechwytujacy wyjatki z funkcji i logujacy je
+# Automatycznie rozpoznaje bledy API i loguje je odpowiednio
+# Podnosi ponownie wyjatek po zalogowaniu
 def log_exceptions(fn):
-    """Dekorator, który przechwytuje wyjątki z funkcji i loguje je (tylko jako błędy)."""
     def wrapper(*args, **kwargs):
         logger = logging.getLogger("login")
         try:
             return fn(*args, **kwargs)
         except Exception as e:
-            # jeśli to błąd połączenia z API, oznacz specjalnie
+            # Sprawdz czy to blad polaczenia z API
             try:
                 if REQUESTS_AVAILABLE and isinstance(e, getattr(__import__("requests").exceptions, "RequestException")):
                     log_api_exception(logger, e, context=f"{fn.__name__}")
                 else:
-                    # heurystyka: jeśli wyjątek wygląda na błąd sieciowy, użyj log_api_exception
+                    # Heurystyka dla bledow sieciowych nie bedacych RequestException
                     msg = str(e).lower()
                     if any(k in msg for k in ("connection", "timeout", "failed to establish", "http")):
                         log_api_exception(logger, e, context=f"{fn.__name__}")
                     else:
                         log_exception(logger, e, context=f"{fn.__name__}")
             except Exception:
-                # awaryjne logowanie
+                # Awaryjne logowanie jezeli cos poszlo nie tak
                 log_exception(logger, e, context=f"{fn.__name__}")
             raise
     return wrapper
 
 
+# Context manager do mierzenia czasu wykonania operacji
+# Loguje czas wykonania lub wyjatek jezeli wystapil
 def timed(logger: logging.Logger, name: str):
-    """Prosty context manager do mierzenia czasu i logowania wyjątków."""
     class _Timer:
         def __enter__(self):
             self.start = time.time()
@@ -124,7 +126,7 @@ def timed(logger: logging.Logger, name: str):
         def __exit__(self, exc_type, exc, tb):
             elapsed = time.time() - self.start
             if exc:
-                # logujemy wyjątek jako error
+                # Loguj wyjatek jako error
                 log_exception(logger, exc, context=name)
                 return False
             logger.info("%s took %.3fs", name, elapsed)
@@ -133,7 +135,7 @@ def timed(logger: logging.Logger, name: str):
     return _Timer()
 
 
-# --- Przykład użycia --- (nie uruchamiać przy imporcie)
+# Przyklad uzycia systemu logowania
 if __name__ == "__main__":
     log = setup_logger()
 

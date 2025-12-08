@@ -10,37 +10,35 @@ import time
 DB_PATH = Path("data/meteodata.db")
 
 
+# Wczytuje lokalizacje z bazy danych do pamieci przy starcie modulu
+# Zwraca liste slownikow z nazwami i koordynatami lokalizacji
+# Jesli wystapi blad zwraca pusta liste zamiast przerywac program
 def _load_locations_from_db(db_path: Path) -> list:
-    """
-    Próbuje bezpiecznie wczytać listę lokalizacji z tabeli 'locations'.
-    Zwraca listę słowników z przynajmniej kluczem 'name' (opcjonalnie 'latitude','longitude','id').
-    W razie błędu zwraca pustą listę.
-    """
     try:
         if not db_path.exists():
             return []
         conn = sqlite3.connect(str(db_path))
         cur = conn.cursor()
-        # spróbuj pobrać jeden wiersz aby odczytać nazwy kolumn
+        # Pobierz nazwy kolumn z pierwszego wiersza
         cur.execute("SELECT * FROM locations LIMIT 1")
         cols = [d[0] for d in cur.description] if cur.description else []
-        # wykryj indeksy kolumn
+        # Znajdz indeksy kolumn zawierajacych dane lokalizacji
         name_idx = next((i for i, c in enumerate(cols) if "name" in c.lower()), None)
         lat_idx = next((i for i, c in enumerate(cols) if "lat" in c.lower()), None)
         lon_idx = next((i for i, c in enumerate(cols) if "lon" in c.lower()), None)
         id_idx = next((i for i, c in enumerate(cols) if c.lower() in ("id", "location_id", "loc_id")), None)
 
-        # pobierz wszystkie wiersze
+        # Pobierz wszystkie lokalizacje z bazy
         cur.execute("SELECT * FROM locations")
         rows = cur.fetchall()
         locations = []
         for r in rows:
-            # name obowiązkowe
+            # Nazwa jest polem obowiazkowym
             name = None
             if name_idx is not None and name_idx < len(r):
                 name = r[name_idx]
             else:
-                # fallback: spróbuj znaleźć pierwsze pole typu tekstowego
+                # Jezeli nie ma indeksu znajdz pierwsze pole tekstowe
                 for v in r:
                     if isinstance(v, str) and v.strip():
                         name = v
@@ -66,11 +64,13 @@ def _load_locations_from_db(db_path: Path) -> list:
         return []
 
 
-# wczytaj LOCATIONS w momencie importu (bez przerywania przy błędach)
+# Lista lokalizacji wczytana przy imporcie modulu
 LOCATIONS = _load_locations_from_db(DB_PATH)
 
-# Parametry zapytania do API
+# Adres API Open-Meteo do pobierania prognoz pogodowych
 API_URL = "https://api.open-meteo.com/v1/forecast"
+
+# Domyslne parametry zapytania do API zawierajace zmienne pogodowe
 DEFAULT_PARAMS = {
     "hourly": ",".join([
         "temperature_2m",
@@ -85,6 +85,8 @@ DEFAULT_PARAMS = {
     "forecast_days": 3,
     "timezone": "UTC",
 }
+
+# Zmienne dostepne w danych 15-minutowych
 MINUTELY_15_VARS = ",".join([
     "temperature_2m",
     "wind_speed_10m",
@@ -99,14 +101,16 @@ logger = logging.getLogger("meteofetch")
 logger_api = logging.getLogger("meteofetch.api")
 
 
+# Tworzy katalog data jesli nie istnieje
 def ensure_dirs():
-    """Upewnij się, że katalog `data/` istnieje."""
     DB_PATH.parent.mkdir(parents=True, exist_ok=True)
 
 
+# Inicjalizuje strukture bazy danych tworząc wymagane tabele
+# Dodaje kolumne origin do tabeli alerts jesli jej nie ma
 def init_db(conn: sqlite3.Connection):
-    """Utwórz tabele `locations`, `hourly`, `minutely15` i `alerts` jeśli nie istnieją."""
     cur = conn.cursor()
+    # Tabela z danymi lokalizacji
     cur.execute(
         """
         CREATE TABLE IF NOT EXISTS locations (
@@ -117,6 +121,7 @@ def init_db(conn: sqlite3.Connection):
         )
         """
     )
+    # Tabela z danymi godzinowymi
     cur.execute(
         """
         CREATE TABLE IF NOT EXISTS hourly (
@@ -134,6 +139,7 @@ def init_db(conn: sqlite3.Connection):
         )
         """
     )
+    # Tabela z danymi 15-minutowymi
     cur.execute(
         """
         CREATE TABLE IF NOT EXISTS minutely15 (
@@ -150,7 +156,7 @@ def init_db(conn: sqlite3.Connection):
         )
         """
     )
-    # Tabela alertów tworzona tutaj tylko po to, aby inny moduł mógł do niej zapisywać
+    # Tabela z alertami pogodowymi
     cur.execute(
         """
         CREATE TABLE IF NOT EXISTS alerts (
@@ -166,7 +172,7 @@ def init_db(conn: sqlite3.Connection):
         """
     )
     conn.commit()
-    # migracja: jeśli tabela istnieje bez kolumny origin, spróbuj dodać
+    # Migracja dodajaca kolumne origin do starszych baz
     try:
         cur.execute("PRAGMA table_info(alerts)")
         cols = [r[1] for r in cur.fetchall()]
@@ -177,8 +183,8 @@ def init_db(conn: sqlite3.Connection):
         logger.debug("Brak potrzeby migracji tabeli alerts albo wystąpił błąd migracji.")
 
 
+# Zwraca id lokalizacji z bazy lub dodaje nowa jezeli nie istnieje
 def insert_or_get_location(conn: sqlite3.Connection, loc: dict) -> int:
-    """Zwróć id lokalizacji; dodaj rekord jeśli nie istnieje."""
     cur = conn.cursor()
     cur.execute("SELECT id FROM locations WHERE name=?", (loc["name"],))
     row = cur.fetchone()
@@ -189,8 +195,9 @@ def insert_or_get_location(conn: sqlite3.Connection, loc: dict) -> int:
     return cur.lastrowid
 
 
+# Pobiera dane pogodowe z API Open-Meteo dla podanej lokalizacji
+# Wykonuje do 3 prob z wykładniczym cofaniem w przypadku bledu
 def fetch_location(location: dict) -> dict:
-    """Pobierz dane z API Open-Meteo dla podanej lokalizacji (z retry/backoff)."""
     params = {"latitude": location["latitude"], "longitude": location["longitude"], **DEFAULT_PARAMS}
     params["minutely_15"] = MINUTELY_15_VARS
     attempts = 3
@@ -207,13 +214,16 @@ def fetch_location(location: dict) -> dict:
     raise RuntimeError(f"Nie udało się pobrać danych dla {location['name']}")
 
 
+# Zapisuje dane godzinowe z payload do tabeli hourly
+# Pomija duplikaty na podstawie znacznika czasu
+# Zwraca liczbe dodanych wierszy
 def store_hourly(conn: sqlite3.Connection, location_id: int, payload: dict) -> int:
-    """Zapisz tablice `hourly` do tabeli `hourly`. Zwraca liczbę dodanych wierszy (potencjalnie zawiera zduplikowane próby)."""
     hourly = payload.get("hourly", {})
     times = hourly.get("time", [])
     if not times:
         return 0
 
+    # Pomocnicza funkcja do bezpiecznego pobierania tablic z payload
     def arr(name):
         return hourly.get(name, [])
 
@@ -225,6 +235,7 @@ def store_hourly(conn: sqlite3.Connection, location_id: int, payload: dict) -> i
     dirs = arr("wind_direction_10m")
     uvs = arr("uv_index")
 
+    # Pobierz najnowszy znacznik czasu z bazy aby uniknac duplikatow
     cur = conn.cursor()
     cur.execute("SELECT MAX(timestamp) FROM hourly WHERE location_id=?", (location_id,))
     r = cur.fetchone()
@@ -232,6 +243,7 @@ def store_hourly(conn: sqlite3.Connection, location_id: int, payload: dict) -> i
 
     rows = []
     for i, t in enumerate(times):
+        # Pomijaj wiersze starsze lub rowne najnowszemu w bazie
         if max_ts is not None and t <= max_ts:
             continue
         t_temp = temps[i] if i < len(temps) else None
@@ -252,13 +264,16 @@ def store_hourly(conn: sqlite3.Connection, location_id: int, payload: dict) -> i
     return len(rows)
 
 
+# Zapisuje dane 15-minutowe z payload do tabeli minutely15
+# Pomija duplikaty na podstawie znacznika czasu
+# Zwraca liczbe dodanych wierszy
 def store_minutely15(conn: sqlite3.Connection, location_id: int, payload: dict) -> int:
-    """Zapisz dane 15-minutowe `minutely_15` do tabeli `minutely15`. Zwraca liczbę wierszy."""
     minutely = payload.get("minutely_15", {})
     times = minutely.get("time", [])
     if not times:
         return 0
 
+    # Pomocnicza funkcja do bezpiecznego pobierania tablic z payload
     def arr(name):
         return minutely.get(name, [])
 
@@ -269,6 +284,7 @@ def store_minutely15(conn: sqlite3.Connection, location_id: int, payload: dict) 
     dirs = arr("wind_direction_10m")
     codes = arr("weather_code") or arr("weathercode")
 
+    # Pobierz najnowszy znacznik czasu z bazy aby uniknac duplikatow
     cur = conn.cursor()
     cur.execute("SELECT MAX(timestamp) FROM minutely15 WHERE location_id=?", (location_id,))
     r = cur.fetchone()
@@ -276,6 +292,7 @@ def store_minutely15(conn: sqlite3.Connection, location_id: int, payload: dict) 
 
     rows = []
     for i, t in enumerate(times):
+        # Pomijaj wiersze starsze lub rowne najnowszemu w bazie
         if max_ts is not None and t <= max_ts:
             continue
         t_temp = temps[i] if i < len(temps) else None
@@ -295,16 +312,14 @@ def store_minutely15(conn: sqlite3.Connection, location_id: int, payload: dict) 
     return len(rows)
 
 
+# Glowna funkcja pobierajaca i zapisujaca dane dla wybranych lokalizacji
+# Obsluguje wybor lokalizacji typy danych i zapis plikow JSON
+# Zwraca calkowita liczbe wstawionych wierszy do bazy
 def fetch_and_store_all(db_path: Path | str,
                         fetch_hourly: bool,
                         fetch_minutely: bool,
                         location_names: Iterable[str] | None = None,
                         save_payloads: bool = False) -> int:
-    """
-    Kompatybilny wrapper używany przez Main.py.
-    Pobiera dane dla wybranych lokalizacji i zapisuje do bazy.
-    Zwraca liczbę wstawionych wierszy (int).
-    """
     logger_api.info("fetch_and_store_all called: hourly=%s minutely=%s locations=%s save_payloads=%s",
                 fetch_hourly, fetch_minutely, location_names, save_payloads)
     
@@ -316,22 +331,26 @@ def fetch_and_store_all(db_path: Path | str,
     init_db(conn)
     total = 0
     
-    # Wybierz lokalizacje do pobrania
+    # Wybierz lokalizacje do pobrania lub wszystkie jesli nie podano
     locations_to_fetch = LOCATIONS
     if location_names:
         locations_to_fetch = [loc for loc in LOCATIONS if loc["name"] in location_names]
     
     for loc in locations_to_fetch:
         try:
+            # Pobierz lub stworz id lokalizacji w bazie
             loc_id = insert_or_get_location(conn, loc)
+            # Pobierz dane z API
             payload = fetch_location(loc)
             
+            # Opcjonalnie zapisz surowy payload do pliku JSON
             if save_payloads:
                 try:
                     save_payload_to_json(payload, prefix=loc["name"].replace(" ", "_"))
                 except Exception:
                     logger.debug("Nie udało się zapisać payloadu do JSON dla %s", loc["name"])
             
+            # Zapisz dane do odpowiednich tabel
             if fetch_hourly:
                 total += store_hourly(conn, loc_id, payload)
             if fetch_minutely:
@@ -346,6 +365,6 @@ def fetch_and_store_all(db_path: Path | str,
 
 
 if __name__ == "__main__":
-    # Prosty program: wykonaj jedno pobranie i zakończ.
+    # Uruchomienie bezposrednie wykonuje pojedyncze pobranie danych
     inserted = fetch_and_store_all(DB_PATH, fetch_hourly=True, fetch_minutely=True, save_payloads=False)
     logger.info("Wstawiono rekordów: %d", inserted)

@@ -1,3 +1,4 @@
+# data_quality.py
 import sqlite3
 import json
 from pathlib import Path
@@ -6,16 +7,11 @@ import argparse
 
 DEFAULT_DB = Path("data") / "meteodata.db"
 
+
+# Generuje raport jakosci danych z bazy SQLite
+# Sprawdza liczbe rekordow brakujace wartosci i rekordy z przyszlosci
+# Zwraca slownik z wynikami analizy gotowy do zapisu jako JSON
 def inspect_db(db_path: str | Path = DEFAULT_DB, ignore_future: bool = False) -> dict:
-    """
-    Zbiera raport jakości danych z bazy sqlite:
-     - lista tabel
-     - liczba wierszy w kluczowych tabelach
-     - brakujące pola w tabeli hourly (temperature, rain, snowfall, wind_speed)
-     - liczba rekordów z timestamp > teraz (future rows)
-     - statystyki per location: liczba wierszy, liczba braków
-    Zwraca słownik gotowy do serializacji JSON.
-    """
     db_path = Path(db_path)
     res = {"db_path": str(db_path), "generated_at": datetime.now(timezone.utc).isoformat()}
     if not db_path.exists():
@@ -25,12 +21,12 @@ def inspect_db(db_path: str | Path = DEFAULT_DB, ignore_future: bool = False) ->
     conn = sqlite3.connect(str(db_path))
     cur = conn.cursor()
 
-    # tables
+    # Pobierz liste wszystkich tabel w bazie
     cur.execute("SELECT name FROM sqlite_master WHERE type='table'")
     tables = [r[0] for r in cur.fetchall()]
     res["tables"] = tables
 
-    # counts
+    # Policz wiersze w kluczowych tabelach
     for t in ("locations", "hourly", "minutely15", "alerts", "features"):
         if t in tables:
             try:
@@ -39,24 +35,24 @@ def inspect_db(db_path: str | Path = DEFAULT_DB, ignore_future: bool = False) ->
             except Exception:
                 res[f"count_{t}"] = None
 
-    # hourly quality
+    # Analiza jakosci danych w tabeli hourly
     if "hourly" in tables:
         now_iso = datetime.now(timezone.utc).isoformat() + "Z"
-        # missing per column
+        # Policz brakujace wartosci w kazdej kolumnie
         for col in ("temperature", "rain", "snowfall", "wind_speed", "weather_code"):
             try:
                 cur.execute(f"SELECT COUNT(*) FROM hourly WHERE {col} IS NULL")
                 res[f"missing_{col}"] = cur.fetchone()[0]
             except Exception:
                 res[f"missing_{col}"] = None
-        # future rows
+        # Policz rekordy z przyszlosci
         try:
             cur.execute("SELECT COUNT(*) FROM hourly WHERE timestamp>?", (now_iso,))
             res["future_rows"] = cur.fetchone()[0]
         except Exception:
             res["future_rows"] = None
 
-        # per-location summary
+        # Statystyki per lokalizacja
         try:
             cur.execute("SELECT DISTINCT location_id FROM hourly")
             loc_ids = [r[0] for r in cur.fetchall()]
@@ -65,6 +61,7 @@ def inspect_db(db_path: str | Path = DEFAULT_DB, ignore_future: bool = False) ->
                 linfo = {}
                 cur.execute("SELECT COUNT(*) FROM hourly WHERE location_id=?", (lid,))
                 linfo["rows"] = cur.fetchone()[0]
+                # Policz wiersze z brakami w krytycznych kolumnach
                 cur.execute("SELECT COUNT(*) FROM hourly WHERE location_id=? AND (temperature IS NULL OR wind_speed IS NULL OR weather_code IS NULL)", (lid,))
                 linfo["rows_with_missing_critical"] = cur.fetchone()[0]
                 res["locations"][str(lid)] = linfo
@@ -74,6 +71,8 @@ def inspect_db(db_path: str | Path = DEFAULT_DB, ignore_future: bool = False) ->
     conn.close()
     return res
 
+
+# Funkcja glowna CLI do generowania raportu
 def main():
     p = argparse.ArgumentParser(prog="data_quality.py", description="Raport jakości bazy meteo")
     p.add_argument("--db", "-d", default=str(DEFAULT_DB), help="Ścieżka do bazy sqlite")
@@ -87,6 +86,7 @@ def main():
         print(f"Raport zapisany do: {args.out}")
     else:
         print(json.dumps(report, indent=2, ensure_ascii=False))
+
 
 if __name__ == "__main__":
     main()

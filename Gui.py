@@ -12,18 +12,21 @@ from Login import setup_logger
 import quota
 
 
+# Glowna klasa aplikacji GUI do monitorowania pogody
+# Obsluguje interfejs uzytkownika pobieranie danych i wyswietlanie alertow
 class WeatherMonitorGUI:
+    # Inicjalizuje GUI konfiguruje loggery i tworzy interfejs
     def __init__(self, root):
         self.root = root
         self.root.title("Weather Monitor - Metody Pozyskiwania Informacji")
         self.root.geometry("900x700")
         
-        # Setup logger
+        # Konfiguruj system logowania
         self.logger = setup_logger()
         self.bot_logger = logging.getLogger("meteofetch")
         self.bot_logger.setLevel(logging.INFO)
         
-        # Dodaj handler do wyświetlania logów w GUI
+        # Dodaj handler przekierowujacy logi do okna GUI
         self.log_handler = GUILogHandler(self)
         self.bot_logger.addHandler(self.log_handler)
         
@@ -32,9 +35,11 @@ class WeatherMonitorGUI:
         
         self._create_widgets()
         self._update_quota_display()
-        
+    
+    # Tworzy wszystkie widgety interfejsu uzytkownika
+    # Obejmuje naglowek panele ustawien logi i alerty
     def _create_widgets(self):
-        # Header
+        # Naglowek aplikacji
         header = tk.Frame(self.root, bg="#2c3e50", height=60)
         header.pack(fill=tk.X)
         
@@ -42,16 +47,16 @@ class WeatherMonitorGUI:
                         font=("Arial", 18, "bold"), bg="#2c3e50", fg="white")
         title.pack(pady=15)
         
-        # Main container
+        # Glowny kontener
         main_frame = tk.Frame(self.root, padx=20, pady=20)
         main_frame.pack(fill=tk.BOTH, expand=True)
         
-        # Left panel - Settings
+        # Lewy panel z ustawieniami pobierania
         left_panel = tk.LabelFrame(main_frame, text="Ustawienia pobierania", 
                                    font=("Arial", 11, "bold"), padx=15, pady=15)
         left_panel.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=(0, 10))
         
-        # Data type selection
+        # Wybor typu danych
         tk.Label(left_panel, text="Typ danych:", font=("Arial", 10, "bold")).pack(anchor=tk.W, pady=(0, 5))
         
         self.hourly_var = tk.BooleanVar(value=True)
@@ -62,7 +67,7 @@ class WeatherMonitorGUI:
         tk.Checkbutton(left_panel, text="Dane 15-minutowe (minutely_15)", 
                       variable=self.minutely_var, font=("Arial", 10)).pack(anchor=tk.W, pady=(0, 15))
         
-        # Location selection
+        # Wybor lokalizacji z lista wielokrotnego wyboru
         tk.Label(left_panel, text="Lokalizacje:", font=("Arial", 10, "bold")).pack(anchor=tk.W, pady=(0, 5))
         
         locations_frame = tk.Frame(left_panel)
@@ -76,10 +81,11 @@ class WeatherMonitorGUI:
         self.locations_listbox.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
         scrollbar.config(command=self.locations_listbox.yview)
         
+        # Wypelnij liste lokalizacjami z bazy
         for loc in LOCATIONS:
             self.locations_listbox.insert(tk.END, loc['name'])
         
-        # Select/Deselect all buttons
+        # Przyciski zaznaczania lokalizacji
         btn_frame = tk.Frame(left_panel)
         btn_frame.pack(fill=tk.X, pady=(5, 15))
         
@@ -88,19 +94,19 @@ class WeatherMonitorGUI:
         tk.Button(btn_frame, text="Odznacz wszystkie", command=self._deselect_all_locations,
                  bg="#95a5a6", fg="white", font=("Arial", 9)).pack(side=tk.LEFT)
         
-        # Save JSON option
+        # Opcja zapisu surowych danych JSON
         self.save_json_var = tk.BooleanVar(value=False)
         tk.Checkbutton(left_panel, text="Zapisz surowe JSON", 
                       variable=self.save_json_var, font=("Arial", 10)).pack(anchor=tk.W, pady=(0, 15))
         
-        # Quota info
+        # Panel informacyjny o quota API
         quota_frame = tk.LabelFrame(left_panel, text="API Quota", font=("Arial", 10, "bold"), padx=10, pady=10)
         quota_frame.pack(fill=tk.X, pady=(0, 15))
         
         self.quota_label = tk.Label(quota_frame, text="", font=("Arial", 9))
         self.quota_label.pack()
         
-        # Action buttons
+        # Przyciski akcji
         self.fetch_btn = tk.Button(left_panel, text="🔄 Pobierz dane raz", 
                                    command=self._fetch_once, bg="#27ae60", fg="white",
                                    font=("Arial", 11, "bold"), height=2)
@@ -111,11 +117,11 @@ class WeatherMonitorGUI:
                                        font=("Arial", 11, "bold"), height=2)
         self.continuous_btn.pack(fill=tk.X)
         
-        # Right panel - Logs and Alerts
+        # Prawy panel z logami i alertami
         right_panel = tk.Frame(main_frame)
         right_panel.pack(side=tk.RIGHT, fill=tk.BOTH, expand=True)
         
-        # Logs
+        # Panel logow systemowych
         logs_frame = tk.LabelFrame(right_panel, text="Logi systemowe", 
                                   font=("Arial", 11, "bold"), padx=10, pady=10)
         logs_frame.pack(fill=tk.BOTH, expand=True, pady=(0, 10))
@@ -124,7 +130,7 @@ class WeatherMonitorGUI:
                                                   font=("Courier", 9), bg="#ecf0f1")
         self.log_text.pack(fill=tk.BOTH, expand=True)
         
-        # Alerts
+        # Panel alertow pogodowych
         alerts_frame = tk.LabelFrame(right_panel, text="Alerty pogodowe", 
                                     font=("Arial", 11, "bold"), padx=10, pady=10)
         alerts_frame.pack(fill=tk.BOTH, expand=True)
@@ -141,17 +147,22 @@ class WeatherMonitorGUI:
         tk.Button(btn_frame2, text="Wyczyść", command=lambda: self.alerts_text.delete(1.0, tk.END),
                  bg="#95a5a6", fg="white", font=("Arial", 9)).pack(side=tk.LEFT, padx=(5, 0))
         
-        # Status bar
+        # Pasek statusu na dole okna
         self.status_bar = tk.Label(self.root, text="Gotowy", bd=1, relief=tk.SUNKEN, 
                                   anchor=tk.W, bg="#34495e", fg="white", font=("Arial", 9))
         self.status_bar.pack(side=tk.BOTTOM, fill=tk.X)
-        
+    
+    # Zaznacza wszystkie lokalizacje na liscie
     def _select_all_locations(self):
         self.locations_listbox.select_set(0, tk.END)
-        
+    
+    # Odznacza wszystkie lokalizacje na liscie
     def _deselect_all_locations(self):
         self.locations_listbox.select_clear(0, tk.END)
-        
+    
+    # Aktualizuje wyswietlanie stanu quota API
+    # Zmienia kolor w zaleznosci od pozostalego limitu
+    # Wywoluje sie co 5 sekund automatycznie
     def _update_quota_display(self):
         remaining = quota.remaining()
         total = quota.DAILY_QUOTA
@@ -160,28 +171,33 @@ class WeatherMonitorGUI:
         
         self.quota_label.config(text=f"Pozostało: {remaining}/{total} ({percentage:.1f}%)", 
                                fg=color)
-        self.root.after(5000, self._update_quota_display)  # Update every 5 seconds
-        
+        self.root.after(5000, self._update_quota_display)
+    
+    # Pobiera liste wybranych lokalizacji z listboxa
+    # Zwraca None jezeli nie wybrano zadnej co oznacza wszystkie lokalizacje
     def _get_selected_locations(self):
         indices = self.locations_listbox.curselection()
         if not indices:
-            return None  # All locations
+            return None
         return [LOCATIONS[i]['name'] for i in indices]
-        
+    
+    # Dodaje wpis do okna logow z timestampem i poziomem waznosci
     def _log(self, message, level="INFO"):
         timestamp = datetime.now().strftime("%H:%M:%S")
         self.log_text.insert(tk.END, f"[{timestamp}] {level}: {message}\n")
         self.log_text.see(tk.END)
-        
+    
+    # Wykonuje jednorazowe pobieranie danych w osobnym watku
+    # Sprawdza quota generuje alerty i aktualizuje interfejs
     def _fetch_once(self):
         if not self.hourly_var.get() and not self.minutely_var.get():
             messagebox.showwarning("Brak wyboru", "Wybierz przynajmniej jeden typ danych!")
             return
-            
+        
         if not quota.can_consume(quota.WEIGHT_PER_QUERY):
             messagebox.showerror("Brak quota", f"Brak budżetu API (pozostało {quota.remaining()})")
             return
-            
+        
         self.fetch_btn.config(state=tk.DISABLED)
         self.status_bar.config(text="Pobieranie danych...")
         
@@ -202,7 +218,7 @@ class WeatherMonitorGUI:
                 
                 self._log(f"Pobrano i zapisano {inserted} wierszy", "SUCCESS")
                 
-                # Analyze alerts
+                # Analiza i generowanie alertow
                 conn = sqlite3.connect(str(DB_PATH))
                 alerts_total = 0
                 for loc in LOCATIONS:
@@ -229,9 +245,10 @@ class WeatherMonitorGUI:
                 self.root.after(0, lambda: self.status_bar.config(text="Błąd podczas pobierania"))
             finally:
                 self.root.after(0, lambda: self.fetch_btn.config(state=tk.NORMAL))
-                
-        threading.Thread(target=fetch, daemon=True).start()
         
+        threading.Thread(target=fetch, daemon=True).start()
+    
+    # Przelacza tryb ciagly pomiedzy uruchomionym a zatrzymanym
     def _toggle_continuous(self):
         if not self.is_running:
             if not self.hourly_var.get() and not self.minutely_var.get():
@@ -240,7 +257,9 @@ class WeatherMonitorGUI:
             self._start_continuous()
         else:
             self._stop_continuous()
-            
+    
+    # Uruchamia tryb ciagly pobierajacy dane co 60 minut
+    # Sprawdza quota przed kazda iteracja i generuje alerty
     def _start_continuous(self):
         self.is_running = True
         self.continuous_btn.config(text="⏹️ Stop trybu ciągłego", bg="#c0392b")
@@ -265,7 +284,7 @@ class WeatherMonitorGUI:
                         
                         self._log(f"Iteracja: pobrano {inserted} wierszy")
                         
-                        # Analyze alerts
+                        # Analiza i generowanie alertow
                         conn = sqlite3.connect(str(DB_PATH))
                         alerts_total = 0
                         for loc in LOCATIONS:
@@ -290,22 +309,25 @@ class WeatherMonitorGUI:
                 else:
                     self._log("Brak quota - pomijam iterację", "WARNING")
                 
-                # Wait 60 minutes
+                # Czekaj 60 minut podzielone na minutowe interwaly
                 for _ in range(60):
                     if not self.is_running:
                         break
-                    threading.Event().wait(60)  # Wait 1 minute, 60 times
-                    
+                    threading.Event().wait(60)
+        
         self.fetch_thread = threading.Thread(target=continuous_loop, daemon=True)
         self.fetch_thread.start()
-        
+    
+    # Zatrzymuje tryb ciagly i przywraca stan interfejsu
     def _stop_continuous(self):
         self.is_running = False
         self.continuous_btn.config(text="▶️ Start trybu ciągłego", bg="#e74c3c")
         self.fetch_btn.config(state=tk.NORMAL)
         self.status_bar.config(text="Gotowy")
         self._log("Zatrzymano tryb ciągły", "INFO")
-        
+    
+    # Odswierza wyswietlanie alertow pobierajac je z bazy danych
+    # Pokazuje tylko alerty od dzisiejszego dnia w przod
     def _refresh_alerts(self):
         self.alerts_text.delete(1.0, tk.END)
         
@@ -313,7 +335,7 @@ class WeatherMonitorGUI:
             conn = sqlite3.connect(str(DB_PATH))
             cur = conn.cursor()
             
-            # Pobierz tylko alerty od dzisiaj w przyszłość (dynamicznie)
+            # Pobierz tylko alerty od dzisiaj dynamicznie
             today = datetime.now().strftime("%Y-%m-%d")
             
             cur.execute("""
@@ -341,17 +363,20 @@ class WeatherMonitorGUI:
             self.alerts_text.insert(tk.END, f"Błąd odczytu alertów: {str(e)}\n")
 
 
+# Handler loggera przekierowujacy komunikaty do okna GUI
 class GUILogHandler(logging.Handler):
     def __init__(self, gui):
         super().__init__()
         self.gui = gui
-        
+    
+    # Emituje rekord logu do okna GUI w bezpieczny sposob dla watkow
     def emit(self, record):
         msg = self.format(record)
         level = record.levelname
         self.gui.root.after(0, lambda: self.gui._log(msg, level))
 
 
+# Uruchamia aplikacje GUI
 def run_gui():
     root = tk.Tk()
     app = WeatherMonitorGUI(root)
