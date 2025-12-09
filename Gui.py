@@ -5,6 +5,8 @@ import logging
 from pathlib import Path
 import sqlite3
 from datetime import datetime, timedelta
+import sys
+import io
 
 from Api import fetch_and_store_all, DB_PATH, LOCATIONS
 import Alert
@@ -173,14 +175,14 @@ class WeatherMonitorGUI:
         # Zakladka z ustawieniami
         self.settings_tab = tk.Frame(self.tab_control)
         self.tab_control.add(self.settings_tab, text="Ustawienia")
-        
+        self._create_settings_tab(self.settings_tab)
+    
         # Zakladka z mapa
         self.map_tab = tk.Frame(self.tab_control)
         self.tab_control.add(self.map_tab, text="Mapa")
         
         # Tworzenie interfejsu zakladki z historia
         self._create_history_tab(self.history_tab)
-        self._create_settings_tab(self.settings_tab)
         self._create_map_tab(self.map_tab)
     
     # Tworzy zakladke z historia danych i alertami
@@ -319,20 +321,20 @@ class WeatherMonitorGUI:
         info_frame = tk.LabelFrame(main_frame, text="Legenda", font=("Arial", 10, "bold"), padx=10, pady=10)
         info_frame.pack(fill=tk.X, pady=(0, 10))
         
-        info_text = "Zielone - brak alertów | Pomarańczowe - ostrzeżenie | Czerwone - alert aktywny\nRozmiar bąbelka = temperatura | Najechanie - szczegóły pogody"
-        tk.Label(info_frame, text=info_text, font=("Arial", 9), justify=tk.LEFT).pack(anchor=tk.W)
+        info_text = "Zielone - brak alertów | Pomarańczowe - ostrzeżenie | Czerwone - alert aktywny"
+        tk.Label(info_frame, text=info_text, font=("Arial", 9)).pack(anchor=tk.W)
         
-        # Panel wyświetlania mapy
+        # Panel statusu
         map_frame = tk.LabelFrame(main_frame, text="Mapa pogodowa", font=("Arial", 10, "bold"), padx=10, pady=10)
         map_frame.pack(fill=tk.BOTH, expand=True)
         
-        self.map_status_label = tk.Label(map_frame, text="Mapa będzie załadowana po kliknięciu 'Odśwież mapę'",
+        self.map_status_label = tk.Label(map_frame, text="Kliknij 'Odśwież mapę' aby załadować mapę interaktywną",
                                         font=("Arial", 10), fg="#666")
-        self.map_status_label.pack(fill=tk.X, pady=20)
+        self.map_status_label.pack(fill=tk.X, pady=40)
         
         self.map_current_fig = None
     
-    # Generuje i odświeża mapę z bieżącymi danymi pogodowymi
+    # Generuje i odświeża mapę
     def _refresh_map(self):
         self.map_status_label.config(text="Generowanie mapy...", fg="#3498db")
         self.map_status_label.update()
@@ -340,25 +342,28 @@ class WeatherMonitorGUI:
         try:
             self.map_current_fig = map_visualization.generate_weather_map()
             html_path = map_visualization.save_map_to_html(self.map_current_fig)
+            
             self.map_status_label.config(
-                text=f"✓ Mapa wygenerowana ({html_path}). Kliknij 'Otwórz w przeglądarce'",
+                text=f"✓ Mapa wygenerowana. Kliknij 'Otwórz w przeglądarce' aby zobaczyć interaktywną mapę",
                 fg="#27ae60"
             )
             self._log("Mapa pogodowa wygenerowana pomyślnie", "INFO")
+            
         except Exception as e:
             self.map_status_label.config(text=f"Błąd: {str(e)}", fg="#e74c3c")
             self._log(f"Błąd przy generowaniu mapy: {str(e)}", "ERROR")
     
-    # Otwiera mapę w domyślnej przeglądarce
+    # Otwiera mapę w przeglądarce
     def _open_map_browser(self):
         try:
             if self.map_current_fig is None:
                 messagebox.showinfo("Informacja", "Najpierw wygeneruj mapę klikając 'Odśwież mapę'")
                 return
-            with tempfile.NamedTemporaryFile(mode='w', suffix='.html', delete=False) as f:
-                self.map_current_fig.save(f.name)
-                webbrowser.open('file://' + f.name)
-                self._log(f"Otwarta mapa w przeglądarce", "INFO")
+            
+            html_path = "data/weather_map.html"
+            webbrowser.open('file://' + str(Path(html_path).absolute()))
+            self._log("Otwarta mapa w przeglądarce", "INFO")
+            
         except Exception as e:
             messagebox.showerror("Błąd", f"Nie udało się otworzyć mapy: {str(e)}")
             self._log(f"Błąd: {str(e)}", "ERROR")
@@ -476,39 +481,38 @@ class WeatherMonitorGUI:
             self.settings_quality_text.insert(tk.END, error_msg)
             self._log(f"Błąd: {str(e)}", "ERROR")
     
-    # Uruchamia uzupelnianie brakow z fill_missing.py
+    # Uruchamia uzupelnianie brakow z fill_missing.py w osobnym watku
     def _run_fill_missing(self):
         self.settings_fill_text.delete(1.0, tk.END)
         self._log("Rozpoczęto uzupełnianie braków...", "INFO")
+        self.settings_fill_text.insert(tk.END, "=== UZUPEŁNIANIE BRAKÓW DANYCH ===\n\n")
+        self.settings_fill_text.insert(tk.END, f"Baza danych: {DB_PATH}\n")
+        self.settings_fill_text.insert(tk.END, f"Backup: {'TAK' if self.fill_backup_var.get() else 'NIE'}\n\n")
+        self.settings_fill_text.insert(tk.END, "Przetwarzanie...\n")
         
-        try:
-            # Uruchom w osobnym wątku żeby nie zablokować GUI
-            def fill_thread():
-                output = "=== UZUPEŁNIANIE BRAKÓW DANYCH ===\n\n"
-                output += f"Baza danych: {DB_PATH}\n"
-                output += f"Backup: {'TAK' if self.fill_backup_var.get() else 'NIE'}\n\n"
+        def fill_thread():
+            try:
+                # Callback do GUI
+                def log_callback(msg):
+                    self.root.after(0, lambda: self.settings_fill_text.insert(tk.END, msg + "\n"))
+                    self.root.after(0, lambda: self.settings_fill_text.see(tk.END))
                 
-                self.settings_fill_text.insert(tk.END, output)
+                fill_missing.fill_missing(
+                    Path(DB_PATH), 
+                    do_backup=self.fill_backup_var.get(), 
+                    log_callback=log_callback
+                )
                 
-                # Uruchom fill_missing
-                fill_missing.fill_missing(Path(DB_PATH), do_backup=self.fill_backup_var.get())
+                self.root.after(0, lambda: self.settings_fill_text.insert(tk.END, "\n✓ Uzupełnianie zakończone pomyślnie\n"))
+                self.root.after(0, lambda: self._log("Uzupełnianie braków ukończone", "INFO"))
                 
-                self.settings_fill_text.insert(tk.END, "\n✓ Uzupełnianie zakończone\n")
-                self._log("Uzupełnianie braków ukończone", "INFO")
-            
-            thread = threading.Thread(target=fill_thread, daemon=True)
-            thread.start()
-            
-        except Exception as e:
-            error_msg = f"Błąd: {str(e)}\n"
-            self.settings_fill_text.insert(tk.END, error_msg)
-            self._log(f"Błąd: {str(e)}", "ERROR")
-
-# W metodzie _create_widgets, po dodaniu zakładki history, dodaj:
-        # Zakladka z ustawieniami
-        self.settings_tab = tk.Frame(self.tab_control)
-        self.tab_control.add(self.settings_tab, text="Ustawienia")
-        self._create_settings_tab(self.settings_tab)
+            except Exception as e:
+                self.root.after(0, lambda: self.settings_fill_text.insert(tk.END, f"\nBłąd: {str(e)}\n"))
+                self.root.after(0, lambda: self._log(f"Błąd: {str(e)}", "ERROR"))
+        
+        thread = threading.Thread(target=fill_thread, daemon=True)
+        thread.start()
+    
     
     # Zaznacza wszystkie lokalizacje na liscie
     def _select_all_locations(self):
@@ -605,6 +609,27 @@ class WeatherMonitorGUI:
                 self.root.after(0, lambda: self.fetch_btn.config(state=tk.NORMAL))
         
         threading.Thread(target=fetch, daemon=True).start()
+    
+    # Oblicza interwał trybu ciągłego na podstawie wybranych typów danych
+    # Zwraca interwał w sekundach
+    def _calculate_continuous_interval(self) -> int:
+        hourly_selected = self.hourly_var.get()
+        minutely_selected = self.minutely_var.get()
+        
+        # Jesli oba są włączone to 60 minut
+        if hourly_selected and minutely_selected:
+            return 60 * 60  # 60 minut w sekundach
+        
+        # Jeśli tylko minutely_15 to 15 minut
+        if minutely_selected:
+            return 15 * 60  # 15 minut w sekundach
+        
+        # Jeśli tylko hourly to 60 minut
+        if hourly_selected:
+            return 60 * 60  # 60 minut w sekundach
+        
+        # Domyślnie 60 minut jeśli nic nie wybrano
+        return 60 * 60
     
     # Przelacza tryb ciagly pomiedzy uruchomionym a zatrzymanym
     def _toggle_continuous(self):

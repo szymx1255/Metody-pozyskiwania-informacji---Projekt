@@ -30,33 +30,40 @@ def find_next(cur, col, loc_id, ts):
 # Dla kazdej brakujacej wartosci probuje uzyc wartosci z poprzedniego lub nastepnego pomiaru
 # Opcjonalnie tworzy backup bazy przed zmianami
 # Zwraca statystyki uzupelnionych wartosci
-def fill_missing(db_path: Path, do_backup: bool = True):
+def fill_missing(db_path: Path, do_backup: bool = True, log_callback=None):
     if not db_path.exists():
-        print("Baza nie istnieje:", db_path)
+        msg = "Baza nie istnieje: " + str(db_path)
+        if log_callback:
+            log_callback(msg)
         return
+    
     # Utworz backup przed modyfikacja bazy
     if do_backup:
         try:
             b = backup_db.backup_db(db_path, backups_dir=str(db_path.parent / "backups"), keep=7)
-            print("Utworzono backup:", b)
+            msg = f"Utworzono backup: {b}"
+            if log_callback:
+                log_callback(msg)
         except Exception as e:
-            print("Backup nieudany:", e)
+            msg = f"Backup nieudany: {e}"
+            if log_callback:
+                log_callback(msg)
 
     conn = sqlite3.connect(str(db_path))
     cur = conn.cursor()
-    # Pobierz wszystkie wiersze z brakami w kluczowych kolumnach
     cur.execute("SELECT id, location_id, timestamp, temperature, wind_speed, weather_code FROM hourly WHERE temperature IS NULL OR wind_speed IS NULL OR weather_code IS NULL ORDER BY location_id, timestamp")
     rows = cur.fetchall()
-    print("Znaleziono wierszy z brakami:", len(rows))
+    msg = f"Znaleziono wierszy z brakami: {len(rows)}"
+    if log_callback:
+        log_callback(msg)
+    
     counts = {col:0 for col in COLUMNS}
     updated_rows = 0
 
-    # Przejdz przez kazdy wiersz i uzupelnij braki
     for r in rows:
         row_id, loc_id, ts, temp, wind, code = r
         updates = {}
         for col in COLUMNS:
-            # Sprawdz czy kolumna wymaga uzupelnienia
             cur_val = None
             if col == "temperature":
                 cur_val = temp
@@ -66,40 +73,37 @@ def fill_missing(db_path: Path, do_backup: bool = True):
                 cur_val = code
             if cur_val is not None:
                 continue
-            # Sprobuj znalezc wartosc z poprzedniego pomiaru
             prev_val = find_prev(cur, col, loc_id, ts)
-            # Jesli brak sprobuj z nastepnego pomiaru
             if prev_val is None:
                 prev_val = find_next(cur, col, loc_id, ts)
             if prev_val is not None:
                 updates[col] = prev_val
 
-        # Wykonaj update jesli znaleziono wartosci do uzupelnienia
         if updates:
             set_clause = ", ".join([f"{c} = ?" for c in updates.keys()])
             params = list(updates.values()) + [row_id]
-            sql = f"UPDATE hourly SET {set_clause} WHERE id = ?"
-            cur.execute(sql, params)
+            cur.execute(f"UPDATE hourly SET {set_clause} WHERE id=?", params)
             for c in updates.keys():
                 counts[c] += 1
             updated_rows += 1
 
     conn.commit()
     conn.close()
-    print("Zaktualizowano wierszy:", updated_rows)
-    print("Szczegóły aktualizacji:", counts)
-    return {"updated_rows": updated_rows, "counts": counts}
+    
+    msg = f"Uzupełniono {updated_rows} wierszy\nStatystyki: {counts}"
+    if log_callback:
+        log_callback(msg)
+    else:
+        print(msg)
 
 
-# Funkcja glowna CLI do uzupelniania brakow
+# Funkcja glowna CLI do generowania raportu
 def main():
-    p = argparse.ArgumentParser(prog="fill_missing.py", description="Uzupełnia brakujące pola w tabeli hourly wartością z wcześniejszych (lub następnych) pomiarów.")
-    p.add_argument("--db", "-d", default=str(DB_PATH), help="Ścieżka do bazy")
-    p.add_argument("--no-backup", action="store_true", help="Nie twórz backupu przed zmianami")
+    p = argparse.ArgumentParser(prog="fill_missing.py", description="Uzupełnianie braków danych pogodowych")
+    p.add_argument("--db", "-d", default=str(DB_PATH), help="Ścieżka do bazy sqlite")
+    p.add_argument("--backup", "-b", action="store_true", default=True, help="Utwórz backup przed zmianami")
     args = p.parse_args()
-    db = Path(args.db)
-    fill_missing(db, do_backup=not args.no_backup)
-
+    fill_missing(Path(args.db), do_backup=args.backup)
 
 if __name__ == "__main__":
     main()

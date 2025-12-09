@@ -5,9 +5,9 @@ import sqlite3
 import os
 
 # Prog predkosci wiatru powyzej ktorego generowany jest alert
-ALERT_WIND_THRESHOLD = 50.0
+ALERT_WIND_THRESHOLD = 28.0
 # Prog temperatury ponizej ktorego generowany jest alert
-ALERT_TEMP_LOW_THRESHOLD = -10.0
+ALERT_TEMP_LOW_THRESHOLD = -15.0
 # Kody pogodowe wskazujace na opady wymagajace alertu
 ALERT_WEATHER_CODES_PRECIP = {51, 53, 55, 61, 63, 65, 80, 81, 82, 95}
 
