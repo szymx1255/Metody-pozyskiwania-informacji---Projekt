@@ -11,6 +11,11 @@ import Alert
 from Login import setup_logger
 import quota
 import history  # Nowy import
+import data_quality
+import fill_missing
+import map_visualization
+import webbrowser
+import tempfile
 
 
 # Glowna klasa aplikacji GUI do monitorowania pogody
@@ -165,8 +170,18 @@ class WeatherMonitorGUI:
         self.history_tab = tk.Frame(self.tab_control)
         self.tab_control.add(self.history_tab, text="Historia")
         
+        # Zakladka z ustawieniami
+        self.settings_tab = tk.Frame(self.tab_control)
+        self.tab_control.add(self.settings_tab, text="Ustawienia")
+        
+        # Zakladka z mapa
+        self.map_tab = tk.Frame(self.tab_control)
+        self.tab_control.add(self.map_tab, text="Mapa")
+        
         # Tworzenie interfejsu zakladki z historia
         self._create_history_tab(self.history_tab)
+        self._create_settings_tab(self.settings_tab)
+        self._create_map_tab(self.map_tab)
     
     # Tworzy zakladke z historia danych i alertami
     def _create_history_tab(self, parent):
@@ -279,157 +294,221 @@ class WeatherMonitorGUI:
             self.history_alerts_text.delete(1.0, tk.END)
             self.history_alerts_text.insert(tk.END, f"Blad: {str(e)}\n")
     
-    # Oblicza interwał trybu ciągłego na podstawie wybranych typów danych
-    # Zwraca interwał w sekundach
-    def _calculate_continuous_interval(self) -> int:
-        hourly_selected = self.hourly_var.get()
-        minutely_selected = self.minutely_var.get()
-        
-        # Jesli oba są włączone to 60 minut
-        if hourly_selected and minutely_selected:
-            return 60 * 60  # 60 minut w sekundach
-        
-        # Jeśli tylko minutely_15 to 15 minut
-        if minutely_selected:
-            return 15 * 60  # 15 minut w sekundach
-        
-        # Jeśli tylko hourly to 60 minut
-        if hourly_selected:
-            return 60 * 60  # 60 minut w sekundach
-        
-        # Domyślnie 60 minut jeśli nic nie wybrano
-        return 60 * 60
-    
-    # Tworzy wszystkie widgety interfejsu uzytkownika
-    # Obejmuje naglowek panele ustawien logi i alerty
-    def _create_widgets(self):
-        # Naglowek aplikacji
-        header = tk.Frame(self.root, bg="#2c3e50", height=60)
-        header.pack(fill=tk.X)
-        
-        title = tk.Label(header, text="⛰️ Weather Monitor System", 
-                        font=("Arial", 18, "bold"), bg="#2c3e50", fg="white")
-        title.pack(pady=15)
-        
-        # Glowny kontener
-        main_frame = tk.Frame(self.root, padx=20, pady=20)
+    # Tworzy zakladke z interaktywna mapa pogodowa
+    def _create_map_tab(self, parent):
+        main_frame = tk.Frame(parent, padx=20, pady=20)
         main_frame.pack(fill=tk.BOTH, expand=True)
         
-        # Lewy panel z ustawieniami pobierania
-        left_panel = tk.LabelFrame(main_frame, text="Ustawienia pobierania", 
-                                   font=("Arial", 11, "bold"), padx=15, pady=15)
-        left_panel.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=(0, 10))
+        # Panel z przyciskami
+        control_frame = tk.Frame(main_frame)
+        control_frame.pack(fill=tk.X, pady=(0, 10))
         
-        # Wybor typu danych
-        tk.Label(left_panel, text="Typ danych:", font=("Arial", 10, "bold")).pack(anchor=tk.W, pady=(0, 5))
+        tk.Label(control_frame, text="Interaktywna mapa szczytów alpejskich z bieżącymi danymi pogodowymi", 
+                font=("Arial", 11, "bold")).pack(anchor=tk.W, pady=(0, 10))
         
-        self.hourly_var = tk.BooleanVar(value=True)
-        tk.Checkbutton(left_panel, text="Dane godzinowe (hourly)", 
-                      variable=self.hourly_var, font=("Arial", 10)).pack(anchor=tk.W)
+        btn_frame = tk.Frame(control_frame)
+        btn_frame.pack(fill=tk.X, pady=(0, 10))
         
-        self.minutely_var = tk.BooleanVar(value=False)
-        tk.Checkbutton(left_panel, text="Dane 15-minutowe (minutely_15)", 
-                      variable=self.minutely_var, font=("Arial", 10)).pack(anchor=tk.W, pady=(0, 15))
+        tk.Button(btn_frame, text="Odśwież mapę", command=self._refresh_map,
+                 bg="#3498db", fg="white", font=("Arial", 10), width=20).pack(side=tk.LEFT, padx=(0, 5))
         
-        # Wybor lokalizacji z lista wielokrotnego wyboru
-        tk.Label(left_panel, text="Lokalizacje:", font=("Arial", 10, "bold")).pack(anchor=tk.W, pady=(0, 5))
+        tk.Button(btn_frame, text="Otwórz w przeglądarce", command=self._open_map_browser,
+                 bg="#27ae60", fg="white", font=("Arial", 10), width=20).pack(side=tk.LEFT)
         
-        locations_frame = tk.Frame(left_panel)
-        locations_frame.pack(fill=tk.BOTH, expand=True)
+        # Info text
+        info_frame = tk.LabelFrame(main_frame, text="Legenda", font=("Arial", 10, "bold"), padx=10, pady=10)
+        info_frame.pack(fill=tk.X, pady=(0, 10))
         
-        scrollbar = tk.Scrollbar(locations_frame)
-        scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+        info_text = "Zielone - brak alertów | Pomarańczowe - ostrzeżenie | Czerwone - alert aktywny\nRozmiar bąbelka = temperatura | Najechanie - szczegóły pogody"
+        tk.Label(info_frame, text=info_text, font=("Arial", 9), justify=tk.LEFT).pack(anchor=tk.W)
         
-        self.locations_listbox = tk.Listbox(locations_frame, selectmode=tk.MULTIPLE, 
-                                            yscrollcommand=scrollbar.set, height=8)
-        self.locations_listbox.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
-        scrollbar.config(command=self.locations_listbox.yview)
+        # Panel wyświetlania mapy
+        map_frame = tk.LabelFrame(main_frame, text="Mapa pogodowa", font=("Arial", 10, "bold"), padx=10, pady=10)
+        map_frame.pack(fill=tk.BOTH, expand=True)
         
-        # Wypelnij liste lokalizacjami z bazy
-        for loc in LOCATIONS:
-            self.locations_listbox.insert(tk.END, loc['name'])
+        self.map_status_label = tk.Label(map_frame, text="Mapa będzie załadowana po kliknięciu 'Odśwież mapę'",
+                                        font=("Arial", 10), fg="#666")
+        self.map_status_label.pack(fill=tk.X, pady=20)
         
-        # Przyciski zaznaczania lokalizacji
-        btn_frame = tk.Frame(left_panel)
-        btn_frame.pack(fill=tk.X, pady=(5, 15))
+        self.map_current_fig = None
+    
+    # Generuje i odświeża mapę z bieżącymi danymi pogodowymi
+    def _refresh_map(self):
+        self.map_status_label.config(text="Generowanie mapy...", fg="#3498db")
+        self.map_status_label.update()
         
-        tk.Button(btn_frame, text="Zaznacz wszystkie", command=self._select_all_locations,
-                 bg="#3498db", fg="white", font=("Arial", 9)).pack(side=tk.LEFT, padx=(0, 5))
-        tk.Button(btn_frame, text="Odznacz wszystkie", command=self._deselect_all_locations,
-                 bg="#95a5a6", fg="white", font=("Arial", 9)).pack(side=tk.LEFT)
+        try:
+            self.map_current_fig = map_visualization.generate_weather_map()
+            html_path = map_visualization.save_map_to_html(self.map_current_fig)
+            self.map_status_label.config(
+                text=f"✓ Mapa wygenerowana ({html_path}). Kliknij 'Otwórz w przeglądarce'",
+                fg="#27ae60"
+            )
+            self._log("Mapa pogodowa wygenerowana pomyślnie", "INFO")
+        except Exception as e:
+            self.map_status_label.config(text=f"Błąd: {str(e)}", fg="#e74c3c")
+            self._log(f"Błąd przy generowaniu mapy: {str(e)}", "ERROR")
+    
+    # Otwiera mapę w domyślnej przeglądarce
+    def _open_map_browser(self):
+        try:
+            if self.map_current_fig is None:
+                messagebox.showinfo("Informacja", "Najpierw wygeneruj mapę klikając 'Odśwież mapę'")
+                return
+            with tempfile.NamedTemporaryFile(mode='w', suffix='.html', delete=False) as f:
+                self.map_current_fig.save(f.name)
+                webbrowser.open('file://' + f.name)
+                self._log(f"Otwarta mapa w przeglądarce", "INFO")
+        except Exception as e:
+            messagebox.showerror("Błąd", f"Nie udało się otworzyć mapy: {str(e)}")
+            self._log(f"Błąd: {str(e)}", "ERROR")
+    
+    # Tworzy zakladke z ustawieniami i funkcjami jakosci danych
+    def _create_settings_tab(self, parent):
+        main_frame = tk.Frame(parent, padx=20, pady=20)
+        main_frame.pack(fill=tk.BOTH, expand=True)
         
-        # Opcja zapisu surowych danych JSON
-        self.save_json_var = tk.BooleanVar(value=False)
-        tk.Checkbutton(left_panel, text="Zapisz surowe JSON", 
-                      variable=self.save_json_var, font=("Arial", 10)).pack(anchor=tk.W, pady=(0, 15))
+        # Sekcja jakosci danych
+        quality_frame = tk.LabelFrame(main_frame, text="Jakość danych (Data Quality)", 
+                                     font=("Arial", 11, "bold"), padx=15, pady=15)
+        quality_frame.pack(fill=tk.X, pady=(0, 10))
         
-        # Panel informacyjny o quota API
-        quota_frame = tk.LabelFrame(left_panel, text="API Quota", font=("Arial", 10, "bold"), padx=10, pady=10)
-        quota_frame.pack(fill=tk.X, pady=(0, 15))
+        tk.Label(quality_frame, text="Analiza jakości bazy danych - sprawdza braki i anomalii", 
+                font=("Arial", 10)).pack(anchor=tk.W, pady=(0, 10))
         
-        self.quota_label = tk.Label(quota_frame, text="", font=("Arial", 9))
-        self.quota_label.pack()
+        quality_btn_frame = tk.Frame(quality_frame)
+        quality_btn_frame.pack(fill=tk.X, pady=(0, 10))
         
-        # Przyciski akcji
-        self.fetch_btn = tk.Button(left_panel, text="🔄 Pobierz dane raz", 
-                                   command=self._fetch_once, bg="#27ae60", fg="white",
-                                   font=("Arial", 11, "bold"), height=2)
-        self.fetch_btn.pack(fill=tk.X, pady=(0, 5))
+        tk.Button(quality_btn_frame, text="Uruchom analizę jakości", 
+                 command=self._run_data_quality_check, 
+                 bg="#3498db", fg="white", font=("Arial", 10), width=25).pack(side=tk.LEFT, padx=(0, 5))
         
-        self.continuous_btn = tk.Button(left_panel, text="▶️ Start trybu ciągłego", 
-                                       command=self._toggle_continuous, bg="#e74c3c", fg="white",
-                                       font=("Arial", 11, "bold"), height=2)
-        self.continuous_btn.pack(fill=tk.X)
+        tk.Button(quality_btn_frame, text="Wyczyść raport", 
+                 command=lambda: self.settings_quality_text.delete(1.0, tk.END),
+                 bg="#95a5a6", fg="white", font=("Arial", 10)).pack(side=tk.LEFT)
         
-        # Prawy panel z logami i alertami
-        right_panel = tk.Frame(main_frame)
-        right_panel.pack(side=tk.RIGHT, fill=tk.BOTH, expand=True)
+        self.settings_quality_text = scrolledtext.ScrolledText(quality_frame, height=12, 
+                                                               font=("Courier", 9), bg="#ecf0f1")
+        self.settings_quality_text.pack(fill=tk.BOTH, expand=True)
         
-        # Panel logow systemowych
-        logs_frame = tk.LabelFrame(right_panel, text="Logi systemowe", 
-                                  font=("Arial", 11, "bold"), padx=10, pady=10)
-        logs_frame.pack(fill=tk.BOTH, expand=True, pady=(0, 10))
+        # Sekcja uzupelniania brakow
+        fill_frame = tk.LabelFrame(main_frame, text="Uzupełnianie braków (Fill Missing)", 
+                                  font=("Arial", 11, "bold"), padx=15, pady=15)
+        fill_frame.pack(fill=tk.X, pady=(0, 10))
         
-        self.log_text = scrolledtext.ScrolledText(logs_frame, height=15, 
-                                                  font=("Courier", 9), bg="#ecf0f1")
-        self.log_text.pack(fill=tk.BOTH, expand=True)
+        tk.Label(fill_frame, text="Uzupełnia brakujące wartości (NULL) średnią z sąsiednich pomiarów", 
+                font=("Arial", 10)).pack(anchor=tk.W, pady=(0, 10))
         
-        # Panel alertow pogodowych
-        alerts_frame = tk.LabelFrame(right_panel, text="Alerty pogodowe", 
-                                    font=("Arial", 11, "bold"), padx=10, pady=10)
-        alerts_frame.pack(fill=tk.BOTH, expand=True)
+        # Opcje
+        options_frame = tk.Frame(fill_frame)
+        options_frame.pack(fill=tk.X, pady=(0, 10))
         
-        self.alerts_text = scrolledtext.ScrolledText(alerts_frame, height=12, 
-                                                     font=("Courier", 9), bg="#fff3cd")
-        self.alerts_text.pack(fill=tk.BOTH, expand=True)
+        self.fill_backup_var = tk.BooleanVar(value=True)
+        tk.Checkbutton(options_frame, text="Utwórz backup przed uzupełnianiem", 
+                      variable=self.fill_backup_var, font=("Arial", 10)).pack(anchor=tk.W)
         
-        btn_frame2 = tk.Frame(alerts_frame)
-        btn_frame2.pack(fill=tk.X, pady=(5, 0))
+        fill_btn_frame = tk.Frame(fill_frame)
+        fill_btn_frame.pack(fill=tk.X, pady=(0, 10))
         
-        tk.Button(btn_frame2, text="Odśwież alerty", command=self._refresh_alerts,
-                 bg="#f39c12", fg="white", font=("Arial", 9)).pack(side=tk.LEFT)
-        tk.Button(btn_frame2, text="Wyczyść", command=lambda: self.alerts_text.delete(1.0, tk.END),
-                 bg="#95a5a6", fg="white", font=("Arial", 9)).pack(side=tk.LEFT, padx=(5, 0))
+        tk.Button(fill_btn_frame, text="Uruchom uzupełnianie", 
+                 command=self._run_fill_missing, 
+                 bg="#27ae60", fg="white", font=("Arial", 10), width=25).pack(side=tk.LEFT, padx=(0, 5))
         
-        # Pasek statusu na dole okna
-        self.status_bar = tk.Label(self.root, text="Gotowy", bd=1, relief=tk.SUNKEN, 
-                                  anchor=tk.W, bg="#34495e", fg="white", font=("Arial", 9))
-        self.status_bar.pack(side=tk.BOTTOM, fill=tk.X)
+        tk.Button(fill_btn_frame, text="Wyczyść raport", 
+                 command=lambda: self.settings_fill_text.delete(1.0, tk.END),
+                 bg="#95a5a6", fg="white", font=("Arial", 10)).pack(side=tk.LEFT)
         
-        # Zakladki
-        self.tab_control = ttk.Notebook(main_frame)
-        self.tab_control.pack(fill=tk.BOTH, expand=True)
+        self.settings_fill_text = scrolledtext.ScrolledText(fill_frame, height=12, 
+                                                            font=("Courier", 9), bg="#e8f8f5")
+        self.settings_fill_text.pack(fill=tk.BOTH, expand=True)
+    
+    # Uruchamia analize jakosci danych z data_quality.py
+    def _run_data_quality_check(self):
+        self.settings_quality_text.delete(1.0, tk.END)
+        self._log("Rozpoczęto analizę jakości danych...", "INFO")
         
-        # Zakladka z danymi biezacymi
-        self.current_data_tab = tk.Frame(self.tab_control)
-        self.tab_control.add(self.current_data_tab, text="Dane biezace")
+        try:
+            result = data_quality.inspect_db(Path(DB_PATH))
+            
+            # Formatuj wynik
+            output = "=== RAPORT JAKOŚCI DANYCH ===\n\n"
+            
+            if "error" in result:
+                output += f"BŁĄD: {result['error']}\n"
+            else:
+                output += f"Data generacji: {result.get('generated_at', 'N/A')}\n"
+                output += f"Baza danych: {result.get('db_path', 'N/A')}\n\n"
+                
+                output += "TABELE:\n"
+                for t in result.get("tables", []):
+                    output += f"  - {t}\n"
+                output += "\n"
+                
+                output += "STATYSTYKI REKORDÓW:\n"
+                for key in ["count_locations", "count_hourly", "count_minutely15", "count_alerts"]:
+                    if key in result:
+                        output += f"  {key}: {result[key]}\n"
+                output += "\n"
+                
+                output += "BRAKI DANYCH (hourly):\n"
+                missing_cols = ["temperature", "rain", "snowfall", "wind_speed", "weather_code"]
+                for col in missing_cols:
+                    key = f"missing_{col}"
+                    if key in result:
+                        output += f"  {col}: {result[key]} wierszy\n"
+                output += "\n"
+                
+                if "future_rows" in result:
+                    output += f"Rekordy z przyszłości: {result['future_rows']}\n\n"
+                
+                if "locations" in result and result["locations"]:
+                    output += "JAKOŚĆ PER LOKALIZACJA:\n"
+                    for loc_id, info in result["locations"].items():
+                        output += f"  Lokacja {loc_id}:\n"
+                        output += f"    - Wiersze: {info.get('rows', 0)}\n"
+                        output += f"    - Z brakami: {info.get('rows_with_missing_critical', 0)}\n"
+            
+            self.settings_quality_text.insert(tk.END, output)
+            self._log("Analiza jakości ukończona", "INFO")
+            
+        except Exception as e:
+            error_msg = f"Błąd podczas analizy: {str(e)}\n"
+            self.settings_quality_text.insert(tk.END, error_msg)
+            self._log(f"Błąd: {str(e)}", "ERROR")
+    
+    # Uruchamia uzupelnianie brakow z fill_missing.py
+    def _run_fill_missing(self):
+        self.settings_fill_text.delete(1.0, tk.END)
+        self._log("Rozpoczęto uzupełnianie braków...", "INFO")
         
-        # Zakladka z historia
-        self.history_tab = tk.Frame(self.tab_control)
-        self.tab_control.add(self.history_tab, text="Historia")
-        
-        # Tworzenie interfejsu zakladki z historia
-        self._create_history_tab(self.history_tab)
+        try:
+            # Uruchom w osobnym wątku żeby nie zablokować GUI
+            def fill_thread():
+                output = "=== UZUPEŁNIANIE BRAKÓW DANYCH ===\n\n"
+                output += f"Baza danych: {DB_PATH}\n"
+                output += f"Backup: {'TAK' if self.fill_backup_var.get() else 'NIE'}\n\n"
+                
+                self.settings_fill_text.insert(tk.END, output)
+                
+                # Uruchom fill_missing
+                fill_missing.fill_missing(Path(DB_PATH), do_backup=self.fill_backup_var.get())
+                
+                self.settings_fill_text.insert(tk.END, "\n✓ Uzupełnianie zakończone\n")
+                self._log("Uzupełnianie braków ukończone", "INFO")
+            
+            thread = threading.Thread(target=fill_thread, daemon=True)
+            thread.start()
+            
+        except Exception as e:
+            error_msg = f"Błąd: {str(e)}\n"
+            self.settings_fill_text.insert(tk.END, error_msg)
+            self._log(f"Błąd: {str(e)}", "ERROR")
+
+# W metodzie _create_widgets, po dodaniu zakładki history, dodaj:
+        # Zakladka z ustawieniami
+        self.settings_tab = tk.Frame(self.tab_control)
+        self.tab_control.add(self.settings_tab, text="Ustawienia")
+        self._create_settings_tab(self.settings_tab)
     
     # Zaznacza wszystkie lokalizacje na liscie
     def _select_all_locations(self):
