@@ -49,7 +49,7 @@ class WeatherMonitorGUI:
     # Obejmuje naglowek panele ustawien logi i alerty
     def _create_widgets(self):
         # Naglowek aplikacji
-        header = tk.Frame(self.root, bg="#2c3e50", height=60)
+        header = tk.Frame(self.root, bg="#067bf0", height=60)
         header.pack(fill=tk.X)
         
         title = tk.Label(header, text="⛰️ Weather Monitor System", 

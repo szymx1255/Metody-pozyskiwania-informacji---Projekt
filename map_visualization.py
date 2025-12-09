@@ -2,7 +2,13 @@
 import sqlite3
 from pathlib import Path
 from datetime import datetime
-import folium
+
+try:
+    import folium
+except ImportError:
+    print("Błąd: folium nie jest zainstalowany. Uruchom: pip install folium")
+    folium = None
+
 from Api import LOCATIONS, DB_PATH
 
 # Generuje interaktywną mapę z bieżącymi danymi pogodowymi dla wszystkich szczytów
