@@ -28,11 +28,11 @@ def generate_weather_map():
     # Dodaj markery dla każdego szczytu
     for loc in LOCATIONS:
         name = loc.get("name", "Unknown")
-        lat = loc.get("latitude")
-        lon = loc.get("longitude")
+        lat = loc.get("latitude")      # Może być None
+        lon = loc.get("longitude")     # Może być None
         
         if lat is None or lon is None:
-            continue
+            continue  # ✓ Prawidłowe
         
         # Pobierz bieżące dane
         temp, wind, alert_status = _get_latest_weather(name)
@@ -135,12 +135,11 @@ def _get_latest_weather(location_name: str) -> tuple:
         print(f"Błąd w _get_latest_weather dla '{location_name}': {e}")
         return None, None, "unknown"
 
-# Zapisuje mapę do pliku HTML
+# Zapisuje mapę do pliku HTML (zawsze nadpisuje ten sam plik)
 def save_map_to_html(m, output_path: str = None):
     if output_path is None:
-        # Dodaj timestamp do nazwy
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        output_path = f"data/weather_map_{timestamp}.html"
+        # Zawsze nadpisuj ten sam plik zamiast tworzyć nowy z timestampem
+        output_path = "data/weather_map.html"
     
     Path(output_path).parent.mkdir(parents=True, exist_ok=True)
     m.save(output_path)

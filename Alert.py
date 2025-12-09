@@ -212,8 +212,8 @@ def analyze_db_and_alert(conn: sqlite3.Connection, location_id: int, location_na
         max_dt = now + timedelta(days=horizon_days)
         # Pobierz dane z tabeli hourly w zakresie prognozy
         cur.execute(
-            "SELECT timestamp, temperature, rain, snowfall, wind_speed, weather_code FROM hourly WHERE location_id=? AND timestamp>? AND timestamp<=? ORDER BY timestamp ASC",
-            (location_id, now.isoformat() + "Z", max_dt.isoformat() + "Z")
+            "SELECT timestamp, temperature, rain, snowfall, wind_speed, weather_code FROM hourly WHERE location_id=? AND timestamp>=? AND timestamp<=?",
+            (location_id, (now - timedelta(hours=1)).isoformat() + "Z", max_dt.isoformat() + "Z")
         )
         rows = cur.fetchall()
         if not rows:

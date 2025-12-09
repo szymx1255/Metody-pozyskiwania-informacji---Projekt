@@ -40,7 +40,6 @@ class WeatherMonitorGUI:
         
         self.is_running = False
         self.fetch_thread = None
-        self.last_map_path = None  # Dodaj to
     
         self._create_widgets()
         self._update_quota_display()
@@ -49,10 +48,10 @@ class WeatherMonitorGUI:
     # Obejmuje naglowek panele ustawien logi i alerty
     def _create_widgets(self):
         # Naglowek aplikacji
-        header = tk.Frame(self.root, bg="#067bf0", height=60)
+        header = tk.Frame(self.root, bg="#32506e", height=60)
         header.pack(fill=tk.X)
         
-        title = tk.Label(header, text="⛰️ Weather Monitor System", 
+        title = tk.Label(header, text="Monitor Pogodowy", 
                         font=("Arial", 18, "bold"), bg="#2c3e50", fg="white")
         title.pack(pady=15)
         
@@ -143,6 +142,23 @@ class WeatherMonitorGUI:
         alerts_frame = tk.LabelFrame(right_panel, text="Alerty pogodowe", 
                                     font=("Arial", 11, "bold"), padx=10, pady=10)
         alerts_frame.pack(fill=tk.BOTH, expand=True)
+        
+        # Dodaj filtr dla alertów
+        filter_frame = tk.Frame(alerts_frame)
+        filter_frame.pack(fill=tk.X, pady=(0, 10))
+        
+        tk.Label(filter_frame, text="Filtr góry:", font=("Arial", 9)).pack(side=tk.LEFT, padx=(0, 5))
+        
+        self.alerts_location_var = tk.StringVar(value="Wszystkie")
+        location_names = ["Wszystkie"] + [loc['name'] for loc in LOCATIONS]
+        self.alerts_location_combo = ttk.Combobox(
+            filter_frame,
+            textvariable=self.alerts_location_var,
+            values=location_names,
+            state="readonly",
+            width=20
+        )
+        self.alerts_location_combo.pack(side=tk.LEFT, padx=(0, 10))
         
         self.alerts_text = scrolledtext.ScrolledText(alerts_frame, height=12, 
                                                      font=("Courier", 9), bg="#fff3cd")
@@ -343,10 +359,7 @@ class WeatherMonitorGUI:
         
         try:
             self.map_current_fig = map_visualization.generate_weather_map()
-            html_path = map_visualization.save_map_to_html(self.map_current_fig)  # Zwraca nową ścieżkę z timestampem
-            
-            # Zapisz ścieżkę do użycia w _open_map_browser
-            self.last_map_path = html_path
+            map_visualization.save_map_to_html(self.map_current_fig)
             
             self.map_status_label.config(
                 text=f"✓ Mapa wygenerowana. Kliknij 'Otwórz w przeglądarce' aby zobaczyć interaktywną mapę",
@@ -365,9 +378,9 @@ class WeatherMonitorGUI:
                 messagebox.showinfo("Informacja", "Najpierw wygeneruj mapę klikając 'Odśwież mapę'")
                 return
             
-            # Użyj zapisanej ścieżki zamiast hardcoded
-            html_path = getattr(self, 'last_map_path', 'data/weather_map.html')
-            webbrowser.open('file://' + str(Path(html_path).absolute()))
+            # Zawsze otwieraj ten sam plik
+            html_path = Path("data/weather_map.html")
+            webbrowser.open('file://' + str(html_path.absolute()))
             self._log("Otwarta mapa w przeglądarce", "INFO")
             
         except Exception as e:
@@ -728,30 +741,49 @@ class WeatherMonitorGUI:
             conn = sqlite3.connect(str(DB_PATH))
             cur = conn.cursor()
             
-            # Pobierz tylko alerty od dzisiaj dynamicznie
             today = datetime.now().strftime("%Y-%m-%d")
+            week_later = (datetime.now() + timedelta(days=7)).strftime("%Y-%m-%d")
             
-            cur.execute("""
-                SELECT l.name, a.timestamp, a.metric, a.value, a.message
-                FROM alerts a
-                JOIN locations l ON a.location_id = l.id
-                WHERE a.timestamp >= ?
-                ORDER BY a.timestamp ASC
-                LIMIT 100
-            """, (today,))
+            # Pobierz wybraną górę z filtru
+            selected_location = self.alerts_location_var.get()
+            
+            # Buduj zapytanie SQL w zależności od filtru
+            if selected_location == "Wszystkie":
+                # Pobierz UNIKALNE alerty (DISTINCT) z ostatnich 7 dni - dla wszystkich gór
+                cur.execute("""
+                    SELECT DISTINCT l.name, a.timestamp, a.metric, a.value, a.message
+                    FROM alerts a
+                    JOIN locations l ON a.location_id = l.id
+                    WHERE a.timestamp >= ? AND a.timestamp < ?
+                    ORDER BY a.timestamp ASC, l.name ASC
+                    LIMIT 100
+                """, (today, week_later))
+            else:
+                # Pobierz alerty tylko dla wybranej góry
+                cur.execute("""
+                    SELECT DISTINCT l.name, a.timestamp, a.metric, a.value, a.message
+                    FROM alerts a
+                    JOIN locations l ON a.location_id = l.id
+                    WHERE l.name = ? AND a.timestamp >= ? AND a.timestamp < ?
+                    ORDER BY a.timestamp ASC, l.name ASC
+                    LIMIT 100
+                """, (selected_location, today, week_later))
+            
             alerts = cur.fetchall()
             conn.close()
             
             if not alerts:
-                self.alerts_text.insert(tk.END, f"Brak aktualnych alertów (od {today}).\n")
+                location_text = f" dla {selected_location}" if selected_location != "Wszystkie" else ""
+                self.alerts_text.insert(tk.END, f"Brak aktualnych alertów{location_text} (od {today}).\n")
             else:
-                self.alerts_text.insert(tk.END, f"=== Alerty od {today} ===\n\n")
+                location_text = f" dla {selected_location}" if selected_location != "Wszystkie" else ""
+                self.alerts_text.insert(tk.END, f"=== Alerty{location_text} od {today} (bez duplikatów) ===\n\n")
                 for location, timestamp, metric, value, message in alerts:
                     self.alerts_text.insert(tk.END, f"🚨 {location}\n")
                     self.alerts_text.insert(tk.END, f"   {timestamp} | {metric}: {value}\n")
                     self.alerts_text.insert(tk.END, f"   {message}\n")
                     self.alerts_text.insert(tk.END, "-" * 60 + "\n")
-                
+            
         except Exception as e:
             self.alerts_text.insert(tk.END, f"Błąd odczytu alertów: {str(e)}\n")
     
@@ -846,8 +878,8 @@ class WeatherMonitorGUI:
                     code = rec[3]
 
                 cur.execute(
-                    "SELECT COUNT(*) FROM alerts WHERE location_id=? AND timestamp >= ?",
-                    (loc_id, today),
+                    "SELECT COUNT(*) FROM alerts WHERE location_id=? AND timestamp LIKE ?",
+                    (loc_id, now.strftime("%Y-%m-%dT%H") + '%')
                 )
                 alert_result = cur.fetchone()
                 alert_active = (alert_result[0] if alert_result else 0) > 0
@@ -897,71 +929,3 @@ def run_gui():
 
 if __name__ == "__main__":
     run_gui()
-
-# map_visualization.py
-def _get_latest_weather(location_name: str) -> tuple:
-    """Pobiera temp, wiatr i status alertu dla lokalizacji"""
-    try:
-        conn = sqlite3.connect(str(DB_PATH))
-        cur = conn.cursor()
-        
-        cur.execute("SELECT id FROM locations WHERE name=?", (location_name,))
-        result = cur.fetchone()
-        if not result:
-            return None, None, "unknown"
-        
-        loc_id = result[0]
-        now = datetime.utcnow()
-        
-        # Spróbuj najpierw dane z przeszłości
-        cur.execute(
-            """
-            SELECT timestamp, temperature, wind_speed
-            FROM hourly
-            WHERE location_id=? AND timestamp<=?
-            ORDER BY timestamp DESC
-            LIMIT 1
-            """,
-            (loc_id, now.isoformat()),
-        )
-        
-        row = cur.fetchone()
-        measurement_date = None
-        
-        # Jeśli brak danych z przeszłości, weź najstarszy dostępny (prognozę)
-        if not row:
-            cur.execute(
-                """
-                SELECT timestamp, temperature, wind_speed
-                FROM hourly
-                WHERE location_id=?
-                ORDER BY timestamp ASC
-                LIMIT 1
-                """,
-                (loc_id,),
-            )
-            row = cur.fetchone()
-        
-        temp, wind = None, None
-        if row and row[0]:
-            measurement_date = row[0][:10]  # Wyciągnij datę z timestamp
-            temp = round(row[1], 1) if row[1] else None
-            wind = round(row[2], 1) if row[2] else None
-        
-        # Sprawdź alerty dla TEGO SAMEGO DNIA co pomiary
-        alert_status = "ok"
-        if measurement_date:
-            cur.execute(
-                "SELECT COUNT(*) FROM alerts WHERE location_id=? AND timestamp >= ?",
-                (loc_id, measurement_date),
-            )
-            alert_result = cur.fetchone()
-            alerts_count = alert_result[0] if alert_result else 0
-            alert_status = "alert" if alerts_count > 0 else "ok"
-        
-        conn.close()
-        return temp, wind, alert_status
-        
-    except Exception as e:
-        print(f"Błąd w _get_latest_weather dla '{location_name}': {e}")
-        return None, None, "unknown"
