@@ -40,7 +40,8 @@ class WeatherMonitorGUI:
         
         self.is_running = False
         self.fetch_thread = None
-        
+        self.last_map_path = None  # Dodaj to
+    
         self._create_widgets()
         self._update_quota_display()
     
@@ -167,6 +168,7 @@ class WeatherMonitorGUI:
         # Zakladka z danymi biezacymi
         self.current_data_tab = tk.Frame(self.tab_control)
         self.tab_control.add(self.current_data_tab, text="Dane biezace")
+        self._create_current_tab(self.current_data_tab)
         
         # Zakladka z historia
         self.history_tab = tk.Frame(self.tab_control)
@@ -341,7 +343,10 @@ class WeatherMonitorGUI:
         
         try:
             self.map_current_fig = map_visualization.generate_weather_map()
-            html_path = map_visualization.save_map_to_html(self.map_current_fig)
+            html_path = map_visualization.save_map_to_html(self.map_current_fig)  # Zwraca nową ścieżkę z timestampem
+            
+            # Zapisz ścieżkę do użycia w _open_map_browser
+            self.last_map_path = html_path
             
             self.map_status_label.config(
                 text=f"✓ Mapa wygenerowana. Kliknij 'Otwórz w przeglądarce' aby zobaczyć interaktywną mapę",
@@ -360,7 +365,8 @@ class WeatherMonitorGUI:
                 messagebox.showinfo("Informacja", "Najpierw wygeneruj mapę klikając 'Odśwież mapę'")
                 return
             
-            html_path = "data/weather_map.html"
+            # Użyj zapisanej ścieżki zamiast hardcoded
+            html_path = getattr(self, 'last_map_path', 'data/weather_map.html')
             webbrowser.open('file://' + str(Path(html_path).absolute()))
             self._log("Otwarta mapa w przeglądarce", "INFO")
             
@@ -748,6 +754,125 @@ class WeatherMonitorGUI:
                 
         except Exception as e:
             self.alerts_text.insert(tk.END, f"Błąd odczytu alertów: {str(e)}\n")
+    
+    # Tworzy zakładkę z bieżącymi warunkami
+    def _create_current_tab(self, parent):
+        main_frame = tk.Frame(parent, padx=20, pady=20)
+        main_frame.pack(fill=tk.BOTH, expand=True)
+
+        tk.Label(
+            main_frame,
+            text="AKTUALNE WARUNKI TU I TERAZ",
+            font=("Arial", 14, "bold")
+        ).pack(anchor=tk.W, pady=(0, 10))
+
+        controls = tk.Frame(main_frame)
+        controls.pack(fill=tk.X, pady=(0, 10))
+        tk.Button(
+            controls,
+            text="Odśwież dane",
+            command=self._refresh_current_data,
+            bg="#3498db",
+            fg="white",
+            font=("Arial", 10),
+            width=18,
+        ).pack(side=tk.LEFT, padx=(0, 6))
+
+        self.current_status_label = tk.Label(
+            controls,
+            text="Kliknij 'Odśwież dane' aby pobrać aktualne pomiary",
+            font=("Arial", 10),
+            fg="#666",
+        )
+        self.current_status_label.pack(side=tk.LEFT, padx=(6, 0))
+
+        cols = ("lokalizacja", "czas", "temp", "wiatr", "kod", "alert")
+        self.current_tree = ttk.Treeview(
+            main_frame, columns=cols, show="headings", height=14
+        )
+        headings = {
+            "lokalizacja": "Lokalizacja",
+            "czas": "Czas pomiaru",
+            "temp": "Temp [°C]",
+            "wiatr": "Wiatr [m/s]",
+            "kod": "Kod pogody",
+            "alert": "Alert",
+        }
+        for key, title in headings.items():
+            self.current_tree.heading(key, text=title)
+            self.current_tree.column(key, width=120, anchor=tk.CENTER)
+        self.current_tree.pack(fill=tk.BOTH, expand=True)
+
+        self._refresh_current_data()
+
+    # Odświeża bieżące pomiary z bazy
+    def _refresh_current_data(self):
+        for item in self.current_tree.get_children():
+            self.current_tree.delete(item)
+
+        try:
+            conn = sqlite3.connect(str(DB_PATH))
+            cur = conn.cursor()
+            now = datetime.utcnow()
+            today = now.strftime("%Y-%m-%d")
+
+            for loc in LOCATIONS:
+                name = loc.get("name")
+                cur.execute("SELECT id FROM locations WHERE name=?", (name,))
+                row = cur.fetchone()
+                if not row:
+                    continue
+                loc_id = row[0]
+
+                # Szukaj rekordu gdzie timestamp <= teraz
+                cur.execute(
+                    """
+                    SELECT timestamp, temperature, wind_speed, weather_code
+                    FROM hourly
+                    WHERE location_id=? AND timestamp<=?
+                    ORDER BY timestamp DESC
+                    LIMIT 1
+                    """,
+                    (loc_id, now.isoformat()),
+                )
+                
+                rec = cur.fetchone()
+                ts, temp, wind, code = None, None, None, None
+                
+                if rec and rec[0]:
+                    ts = rec[0]
+                    temp = rec[1]
+                    wind = rec[2]
+                    code = rec[3]
+
+                cur.execute(
+                    "SELECT COUNT(*) FROM alerts WHERE location_id=? AND timestamp >= ?",
+                    (loc_id, today),
+                )
+                alert_result = cur.fetchone()
+                alert_active = (alert_result[0] if alert_result else 0) > 0
+
+                self.current_tree.insert(
+                    "",
+                    tk.END,
+                    values=(
+                        name,
+                        ts if ts else "brak danych",
+                        f"{temp:.1f}" if temp is not None else "brak danych",
+                        f"{wind:.1f}" if wind is not None else "brak danych",
+                        code if code is not None else "brak danych",
+                        "AKTYWNY" if alert_active else "brak",
+                    ),
+                )
+
+            conn.close()
+            self.current_status_label.config(
+                text=f"Ostatnie odświeżenie: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} (UTC: {now.strftime('%Y-%m-%d %H:%M:%S')})",
+                fg="#27ae60",
+            )
+        except Exception as e:
+            self.current_status_label.config(text=f"Błąd: {e}", fg="#e74c3c")
+            self._log(f"Błąd przy odświeżaniu danych bieżących: {e}", "ERROR")
 
 
 # Handler loggera przekierowujacy komunikaty do okna GUI
@@ -772,3 +897,71 @@ def run_gui():
 
 if __name__ == "__main__":
     run_gui()
+
+# map_visualization.py
+def _get_latest_weather(location_name: str) -> tuple:
+    """Pobiera temp, wiatr i status alertu dla lokalizacji"""
+    try:
+        conn = sqlite3.connect(str(DB_PATH))
+        cur = conn.cursor()
+        
+        cur.execute("SELECT id FROM locations WHERE name=?", (location_name,))
+        result = cur.fetchone()
+        if not result:
+            return None, None, "unknown"
+        
+        loc_id = result[0]
+        now = datetime.utcnow()
+        
+        # Spróbuj najpierw dane z przeszłości
+        cur.execute(
+            """
+            SELECT timestamp, temperature, wind_speed
+            FROM hourly
+            WHERE location_id=? AND timestamp<=?
+            ORDER BY timestamp DESC
+            LIMIT 1
+            """,
+            (loc_id, now.isoformat()),
+        )
+        
+        row = cur.fetchone()
+        measurement_date = None
+        
+        # Jeśli brak danych z przeszłości, weź najstarszy dostępny (prognozę)
+        if not row:
+            cur.execute(
+                """
+                SELECT timestamp, temperature, wind_speed
+                FROM hourly
+                WHERE location_id=?
+                ORDER BY timestamp ASC
+                LIMIT 1
+                """,
+                (loc_id,),
+            )
+            row = cur.fetchone()
+        
+        temp, wind = None, None
+        if row and row[0]:
+            measurement_date = row[0][:10]  # Wyciągnij datę z timestamp
+            temp = round(row[1], 1) if row[1] else None
+            wind = round(row[2], 1) if row[2] else None
+        
+        # Sprawdź alerty dla TEGO SAMEGO DNIA co pomiary
+        alert_status = "ok"
+        if measurement_date:
+            cur.execute(
+                "SELECT COUNT(*) FROM alerts WHERE location_id=? AND timestamp >= ?",
+                (loc_id, measurement_date),
+            )
+            alert_result = cur.fetchone()
+            alerts_count = alert_result[0] if alert_result else 0
+            alert_status = "alert" if alerts_count > 0 else "ok"
+        
+        conn.close()
+        return temp, wind, alert_status
+        
+    except Exception as e:
+        print(f"Błąd w _get_latest_weather dla '{location_name}': {e}")
+        return None, None, "unknown"

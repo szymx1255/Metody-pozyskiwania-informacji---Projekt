@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-glyphicons.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.2.0/css/all.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/python-visualization/folium/folium/templates/leaflet.awesome.rotate.min.css"/>
+    
+            <meta name="viewport" content="width=device-width,
+                initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+            <style>
+                #map_7b48e39b8496c1d1a7dce2476709ba35 {
+                    position: relative;
+                    width: 100.0%;
+                    height: 100.0%;
+                    left: 0.0%;
+                    top: 0.0%;
+                }
+                .leaflet-container { font-size: 1rem; }
+            </style>
+
+            <style>html, body {
+                width: 100%;
+                height: 100%;
+                margin: 0;
+                padding: 0;
+            }
+            </style>
+
+            <style>#map {
+                position:absolute;
+                top:0;
+                bottom:0;
+                right:0;
+                left:0;
+                }
+            </style>
+
+            <script>
+                L_NO_TOUCH = false;
+                L_DISABLE_3D = false;
+            </script>
+
+        
+</head>
+<body>
+    
+    
+            <div class="folium-map" id="map_7b48e39b8496c1d1a7dce2476709ba35" ></div>
+        
+</body>
+<script>
+    
+    
+            var map_7b48e39b8496c1d1a7dce2476709ba35 = L.map(
+                "map_7b48e39b8496c1d1a7dce2476709ba35",
+                {
+                    center: [45.5, 8.5],
+                    crs: L.CRS.EPSG3857,
+                    ...{
+  "zoom": 5,
+  "zoomControl": true,
+  "preferCanvas": false,
+}
+
+                }
+            );
+
+            
+
+        
+    
+            var tile_layer_81f053fd725072dcb4d55ca98b7c6308 = L.tileLayer(
+                "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+                {
+  "minZoom": 0,
+  "maxZoom": 19,
+  "maxNativeZoom": 19,
+  "noWrap": false,
+  "attribution": "\u0026copy; \u003ca href=\"https://www.openstreetmap.org/copyright\"\u003eOpenStreetMap\u003c/a\u003e contributors",
+  "subdomains": "abc",
+  "detectRetina": false,
+  "tms": false,
+  "opacity": 1,
+}
+
+            );
+        
+    
+            tile_layer_81f053fd725072dcb4d55ca98b7c6308.addTo(map_7b48e39b8496c1d1a7dce2476709ba35);
+        
+    
+            var marker_4a5074855c0c0ea5ea4f9fba901baeb2 = L.marker(
+                [47.0744, 12.694],
+                {
+}
+            ).addTo(map_7b48e39b8496c1d1a7dce2476709ba35);
+        
+    
+            var icon_86f2ee12e92159213f4fc4f76a325dc4 = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "red",
+  "iconColor": "white",
+  "icon": "exclamation-circle",
+  "prefix": "fa",
+  "extraClasses": "fa-rotate-0",
+}
+            );
+        
+    
+        var popup_65844eccbd67ffa9d81ee4589679768d = L.popup({
+  "maxWidth": 250,
+});
+
+        
+            
+                var html_16ae9c28d611be69a514e884ac1d7e89 = $(`<div id="html_16ae9c28d611be69a514e884ac1d7e89" style="width: 100.0%; height: 100.0%;"><b>Grossglockner</b><br>Temp: -4.2°C<br>Wiatr: 17.6 m/s<br>Status: ALERT</div>`)[0];
+                popup_65844eccbd67ffa9d81ee4589679768d.setContent(html_16ae9c28d611be69a514e884ac1d7e89);
+            
+        
+
+        marker_4a5074855c0c0ea5ea4f9fba901baeb2.bindPopup(popup_65844eccbd67ffa9d81ee4589679768d)
+        ;
+
+        
+    
+    
+            marker_4a5074855c0c0ea5ea4f9fba901baeb2.bindTooltip(
+                `<div>
+                     Grossglockner
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+                marker_4a5074855c0c0ea5ea4f9fba901baeb2.setIcon(icon_86f2ee12e92159213f4fc4f76a325dc4);
+            
+    
+            var marker_519c94cb6552ada671b948957ea5372d = L.marker(
+                [46.0834, 7.8572],
+                {
+}
+            ).addTo(map_7b48e39b8496c1d1a7dce2476709ba35);
+        
+    
+            var icon_0c57af28806b45820d619282f45dc683 = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "red",
+  "iconColor": "white",
+  "icon": "exclamation-circle",
+  "prefix": "fa",
+  "extraClasses": "fa-rotate-0",
+}
+            );
+        
+    
+        var popup_bbbbafddd297e99fe96e4764188bb4f8 = L.popup({
+  "maxWidth": 250,
+});
+
+        
+            
+                var html_7b569d9fe97ac9e5db10625fbba0af46 = $(`<div id="html_7b569d9fe97ac9e5db10625fbba0af46" style="width: 100.0%; height: 100.0%;"><b>Täschhorn</b><br>Temp: -7.0°C<br>Wiatr: 13.6 m/s<br>Status: ALERT</div>`)[0];
+                popup_bbbbafddd297e99fe96e4764188bb4f8.setContent(html_7b569d9fe97ac9e5db10625fbba0af46);
+            
+        
+
+        marker_519c94cb6552ada671b948957ea5372d.bindPopup(popup_bbbbafddd297e99fe96e4764188bb4f8)
+        ;
+
+        
+    
+    
+            marker_519c94cb6552ada671b948957ea5372d.bindTooltip(
+                `<div>
+                     Täschhorn
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+                marker_519c94cb6552ada671b948957ea5372d.setIcon(icon_0c57af28806b45820d619282f45dc683);
+            
+    
+            var marker_21594660923492bb9d8458d5665eb537 = L.marker(
+                [45.9322, 7.8714],
+                {
+}
+            ).addTo(map_7b48e39b8496c1d1a7dce2476709ba35);
+        
+    
+            var icon_cd337b94c00ba2deb406fee92e647ef5 = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "red",
+  "iconColor": "white",
+  "icon": "exclamation-circle",
+  "prefix": "fa",
+  "extraClasses": "fa-rotate-0",
+}
+            );
+        
+    
+        var popup_26b8a06691e06cea789450f9b242df48 = L.popup({
+  "maxWidth": 250,
+});
+
+        
+            
+                var html_c3ef2018bfb887cfd80c622c54d3cd7f = $(`<div id="html_c3ef2018bfb887cfd80c622c54d3cd7f" style="width: 100.0%; height: 100.0%;"><b>Zumsteinspitze</b><br>Temp: -7.7°C<br>Wiatr: 9.9 m/s<br>Status: ALERT</div>`)[0];
+                popup_26b8a06691e06cea789450f9b242df48.setContent(html_c3ef2018bfb887cfd80c622c54d3cd7f);
+            
+        
+
+        marker_21594660923492bb9d8458d5665eb537.bindPopup(popup_26b8a06691e06cea789450f9b242df48)
+        ;
+
+        
+    
+    
+            marker_21594660923492bb9d8458d5665eb537.bindTooltip(
+                `<div>
+                     Zumsteinspitze
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+                marker_21594660923492bb9d8458d5665eb537.setIcon(icon_cd337b94c00ba2deb406fee92e647ef5);
+            
+    
+            var marker_cec71090f32427f8f76c11fb5b187de1 = L.marker(
+                [45.9369, 7.8668],
+                {
+}
+            ).addTo(map_7b48e39b8496c1d1a7dce2476709ba35);
+        
+    
+            var icon_e76deefa734f3eaee6e2f414896e7348 = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "red",
+  "iconColor": "white",
+  "icon": "exclamation-circle",
+  "prefix": "fa",
+  "extraClasses": "fa-rotate-0",
+}
+            );
+        
+    
+        var popup_07b591cc0d50e6afd1b53b70267b45d4 = L.popup({
+  "maxWidth": 250,
+});
+
+        
+            
+                var html_14e82f5f6822cfb3230d15626e1ab5ee = $(`<div id="html_14e82f5f6822cfb3230d15626e1ab5ee" style="width: 100.0%; height: 100.0%;"><b>Dufourspitze</b><br>Temp: -8.1°C<br>Wiatr: 9.9 m/s<br>Status: ALERT</div>`)[0];
+                popup_07b591cc0d50e6afd1b53b70267b45d4.setContent(html_14e82f5f6822cfb3230d15626e1ab5ee);
+            
+        
+
+        marker_cec71090f32427f8f76c11fb5b187de1.bindPopup(popup_07b591cc0d50e6afd1b53b70267b45d4)
+        ;
+
+        
+    
+    
+            marker_cec71090f32427f8f76c11fb5b187de1.bindTooltip(
+                `<div>
+                     Dufourspitze
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+                marker_cec71090f32427f8f76c11fb5b187de1.setIcon(icon_e76deefa734f3eaee6e2f414896e7348);
+            
+    
+            var marker_4241963d8f73ce04806a0d23a0670591 = L.marker(
+                [45.833, 6.864],
+                {
+}
+            ).addTo(map_7b48e39b8496c1d1a7dce2476709ba35);
+        
+    
+            var icon_83fafacff51958100c428950588cdcc4 = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "red",
+  "iconColor": "white",
+  "icon": "exclamation-circle",
+  "prefix": "fa",
+  "extraClasses": "fa-rotate-0",
+}
+            );
+        
+    
+        var popup_28043960426807c2dcff5e745da5aee7 = L.popup({
+  "maxWidth": 250,
+});
+
+        
+            
+                var html_70ec2582478d76e9f3e00bc07a5eb5be = $(`<div id="html_70ec2582478d76e9f3e00bc07a5eb5be" style="width: 100.0%; height: 100.0%;"><b>Mont Blanc</b><br>Temp: -9.5°C<br>Wiatr: 14.1 m/s<br>Status: ALERT</div>`)[0];
+                popup_28043960426807c2dcff5e745da5aee7.setContent(html_70ec2582478d76e9f3e00bc07a5eb5be);
+            
+        
+
+        marker_4241963d8f73ce04806a0d23a0670591.bindPopup(popup_28043960426807c2dcff5e745da5aee7)
+        ;
+
+        
+    
+    
+            marker_4241963d8f73ce04806a0d23a0670591.bindTooltip(
+                `<div>
+                     Mont Blanc
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+                marker_4241963d8f73ce04806a0d23a0670591.setIcon(icon_83fafacff51958100c428950588cdcc4);
+            
+    
+            var marker_c48efa13a26f7d3c28057cb146f6861b = L.marker(
+                [45.9764, 7.6586],
+                {
+}
+            ).addTo(map_7b48e39b8496c1d1a7dce2476709ba35);
+        
+    
+            var icon_55aee8eb0bfc02ed8ca1dd54f827e134 = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "red",
+  "iconColor": "white",
+  "icon": "exclamation-circle",
+  "prefix": "fa",
+  "extraClasses": "fa-rotate-0",
+}
+            );
+        
+    
+        var popup_f36998644c85d9e57b2850dbb12f1017 = L.popup({
+  "maxWidth": 250,
+});
+
+        
+            
+                var html_1aca51269cddd4c42c11c4229f1e6028 = $(`<div id="html_1aca51269cddd4c42c11c4229f1e6028" style="width: 100.0%; height: 100.0%;"><b>Matterhorn</b><br>Temp: -7.3°C<br>Wiatr: 5.2 m/s<br>Status: ALERT</div>`)[0];
+                popup_f36998644c85d9e57b2850dbb12f1017.setContent(html_1aca51269cddd4c42c11c4229f1e6028);
+            
+        
+
+        marker_c48efa13a26f7d3c28057cb146f6861b.bindPopup(popup_f36998644c85d9e57b2850dbb12f1017)
+        ;
+
+        
+    
+    
+            marker_c48efa13a26f7d3c28057cb146f6861b.bindTooltip(
+                `<div>
+                     Matterhorn
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+                marker_c48efa13a26f7d3c28057cb146f6861b.setIcon(icon_55aee8eb0bfc02ed8ca1dd54f827e134);
+            
+    
+            var marker_cf1668c91dcafa92ed174bbc30b2c7cc = L.marker(
+                [46.3782, 13.8367],
+                {
+}
+            ).addTo(map_7b48e39b8496c1d1a7dce2476709ba35);
+        
+    
+            var icon_602614c283408b6574045cc4fa291552 = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "green",
+  "iconColor": "white",
+  "icon": "cloud",
+  "prefix": "fa",
+  "extraClasses": "fa-rotate-0",
+}
+            );
+        
+    
+        var popup_b15036cef7a4fea5c33c9a2784241342 = L.popup({
+  "maxWidth": 250,
+});
+
+        
+            
+                var html_3ccd4453b6e8ea6356c1d7ef30083c9f = $(`<div id="html_3ccd4453b6e8ea6356c1d7ef30083c9f" style="width: 100.0%; height: 100.0%;"><b>Tryglaw</b><br>Temp: -0.6°C<br>Wiatr: 8.2 m/s<br>Status: OK</div>`)[0];
+                popup_b15036cef7a4fea5c33c9a2784241342.setContent(html_3ccd4453b6e8ea6356c1d7ef30083c9f);
+            
+        
+
+        marker_cf1668c91dcafa92ed174bbc30b2c7cc.bindPopup(popup_b15036cef7a4fea5c33c9a2784241342)
+        ;
+
+        
+    
+    
+            marker_cf1668c91dcafa92ed174bbc30b2c7cc.bindTooltip(
+                `<div>
+                     Tryglaw
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+                marker_cf1668c91dcafa92ed174bbc30b2c7cc.setIcon(icon_602614c283408b6574045cc4fa291552);
+            
+    
+            var marker_61bc14cc7845fe8e53ba8e4c7d73ecb6 = L.marker(
+                [47.4212, 10.9863],
+                {
+}
+            ).addTo(map_7b48e39b8496c1d1a7dce2476709ba35);
+        
+    
+            var icon_07cc2271f4db6ce4e88383993e854fc7 = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "green",
+  "iconColor": "white",
+  "icon": "cloud",
+  "prefix": "fa",
+  "extraClasses": "fa-rotate-0",
+}
+            );
+        
+    
+        var popup_c1bb9a0b84adddeae47c6cdfe89fde79 = L.popup({
+  "maxWidth": 250,
+});
+
+        
+            
+                var html_f00ef9fc7236218cf5bb4987ef88f6cd = $(`<div id="html_f00ef9fc7236218cf5bb4987ef88f6cd" style="width: 100.0%; height: 100.0%;"><b>Zugspitze</b><br>Temp: 1.3°C<br>Wiatr: 10.2 m/s<br>Status: OK</div>`)[0];
+                popup_c1bb9a0b84adddeae47c6cdfe89fde79.setContent(html_f00ef9fc7236218cf5bb4987ef88f6cd);
+            
+        
+
+        marker_61bc14cc7845fe8e53ba8e4c7d73ecb6.bindPopup(popup_c1bb9a0b84adddeae47c6cdfe89fde79)
+        ;
+
+        
+    
+    
+            marker_61bc14cc7845fe8e53ba8e4c7d73ecb6.bindTooltip(
+                `<div>
+                     Zugspitze
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+                marker_61bc14cc7845fe8e53ba8e4c7d73ecb6.setIcon(icon_07cc2271f4db6ce4e88383993e854fc7);
+            
+</script>
+</html>

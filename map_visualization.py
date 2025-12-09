@@ -64,74 +64,78 @@ def _get_latest_weather(location_name: str) -> tuple:
     """Pobiera temp, wiatr i status alertu dla lokalizacji"""
     try:
         conn = sqlite3.connect(str(DB_PATH))
-        conn.row_factory = sqlite3.Row
         cur = conn.cursor()
         
-        # Debugowanie – wyświetl nazwy kolumn
-        cur.execute("PRAGMA table_info(hourly)")
-        columns = [row[1] for row in cur.fetchall()]
-        print(f"Kolumny w hourly: {columns}")
-        
-        # Znajdź kolumny temperature i wind
-        temp_col = next((c for c in columns if 'temp' in c.lower()), None)
-        wind_col = next((c for c in columns if 'wind' in c.lower()), None)
-        
-        print(f"Znalezione kolumny: temp={temp_col}, wind={wind_col}")
-        
-        # Pobierz location_id
         cur.execute("SELECT id FROM locations WHERE name=?", (location_name,))
         result = cur.fetchone()
         if not result:
-            print(f"Lokacja '{location_name}' nie znaleziona")
             return None, None, "unknown"
         
         loc_id = result[0]
-        print(f"Lokacja '{location_name}' ID={loc_id}")
+        now = datetime.utcnow()
         
-        # Pobierz ostatni rekord z hourly
-        if temp_col and wind_col:
-            query = f"""
-                SELECT {temp_col}, {wind_col}
-                FROM hourly 
-                WHERE location_id=? 
-                ORDER BY timestamp DESC 
-                LIMIT 1
+        # Spróbuj najpierw dane z przeszłości
+        cur.execute(
             """
-            cur.execute(query, (loc_id,))
-            hourly_result = cur.fetchone()
+            SELECT timestamp, temperature, wind_speed
+            FROM hourly
+            WHERE location_id=? AND timestamp<=?
+            ORDER BY timestamp DESC
+            LIMIT 1
+            """,
+            (loc_id, now.isoformat()),
+        )
+        
+        row = cur.fetchone()
+        is_forecast = False  # Flaga czy to prognoza
+        
+        # Jeśli brak danych z przeszłości, weź najstarszy dostępny (prognozę)
+        if not row:
+            is_forecast = True
+            cur.execute(
+                """
+                SELECT timestamp, temperature, wind_speed
+                FROM hourly
+                WHERE location_id=?
+                ORDER BY timestamp ASC
+                LIMIT 1
+                """,
+                (loc_id,),
+            )
+            row = cur.fetchone()
+        
+        temp, wind = None, None
+        alert_status = "ok"
+        
+        if row and row[0]:
+            temp = round(row[1], 1) if row[1] else None
+            wind = round(row[2], 1) if row[2] else None
             
-            if hourly_result:
-                temp = round(hourly_result[0], 1) if hourly_result[0] else None
-                wind = round(hourly_result[1], 1) if hourly_result[1] else None
-                print(f"Znalezione dane: temp={temp}, wind={wind}")
-            else:
-                temp, wind = None, None
-                print(f"Brak danych w hourly dla loc_id={loc_id}")
-        else:
-            temp, wind = None, None
-            print("Nie znaleziono kolumn temperature/wind")
-        
-        # Sprawdź alerty
-        today = datetime.now().strftime("%Y-%m-%d")
-        cur.execute("""
-            SELECT COUNT(*) FROM alerts 
-            WHERE location_id=? AND timestamp >= ?
-        """, (loc_id, today))
-        
-        alerts_count = cur.fetchone()[0]
-        alert_status = "alert" if alerts_count > 0 else "ok"
+            # Sprawdź alerty TYLKO dla danych NIE z prognozy
+            if not is_forecast:
+                measurement_timestamp = row[0]  # pełny timestamp
+                cur.execute(
+                    "SELECT COUNT(*) FROM alerts WHERE location_id=? AND timestamp LIKE ?",
+                    (loc_id, measurement_timestamp[:13] + '%'),  # Dopasuj YYYY-MM-DDTHH%
+                )
+                alert_result = cur.fetchone()
+                alerts_count = alert_result[0] if alert_result else 0
+                alert_status = "alert" if alerts_count > 0 else "ok"
         
         conn.close()
         return temp, wind, alert_status
         
     except Exception as e:
         print(f"Błąd w _get_latest_weather dla '{location_name}': {e}")
-        import traceback
-        traceback.print_exc()
         return None, None, "unknown"
 
 # Zapisuje mapę do pliku HTML
-def save_map_to_html(m, output_path: str = "data/weather_map.html"):
+def save_map_to_html(m, output_path: str = None):
+    if output_path is None:
+        # Dodaj timestamp do nazwy
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        output_path = f"data/weather_map_{timestamp}.html"
+    
     Path(output_path).parent.mkdir(parents=True, exist_ok=True)
     m.save(output_path)
     return output_path
